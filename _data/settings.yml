@@ -1,32 +1,34 @@
 # Change 'comments' to true for Disqus comments
 disqus:
-  comments: false
-  disqus_shortname: 'https-lenpaul-github-io-lagrange'
+  comments: true
+  disqus_shortname: 'https-kciter-so'
 
 # If you are not using Google Analytics, please change 'google-ID' to an empty string
-google-ID: 'UA-112060364-1'
+# google-ID: 'UA-112060364-1'
+google-ID: ''
 
 menu:
-- {name: 'About', path: 'menu', url: 'about.html'}
+# - {name: 'Résumé', path: 'menu', url: 'resume.html'}
 - {name: 'Writing', path: 'menu', url: 'writing.html'}
-- {name: 'Contact', path: 'menu', url: 'contact.html'}
+# - {name: 'Contact', path: 'menu', url: 'contact.html'}
 
 # Available social icons are powered by Font Awesome, so you can use any icon that they offer
 social:
-- {icon: 'github', link: 'https://www.github.com/lenpaul'}
-- {icon: 'twitter', link: 'https://twitter.com/paululele'}
-- {icon: 'linkedin', link: 'http://www.linkedin.com/in/lenpaul/'}
-- {icon: 'envelope', link: 'mailto:l.nguyen.paul@gmail.com'}
+- {icon: 'github', link: 'https://github.com/kciter'}
+# - {icon: 'twitter', link: 'https://twitter.com/paululele'}
+# - {icon: 'linkedin', link: 'http://www.linkedin.com/in/lenpaul/'}
+- {icon: 'facebook', link: 'https://www.facebook.com/sunhyoup.lee/'}
+- {icon: 'envelope', link: 'mailto:kciter@naver.com'}
 - {icon: 'rss-square', link: '/feed.xml'}
 # - {icon: 'rss-square', link: '/rss-feed.xml'}
 
 # Customize site text
 pagination:
-  next_page: 'Newer'
-  previous_page: 'Older'
+  next_page: '→'
+  previous_page: '←'
 
-sharing_button_prompt: 'Feel free to share!'
+sharing_button_prompt: ''
 
-related_posts: 'You may also enjoy:'
+related_posts: '연관 포스트'
 
 post_date_prefix: 'Written on'
