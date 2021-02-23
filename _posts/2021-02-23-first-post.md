@@ -5,6 +5,7 @@ author: "Lee Sun-Hyoup"
 categories: life
 tags: [diary]
 image: 2020-02-23-first-post/mountains.jpg
+comments: true
 ---
 
 &nbsp;나는 매사 불성실하고 게으름이 많은 성격이다. 하지 않아도 된다면 안 하는 귀찮음이 몸에 배어있는 모범적이지 못한 성격이다. 이 성격으로 인해 얼마나 많은 것을 놓치고 살았는지 이제 와선 아쉽고 씁쓸하지만, 끝끝내 못 고치는 걸 보니 이것이 내 천성이라 여기며 살고 있다.

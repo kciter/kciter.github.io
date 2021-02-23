@@ -1,7 +1,7 @@
 # Change 'comments' to true for Disqus comments
-disqus:
-  comments: true
-  disqus_shortname: 'https-kciter-so'
+# disqus:
+#   comments: true
+#   disqus_shortname: 'https-kciter-so'
 
 # If you are not using Google Analytics, please change 'google-ID' to an empty string
 # google-ID: 'UA-112060364-1'
