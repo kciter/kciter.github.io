@@ -139,6 +139,7 @@ hr {
 */
 
 .post-container {
+  position: relative;;
   margin-bottom: 4rem;
 }
 
@@ -265,6 +266,46 @@ hr {
     margin-bottom: 5px;
   }
 }
+
+/*
+  ToC
+*/
+.toc {
+  position: absolute;
+  right: -20px;
+  transform: translateX(100%);
+}
+.toc ul {
+  margin: 0 0 8px 0;
+  padding: 0;
+}
+.toc li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.toc li ul {
+  margin-left: 16px;
+  border-left: 1px solid #dfe3e8;
+}
+.toc a {
+  display: block;
+  margin-left: 6px;
+  padding: 8px 0 8px 12px;
+  font-size: 14px;
+  line-height: 20px;
+  text-decoration: none;
+  border-radius: 4px;
+}
+.toc a:hover {
+  background-color: #f4f6f8;
+}
+@media (max-width: 1024px) {
+  .toc {
+    display: none;
+  }
+}
+
 
 /*
   Code

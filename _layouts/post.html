@@ -10,6 +10,13 @@ layout: default
   <img src="{{ site.github.url }}/assets/img/{{ page.image }}">
 {% endif %}
 
+<div class="toc">
+  {% include toc.html html=content %}
+</div>
+<script>
+  new Sticky('.toc');
+</script>
+
 {{ content }}
 
 <span class="post-date">
