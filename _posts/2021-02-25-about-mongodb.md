@@ -4,7 +4,7 @@ title: "MongoDB 이해하기"
 author: "Lee Sun-Hyoup"
 categories: dev
 tags: [database, mongodb, server]
-image: 2020-02-25-about-mongodb/thumbnail.png
+image: /assets/img/2020-02-25-about-mongodb/thumbnail.png
 comments: true
 ---
 
