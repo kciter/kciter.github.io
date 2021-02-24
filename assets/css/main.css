@@ -20,7 +20,7 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   font-size: 16px;
-  color: #515151;
+  color: #212b36;
   line-height: 1.75rem;
 }
 
@@ -43,12 +43,12 @@ h1 a {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: #333;
+  color: #454f5b;
 }
 
 a {
   text-decoration: underline;
-  color: #333;
+  color: #454f5b;
 }
 
 a:hover {
@@ -81,8 +81,8 @@ hr {
 .container {
   margin-left: auto;
   margin-right: auto;
-  width: 615px;
-  /* width: 715px; */
+  /* width: 615px; */
+  width: 715px;
 }
 
 /*48em*/
@@ -127,6 +127,7 @@ hr {
   overflow: hidden;
   border-radius: 5px;
   margin-bottom: 25px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, .2);
 }
 
 .thumbnail-container img{
@@ -139,8 +140,17 @@ hr {
 */
 
 .post-container {
-  position: relative;;
-  margin-bottom: 4rem;
+  position: relative;
+  /* margin-bottom: 4rem; */
+}
+
+.post-content a {
+  text-decoration: none;
+  color: #5c6ac4;
+}
+
+.post-content a:hover {
+  text-decoration: underline;
 }
 
 .posts {
@@ -278,6 +288,7 @@ hr {
 .toc ul {
   margin: 0 0 8px 0;
   padding: 0;
+  /* min-width: 250px; */
 }
 .toc li {
   margin: 0;
@@ -291,13 +302,16 @@ hr {
 .toc a {
   display: block;
   margin-left: 6px;
-  padding: 8px 0 8px 12px;
+  padding: 8px 12px 8px 12px;
   font-size: 14px;
   line-height: 20px;
+  font-weight: normal;
   text-decoration: none;
+  color: #454f5b;
   border-radius: 4px;
 }
 .toc a:hover {
+  color: #212b36;
   background-color: #f4f6f8;
 }
 @media (max-width: 1024px) {

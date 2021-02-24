@@ -281,7 +281,8 @@ var Sticky = (function () {
               (t = t.offsetParent);
 
           );
-          return { top: s, left: n, width: i, height: e };
+
+          return { top: s, left: n, width: i + 1, height: e };
         },
       },
       {

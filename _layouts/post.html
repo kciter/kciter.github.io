@@ -10,14 +10,16 @@ layout: default
   <img src="{{ site.github.url }}/assets/img/{{ page.image }}">
 {% endif %}
 
-<div class="toc">
+<div class="toc" data-margin-top="50">
   {% include toc.html html=content %}
 </div>
 <script>
   new Sticky('.toc');
 </script>
 
+<div class="post-content">
 {{ content }}
+</div>
 
 <span class="post-date">
   {{ site.data.settings.post_date_prefix }}
@@ -39,8 +41,6 @@ layout: default
 
 {% include social-sharing.html %}
 
-<!-- {% include related-posts.html %} -->
-
 {% if page.comments %}
 <script src="https://utteranc.es/client.js"
   repo="kciter/kciter.github.io"
@@ -50,3 +50,7 @@ layout: default
   async>
 </script>
 {% endif %}
+
+
+<!-- {% include related-posts.html %} -->
+
