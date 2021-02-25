@@ -4,7 +4,7 @@ title: "첫 포스트를 작성하며"
 author: "Lee Sun-Hyoup"
 categories: life
 tags: []
-image: 2020-02-23-first-post/mountains.jpg
+image: /assets/img/2020-02-23-first-post/mountains.jpg
 comments: true
 ---
 
