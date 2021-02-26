@@ -54,7 +54,7 @@ comments: true
 &nbsp;MongoDB는 Document 기반 데이터베이스다. Database > Collection > Document > Field 계층으로 이루어져 있으며 Document는 RDBMS의 Row에 해당한다. 계층은 RDBMS와 유사하다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/mongodb-layer.png" />
+  <img src="/assets/img/2020-02-25-about-mongodb/mongodb-layer.jpg" />
   <figcaption>RDMBS와 MongoDB 데이터 계층 구조</figcaption>
 </figure>
 
