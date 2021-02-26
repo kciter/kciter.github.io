@@ -104,7 +104,7 @@ comments: true
 
 #### ACID?
 
-&nbsp;마치 MongoDB는 전혀 ACID하지 않다는 식으로 글을 썼지만 사실 MongoDB는 트랜젝션을 제공한다. 아직 ACID하지 않을 때도 `Single-Document Transaction`을 제공하고 MongoDB 4.0부터는 `Multi-Document Transaction`을 제공함으로서 ACID를 충족했다. 이후 MongoDB 4.2에서 `Shard Cluster Transacion`을 제공하면서 분산 트렌젝션까지 가능해졌다.
+&nbsp;마치 MongoDB는 전혀 ACID하지 않다는 식으로 글을 썼지만 사실 MongoDB는 트랜젝션을 제공한다. 아직 ACID하지 않을 때도 `Single-Document Transaction`을 제공하고 MongoDB 4.0부터는 `Multi-Document Transaction`을 제공함으로서 ACID를 충족했다. 이후 MongoDB 4.2에서 `Shard Cluster Transacion`을 제공하면서 분산 트랜젝션까지 가능해졌다.
 
 ## MongoDB는 분산 시스템이 핵심이다
 
