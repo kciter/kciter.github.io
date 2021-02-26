@@ -8,7 +8,7 @@ image: /assets/img/2020-02-25-about-mongodb/thumbnail.png
 comments: true
 ---
 
-&nbsp;사내에서 MongoDB를 잘 쓰기위한 스터디를 하게되어 이번 기회에 관련 자료를 정리하기로 했다. MongoDB가 왜 필요한지, 더 잘사용하기 위해서 무엇이 필요한지를 중심으로 자료를 작성했다. 아마 처음 MongoDB를 접한다면 꽤 도움이 될 것이라 생각한다.
+&nbsp;사내에서 MongoDB를 잘 쓰기위한 스터디를 하게되어 이번 기회에 관련 자료를 정리하기로 했다. MongoDB가 왜 필요한지, 더 잘사용하기 위해서 무엇이 필요한지를 중심으로 처음 MongoDB를 사용할 때 도움이 될 만한 내용으로 정리했다.
 
 <figure>
   <img src="/assets/img/2020-02-25-about-mongodb/toc.png" />
@@ -19,12 +19,10 @@ comments: true
 
 &nbsp;NoSQL은 **Not Only SQL**, SQL 뿐만 아니다라는 의미를 지니고있다. 즉, SQL을 사용하는 관계형 데이터베이스가 아닌 데이터베이스를 의미한다. 대표적인 관계형 데이터베이스로는 MySQL, Oracle, PostgreSQL이 있고, NoSQL 진영에는 이 포스트에서 다루는 MongoDB와 Redis, HBase 등이 있다. 더 다양한 NoSQL 제품을 보고 싶다면 [링크](https://hostingdata.co.uk/nosql-database/)를 들어가면 지금까지 출시된 NoSQL 데이터베이스 목록을 볼 수 있다.
 
-&nbsp;그래서 NoSQL은 왜 탄생하게 된걸까? 사실 RDBMS만으로 충분하지 않을까? 하지만 RDBMS은 은총알이 아니었고 분명한 한계점이 있다. NoSQL은 다음과 같이 RDBMS에선 하기 힘든 일을 지원한다.
-* 수평적 확장 가능한 분산 시스템
+&nbsp;그래서 NoSQL은 왜 탄생하게 된걸까? 사실 RDBMS만으로 충분하지 않을까? 하지만 RDBMS은 은총알이 아니었고 분명한 한계점이 있다. NoSQL은 다음과 같이 RDBMS에선 하기 힘든 일을 쉽게 지원한다.
+* 수평 확장 가능한 분산 시스템
 * Schema-less
 * 완화된 ACID
-
-&nbsp;이젠 RDBMS와 NoSQL 사이 벽이 점점 허물어져가는 느낌이라 공감이 안될 수도 있지만 처음 NoSQL이 나왔을 때 가장 큰 차별점은 위 세 가지다. 앞으로 이 포스트는 위 세 가지를 중심으로 다룰 예정이다.
 
 ### RDBMS vs NoSQL
 
@@ -38,7 +36,7 @@ comments: true
 |확장|하드웨어 강화(Scale up)|수평 확장 가능한 분산 아키텍처(Scale out)|
 |API|SQL 쿼리|객체 기반 API 제공|
 
-&nbsp;사실 전부 옳다고 할 수 없는 것이 RDBMS에 수평 확장이 불가능한 것 처럼 써놨지만 MySQL Replication이나 MySQL Cluster가 존재하여 수평 확장이 불가능한 것은 아니다. 그리고 NoSQL에서도 ACID가 불가능하지 않다. MongoDB의 경우 분산 트랜젝션까지도 지원하고 있다. 단, NoSQL 데이터베이스는 대게 분산 아키텍처를 염두하고 출시된 제품이 많아 더 편리하다는 장점이 있고 BASE 기반이기 때문에 완전한 ACID가 아니다. 그래서 위 표를 70% 정도만 인정하고 보면 될 것 같다.
+&nbsp;마치 RDBMS에 수평 확장이 불가능한 것 처럼 써놨지만 MySQL Replication이나 MySQL Cluster가 존재하여 수평 확장이 불가능한 것은 아니다. 그리고 NoSQL에서도 ACID가 불가능하지 않다. MongoDB의 경우 분산 트랜젝션까지도 지원하고 있다. 단, NoSQL 데이터베이스는 대게 분산 아키텍처를 염두하고 출시된 제품이 많아 더 편리하다는 장점이 있고 BASE 기반이기 때문에 완전한 ACID가 아니다. 점점 서로의 장점을 흡수하고 있기 때문에 위 표는 참고 정도로만 보면 될 것 같다.
 
 ### 그래서 MongoDB가 뭔데?
 
@@ -60,14 +58,14 @@ comments: true
   <figcaption>RDMBS와 MongoDB 데이터 계층 구조</figcaption>
 </figure>
 
-&nbsp;흥미로운 점은 Document 기반 데이터베이스은 스키마가 없어 자유로이 데이터 구조를 잡을 수 있다는 점이다. MongoDB는 BSON으로 데이터가 쌓이기 때문에 Array 데이터나 Nested한 데이터를 쉽게 넣을 수 있다.
+&nbsp;흥미로운 점은 Document 기반 데이터베이스은 RDBMS와 다르게 자유로이 데이터 구조를 잡을 수 있다는 점이다. MongoDB는 BSON으로 데이터가 쌓이기 때문에 Array 데이터나 Nested한 데이터를 쉽게 넣을 수 있다.
 
 <figure>
   <img src="/assets/img/2020-02-25-about-mongodb/bson.png" />
   <figcaption>JSON(BSON)의 형태</figcaption>
 </figure>
 
-&nbsp;위 데이터 구조에서 특이한 부분이 있는데 `ObjectId`라는 타입이 있다는 점이다. `ObjectId`는 RDBMS의 `Primary Key`와 같은 기능을 한다. 차이점으로 `Primary Key`는 DBMS가 직접 부여한다면 `ObjectId`는 클라이언트에서 생성한다는 점이다. 이는 MongoDB 클러스터에서 Sharding된 데이터를 빠르게 가져오기 위함인데 Router(mongos)는 `ObjectId`를 보고 데이터가 존재하는 Shard에서 데이터를 요청할 수 있다. 사실 MongoDB 서버에서 알아서 `ObjectId`를 부여해서 저장해도 될 것 같은데 딱히 지원해주지 않는다. `ObjectId`를 넣지않고 저장한다면 그대로 저장된다.
+&nbsp;위 데이터 구조에서 `ObjectId`라는 생소한 타입을 볼 수 있다. `ObjectId`는 RDBMS의 `Primary Key`와 같이 고유한 키를 의미하는데 차이점은 `Primary Key`는 DBMS가 직접 부여한다면 `ObjectId`는 클라이언트에서 생성한다는 점이다. 이는 MongoDB 클러스터에서 Sharding된 데이터를 빠르게 가져오기 위함인데 Router(mongos)는 `ObjectId`를 보고 데이터가 존재하는 Shard에서 데이터를 요청할 수 있다. 의아하게도 MongoDB 서버에서 알아서 `ObjectId`를 부여해서 저장해도 될 것 같은데 딱히 지원해주지 않는다. 참고로 `ObjectId`를 넣지않고 저장한다면 데이터가 그대로 저장된다.
 
 <figure>
   <img src="/assets/img/2020-02-25-about-mongodb/objectid.png" />
@@ -76,7 +74,7 @@ comments: true
 
 &nbsp;`ObjectId`는 세 영역으로 나눠져있다. 각각 첫 4 byte는 UNIX Timestamp 정보를 담고있고 다음 5 byte는 랜덤한 값으로 이루어져 있는데 3 byte와 2 byte로 나뉜다. 첫 3 byte는 클라이언트의 머신별로 고유한 키(mac 주소나 ip 주소)를 이용하여 랜덤 값을 만들어 사용한다. 다음 2 byte는 process id를 이용한다. 5 byte를 채운 후 마지막 2 byte는 `Auto Increment`되는 값으로 구성된다.
 
-&nbsp;이쯤되면 `ObjectId`가 충돌날 가능성이 어느 정도일지 궁금할 수 있다. 사실 충돌이 발생하려면 같은 시간, 기기에서 만들어낸 해시 값이 일치하고 우연히 같은 process id를 가지고 있으며 정말 우연히 increase된 count가 일치해야 한다. 확률은 계산해보지 않았지만 거의 충돌날 일은 없을 것 같다.
+&nbsp;이쯤되면 `ObjectId`가 충돌날 가능성이 어느 정도일지 궁금할 수 있다. 충돌이 발생하려면 같은 시간, 기기에서 만들어낸 해시 값이 일치하고 우연히 같은 process id를 가지고 있으며 정말 우연히 increase된 count가 일치해야 한다. 확률은 계산해보지 않았지만 거의 충돌날 일은 없을 것 같다.
 
 &nbsp;다음으로 MongoDB 데이터 조작에 대해서 알아보자. MongoDB와 같은 NoSQL은 이름처럼 SQL을 사용하지 않고 **별도로 제공하는 API**를 통해 데이터를 건들 수 있다. MongoDB의 경우 자바스크립트 엔진 `SpiderMonkey`를 사용하여 API를 제공한다. 따라서 자바스크립트를 조금은 알아야한다.
 
@@ -85,7 +83,7 @@ comments: true
   <figcaption>Insert Query</figcaption>
 </figure>
 
-&nbsp;데이터를 삽입하는 쿼리를 보면 SQL과는 모습이 많이 다른 것을 알 수 있다. 마치 클래스에서 메서드를 통해 조작하는 모습인데, 이 처럼 MongoDB는 객체 조작을 통해 데이터를 관리할 수 있다.
+&nbsp;데이터를 삽입하는 쿼리를 보면 SQL과는 모습이 많이 다른 것을 알 수 있다. 마치 클래스에서 메서드를 통해 실행하는 모습인데, 이처럼 MongoDB는 객체 조작을 통해 데이터를 관리할 수 있다.
 
 #### BASE
 
@@ -102,7 +100,7 @@ comments: true
 
 &nbsp;이처럼 BASE는 ACID와는 다르게 일관성을 어느정도 포기하고 가용성을 우선시한다. 즉, 데이터가 조금 맞지 않더라도 일단 내려준다는 뜻이다.
 
-&nbsp;참고로 굳이 왜 `Basically Avaliable`이나 `Eventually consistent`처럼 어렵게 표현했는지 의아했는데 Acid(산)과 대립되는 느낌을 주기 위해 억지로 Base(염기)로 맞췄다는 얘기를 들었다. 물론 진짜인진 모르겠지만 꽤 신빙성있는 얘기같다.
+&nbsp;참고로 굳이 왜 `Basically Avaliable`이나 `Eventually consistent`처럼 어렵게 표현했는지 의아했는데 Acid(산)과 대립되는 느낌을 주기 위해 억지로 Base(염기)로 맞췄다는 소리를 들었다. 물론 진짜인진 모르겠지만 꽤 재밌는 이야기같다.
 
 #### ACID?
 
@@ -110,13 +108,13 @@ comments: true
 
 ## MongoDB는 분산 시스템이 핵심이다
 
-이번엔 MongoDB의 분산 시스템에 대해서 다뤄보자. MongoDB에서 분산 시스템은 기본으로 깔리고 들어가는 만큼 중요한 부분이다.
+이번엔 MongoDB의 분산 시스템에 대해서 다뤄보자. MongoDB에서 분산 시스템은 기본으로 깔리고 들어가는만큼 반드시 알고 넘어가야하는 부분이다.
 
 <figure>
   <img src="/assets/img/2020-02-25-about-mongodb/thinking-face.png" width="340px" />
 </figure>
 
-&nbsp;Thinking face가 생각한 것 처럼 웹 서비스가 발전하면서 데이터 무결성을 버리면서까지 더 많은 데이터, 빠른 성능, 수평 확장이 필요한 데이터베이스가 필요해졌다.
+&nbsp;Thinking face가 생각한 것 처럼 웹 서비스가 발전하면서 데이터 무결성을 버리면서까지 더 많은 데이터, 빠른 성능, 수평 확장이 필요한 데이터베이스가 필요해졌다. 그런 요구 사항으로 인해 MongoDB가 탄생했다.
 
 ### CAP 이론
 
