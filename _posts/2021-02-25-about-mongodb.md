@@ -4,14 +4,14 @@ title: "MongoDB 이해하기"
 author: "Lee Sun-Hyoup"
 categories: dev
 tags: [database, mongodb, server]
-image: /assets/img/2020-02-25-about-mongodb/thumbnail.png
+image: /assets/img/2021-02-25-about-mongodb/thumbnail.png
 comments: true
 ---
 
 &nbsp;사내에서 MongoDB를 잘 쓰기위한 스터디를 하게되어 이번 기회에 관련 자료를 정리하기로 했다. MongoDB가 왜 필요한지, 더 잘사용하기 위해서 무엇이 필요한지를 중심으로 처음 MongoDB를 사용할 때 도움이 될 만한 내용으로 정리했다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/toc.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/toc.png" />
   <figcaption>오늘 다룰 내용들</figcaption>
 </figure>
 
@@ -47,28 +47,28 @@ comments: true
 
 &nbsp;데이터는 Document 기반으로 구성되어있고, ACID 대신 BASE를 택하여 성능과 가용성을 우선시한다. 그리고 오픈 소스라는 점 덕분에 무료로 이용이 가능하다.
 
-&nbsp;여담으로 MongoDB는 분명 몇 년전까진 AGPL 라이센스였는데 어느 순간 [SSPL(Server Side Public License)](https://en.wikipedia.org/wiki/Server_Side_Public_License)로 변경되었다. 아마 AWS(DocumentDB)나 Azure(CosmosDB)에서 별도 계약 없이 MongoDB를 이용해 돈을 벌었기 때문이 아닐까 싶다. 아무튼 아직 오픈 소스기는 하다. MongoDB의 발전을 위한다면 클라우드 서비스 내 제품 대신 [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)를 이용하는 것이 좋을 것 같다. 비용도 AWS DocumentDB보단 저렴하게 시작할 수 있다.
+&nbsp;여담으로 MongoDB는 분명 몇 년전까진 AGPL 라이센스였는데 어느 순간 [SSPL(Server Side Public License)](https://en.wikipedia.org/wiki/Server_Side_Public_License)로 변경되었다. 아마 AWS(DocumentDB)나 Azure(CosmosDB)에서 별도 계약 없이 MongoDB를 이용해 돈을 벌었기 때문이 아닐까 싶다. ~~아무튼 아직 오픈 소스기는 하다~~. MongoDB의 발전을 위한다면 클라우드 서비스 내 제품 대신 [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)를 이용하는 것이 좋을 것 같다. 비용도 AWS DocumentDB보단 저렴하게 시작할 수 있다.
 
 #### Document
 
 &nbsp;MongoDB는 Document 기반 데이터베이스다. Database > Collection > Document > Field 계층으로 이루어져 있으며 Document는 RDBMS의 Row에 해당한다. 계층은 RDBMS와 유사하다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/mongodb-layer.jpg" />
+  <img src="/assets/img/2021-02-25-about-mongodb/mongodb-layer.jpg" />
   <figcaption>RDMBS와 MongoDB 데이터 계층 구조</figcaption>
 </figure>
 
 &nbsp;흥미로운 점은 Document 기반 데이터베이스은 RDBMS와 다르게 자유로이 데이터 구조를 잡을 수 있다는 점이다. MongoDB는 BSON으로 데이터가 쌓이기 때문에 Array 데이터나 Nested한 데이터를 쉽게 넣을 수 있다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/bson.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/bson.png" />
   <figcaption>JSON(BSON)의 형태</figcaption>
 </figure>
 
 &nbsp;위 데이터 구조에서 `ObjectId`라는 생소한 타입을 볼 수 있다. `ObjectId`는 RDBMS의 `Primary Key`와 같이 고유한 키를 의미하는데 차이점은 `Primary Key`는 DBMS가 직접 부여한다면 `ObjectId`는 클라이언트에서 생성한다는 점이다. 이는 MongoDB 클러스터에서 Sharding된 데이터를 빠르게 가져오기 위함인데 Router(mongos)는 `ObjectId`를 보고 데이터가 존재하는 Shard에서 데이터를 요청할 수 있다. 의아하게도 MongoDB 서버에서 알아서 `ObjectId`를 부여해서 저장해도 될 것 같은데 딱히 지원해주지 않는다. 참고로 `ObjectId`를 넣지않고 저장한다면 데이터가 그대로 저장된다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/objectid.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/objectid.png" />
   <figcaption>https://developer.mongodb.com/quickstart/bson-data-types-objectid/</figcaption>
 </figure>
 
@@ -79,7 +79,7 @@ comments: true
 &nbsp;다음으로 MongoDB 데이터 조작에 대해서 알아보자. MongoDB와 같은 NoSQL은 이름처럼 SQL을 사용하지 않고 **별도로 제공하는 API**를 통해 데이터를 건들 수 있다. MongoDB의 경우 자바스크립트 엔진 `SpiderMonkey`를 사용하여 API를 제공한다. 따라서 자바스크립트를 조금은 알아야한다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/query.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/query.png" />
   <figcaption>Insert Query</figcaption>
 </figure>
 
@@ -111,7 +111,7 @@ comments: true
 이번엔 MongoDB의 분산 시스템에 대해서 다뤄보자. MongoDB에서 분산 시스템은 기본으로 깔리고 들어가는만큼 반드시 알고 넘어가야하는 부분이다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/thinking-face.png" width="340px" />
+  <img src="/assets/img/2021-02-25-about-mongodb/thinking-face.png" width="340px" />
 </figure>
 
 &nbsp;Thinking face가 생각한 것 처럼 웹 서비스가 발전하면서 데이터 무결성을 버리면서까지 더 많은 데이터, 빠른 성능, 수평 확장이 필요한 데이터베이스가 필요해졌다. 그런 요구 사항으로 인해 MongoDB가 탄생했다.
@@ -119,7 +119,7 @@ comments: true
 ### CAP 이론
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/cap.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/cap.png" />
 </figure>
 
 &nbsp;CAP 이론은 2000년에 에릭 브류어가 최초로 소개한 이론이며 어떤 분산 시스템이더라도 **Consistency** (일관성), **Availability** (가용성), **Partition tolerance** (분할 내성)를 **모두 만족할 수 없다는 이론**이다. 이 세 가지의 머리 글자를 따서 CAP 이론이라고 부른다.
@@ -127,19 +127,19 @@ comments: true
 &nbsp;**Consistency**는 모든 노드가 같은 시간에 같은 데이터를 볼 수 있다는 의미를 지닌다. 즉 데이터가 업데이트된 후 다른 노드에 동기화되어 모든 사용자가 최신 데이터를 본다면 일관성이 있는 시스템이다. 이를 위해선 동기화가 되는 동안 유저는 대기해야한다. 대기 시간이 길어질 경우 가용성이 떨어지는 시스템이다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/consistency.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/consistency.png" />
 </figure>
 
 &nbsp;**Availability**는 모든 요청에 성공 혹은 실패 결과를 반환 할 수 있다는 의미를 지닌다. 하나의 노드가 망가져도 다른 노드를 통해 데이터를 제공할 수 있다면 가용성이 있는 시스템이다. 만약 다시 노드가 살아났을 때 다른 노드와 데이터가 다르다면 일관성이 떨어지는 시스템이다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/availability.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/availability.png" />
 </figure>
 
 &nbsp;**Partition tolerance**는 통신에 실패해도 시스템이 계속 동작해야한다는 의미를 지닌다. 노드가 망가진 것이 아닌 노드를 연결시켜주는 네트워크가 고장나는 경우를 의미한다. 둘 사이 통신이 망가져서 동기화가 불가능해진다면 일관성이 떨어진다. 만약 통신이 복구되고 동기화되는 것을 기다린다면 가용성이 떨어진다. 결국 둘 다 만족할 수 없다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/partition-tolerance.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/partition-tolerance.png" />
 </figure>
 
 ### CAP 이론의 한계
@@ -151,7 +151,7 @@ comments: true
 &nbsp;그리고 `CP`, `AP` 둘 중 하나에 치우친 시스템은 좋지않다. 상황에 따라 유연하게 변하거나 개발자가 원하는 형태로 설정할 수 있는 방식이 가장 이상적이다. 그렇기에 대부분의 분산 시스템은 상황에 따라 일관성과 가용성의 우선 순위를 다르게 설정한다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/choose.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/choose.png" />
   <figcaption>요구 사항에 따라 골라야한다.</figcaption>
 </figure>
 
@@ -160,7 +160,7 @@ comments: true
 &nbsp;그래서 기본적으로 네트워크 파티션 상황은 반드시 발생한다 가정하고 그에 따른 선택을 정리한 이론이 PACELC 이론이다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/pacelc.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/pacelc.png" />
 </figure>
 
 &nbsp;PACELC는 다음으로 이루어져 있다.
@@ -208,13 +208,13 @@ comments: true
 #### P-S-S
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/pss.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/pss.png" />
 </figure>
 
 &nbsp;P-S-S 시스템은 하나의 Primary와 여러 개의 Secondary로 이루어진 Replica Set이다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/pss-vote.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/pss-vote.png" />
 </figure>
 
 &nbsp;만약 Primary가 죽을 경우 투표를 통해 남은 Secondary 중 새로운 Primary를 선출한다. 여기서 만약 Secondary가 하나만 남았다면 새로운 Primary를 선출할 수 없어 서버 장애가 발생한다.
@@ -222,13 +222,13 @@ comments: true
 #### P-S-A
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/psa.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/psa.png" />
 </figure>
 
 &nbsp;P-S-A 시스템은 하나의 Primary와 Arbiter 그리고 여러 개의 Secondary로 이루어진 Replica Set이다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/psa-vote.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/psa-vote.png" />
 </figure>
 
 &nbsp;P-S-A 시스템에선 Primary가 죽은 경우 Arbiter가 Secondary와 함께 투표해서 Secondary 중 새로운 Primary를 선출한다. P-S-A 시스템에선 Secondary가 하나만 남았더라도 Arbiter가 남아있어서 남은 Secondary를 Primary로 선출 할 수 있어서 정상적으로 서비스가 동작한다.
@@ -242,7 +242,7 @@ comments: true
 &nbsp;같은 Collection에서 데이터가 서로를 참조하는 Tree 구조를 가지고 있을 때 사용할 수 있는 패턴은 다섯가지가 있다. 소개하는 모든 패턴은 아래 트리 구조를 참고하여 구성했다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/model-tree-structure.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/model-tree-structure.png" />
 </figure>
 
 #### Parent References
@@ -318,7 +318,7 @@ comments: true
 &nbsp;Nested Sets은 조금 특이한 구조를 가진다. 아래 그림의 번호를 참고하여 구조를 살펴보자.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/nested-sets.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/nested-sets.png" />
 </figure>
 
 ```js
@@ -339,7 +339,7 @@ comments: true
 &nbsp;MongoDB도 RDBMS와 마찬가지로 `1:1`, `1:N`, `N:M` 구조를 구성할 수 있다. 참조 방식만 제공하는 RDBMS와 다르게 MongoDB는 참조와 포함 두 가지를 제공한다. 참조는 `Foreign Key`처럼 키를 이용하여 참조하는 것이고 포함은 Document에 Object로 데이터를 포함하는 것을 의미한다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/link-vs-embed.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/link-vs-embed.png" />
   <figcaption>출처가 기억이 안납니다...</figcaption>
 </figure>
 
@@ -468,13 +468,13 @@ comments: true
 &nbsp;Extended Reference 패턴은 서로 관계가 있는 Document에서 자주 사용되는 데이터를 저장해두는 패턴이다. MongoDB에선 성능을 위해 Join대신 쿼리를 두 번 날려 연관 데이터를 불러오는 방식을 많이 사용하는데 데이터가 많아질수록 불리하기 때문에 데이터가 많아지고 참조 자주 필요할 수록 Extended Reference 패턴을 사용해야한다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/extended-reference1.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/extended-reference1.png" />
 </figure>
 
 &nbsp;위 Collection을 살펴보자. 주문을 하면 `Order` Collection에 데이터가 쌓이고 어떤 고객이 주문했는지 `customor_id` 필드에 기록된다. 아무런 문제가 없어 보이지만 만약 주문 내역을 사용자에게 보여줄 때 고객 정보도 보여줘야 한다면 Join이 필요해진다. 앞서 말했던 것 처럼 MongoDB에서 Join의 성능은 열악하기 때문에 곤란한 상황이 되어버린다. 이 때 사용할 수 있는 것이 Extended Reference 패턴이다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/extended-reference2.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/extended-reference2.png" />
 </figure>
 
 &nbsp;Extended Reference 패턴은 위 그림처럼 필요한 데이터를 연관된 Collection에서 일부분 Document에 저장하는 것을 의미한다. 사실 RDBMS에서도 성능과 편의성을 위해 자주 사용하는 방법이다. 하지만 MongoDB는 어쩔 수 없이 꼭 써야하는 경우가 꽤 많다. 꼭 기억해두자.
@@ -484,13 +484,13 @@ comments: true
 &nbsp;Subset 패턴은 관계가 있는 Document 사이에 자주 사용되는 데이터를 부분적으로 Embed하는 패턴이다. 설명만 들으면 Extended Reference 패턴과 같아 보이지만 조금 다르다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/subset1.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/subset1.png" />
 </figure>
 
 &nbsp;상품에 관한 Collection이 있고 해당 Collection에 리뷰를 Embed 형태로 저장한다고 가정해보자. 이 때 리뷰는 엄청 많아질 수 있기 때문에 별도 Collection으로 분리 해야한다. 분리하게 될 경우 두 번 쿼리를 날려야한다. 만약 빠르게 최신 5개 리뷰만 보여주고 싶다면 어떻게 해야할까?
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/subset1.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/subset1.png" />
 </figure>
 
 &nbsp;답은 간단하다. 최신 5개 리뷰만 상품 Document에 저장해두면 된다. 이렇게 하면 빠르게 사용자에게 데이터를 전달 할 수 있다. 사용자에겐 `더 보기` 메뉴를 누를 수 있도록 UI를 제공 하면된다. MongoDB를 주력으로 이용한다면 Subset 패턴은 정말 많이 쓰이는 패턴이다. 꼭 기억해두자.
@@ -502,7 +502,7 @@ comments: true
 &nbsp;Computed 패턴은 미리 통계 수치를 데이터 삽입할 때 계산하는 패턴이다. 이 패턴도 RDBMS에서도 자주 쓰이는 패턴이다.
 
 <figure>
-  <img src="/assets/img/2020-02-25-about-mongodb/computed.png" />
+  <img src="/assets/img/2021-02-25-about-mongodb/computed.png" />
 </figure>
 
 &nbsp;위 그림처럼 관객 수 합계가 필요하다면 read할 때 집계 함수를 사용할 수도 있지만 별도 필드에 미리 저장해두는 방법도 있다. 집계 합수는 데이터가 많을 수록 성능이 느리기 때문에 조금 오차가 발생해도 괜찮다면 Computed 패턴을 쓰는 것이 좋다.
@@ -590,7 +590,7 @@ comments: true
 ```
 &nbsp;`schema_version` 필드를 둬서 버전을 2로 설정했다. 이후 애플리케이션에서 `find` 할 때 `schema_version` 조건을 넣는다면 충돌없이 작업이 가능하다. 우선 이렇게 해결한 후 천천히 마이그레이션을 할 수 있다.
 
-## 결론
+## 마치며
 
 &nbsp;MongoDB와 RDBMS는 적합한 사용처가 다르다. 내 개인적인 생각으론 MongoDB를 비롯한 NoSQL은 최대한 단순하게 사용하는 것이 옳은 방향이라고 생각한다. NoSQL은 **최대한 단순하면서 많은 데이터**, RDBMS는 복**잡하면서 무결성이 중요한 데이터**에 적합하다고 생각한다. 물론 데이터를 단순화하는 것도 쉬운 일은 아니기 때문에 만약 당신이 MongoDB를 사용할 계획이 있다면 꼭 위 모델링 패턴을 참고하여 데이터 구조를 잡는 것을 추천한다. 마지막으로 실제 스터디 때 사용된 발표 자료를 첨부한다.
 

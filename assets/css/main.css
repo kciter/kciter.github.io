@@ -43,18 +43,23 @@ h1 a {
 }
 
 h2 {
+  padding-bottom: 8px;
   font-size: 1.6em;
+  border-bottom: 1px solid #eee;
 }
 
 h3 {
+  margin: 8px 0;
   font-size: 1.3em;
 }
 
 h4 {
+  margin: 8px 0;
   font-size: 1.2em;
 }
 
 h1, h2, h3, h4, h5, h6 {
+  padding-top: 24px;
   color: #454f5b;
 }
 
@@ -75,11 +80,13 @@ img {
 }
 
 blockquote {
-  margin: 10px 20px 10px;
-  padding: 0px 15px;
+  /* margin: 10px 20px 10px; */
+  margin: 10px 0;
+  padding: 8px 16px;
   border-left: 0.25em solid #ccc;
-  color: #999;
+  color: #454f5b;
   line-height: 1.5;
+  background-color: #eeeeee;
 }
 
 hr {
