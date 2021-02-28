@@ -268,4 +268,8 @@ $mysqli->query("SELECT * FROM users WHERE username='{$username}' AND password='{
 
 &nbsp;해킹은 뭔가 멋있지만 어려운 것이라고 느끼는 개발자가 많다. 하지만 공격을 막는 입장에서 본다면 방어는 생각보다 간단하는 것을 알 수 있다. 만약 필자처럼 소프트웨어를 만드는 개발자라면 무리해서 해킹 기법을 익힐 필욘는 없다. 그런 일은 더 뛰어난 보안 전문가가 해줄 것이다. 그럼에도 불구하고 우리가 만든 소프트웨어를 지키기 위해 최소한의 상식은 익혀두는 것은 좋다고 생각한다.
 
-추가로 보안에 대해서 더 알고 싶다면 [https://owasp.org/](https://owasp.org/)에서 여러 사례를 읽어볼 수 있다. 그리고 OWASP에서 제공하는 [치트 시트](https://cheatsheetseries.owasp.org/index.html)도 있으니 다양한 공격 기법을 알고싶다면 해당 문서도 읽어보자.
+&nbsp;추가로 보안에 대해서 더 알고 싶다면 [https://owasp.org/](https://owasp.org/)에서 여러 사례를 읽어볼 수 있다. 그리고 OWASP에서 제공하는 [치트 시트](https://cheatsheetseries.owasp.org/index.html)도 있으니 다양한 공격 기법을 알고싶다면 해당 문서도 읽어보자.
+
+&nbsp;다음은 사내 스터디에서 사용한 슬라이드 자료다. 위 내용과 큰 차이는 없다.
+
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/4Tq4nt75krxOPX" width="100%" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> 
