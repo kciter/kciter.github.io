@@ -65,7 +65,6 @@ $mysqli->query("SELECT * FROM users WHERE username='{$username}' AND password='{
 
 * SQL에서 특별한 의미를 가지는 문자를 이스케이프한다. ex) \n, \t, \|, /, &, #, ...
 * 준비된 선언을 사용한다.
-* 라이브러리나 프레임워크에서 지원해준다면 굳이 신경쓰지 않아도 알아서 잘 막힌다.
 
 &nbsp;준비된 선언은 조금 생소할 수 있는데 Placeholder를 넣은 쿼리를 먼저 DB에 보낸 후 Placeholder에 해당하는 데이터를 DB로 보내는 방법이다. 이를 통해 **SQL Injection**을 방어할 수 있다.
 
@@ -86,6 +85,13 @@ $mysqli->query("SELECT * FROM users WHERE username='{$username}' AND password='{
   ```
 
 &nbsp;위 세 가지 공격 방법에 대한 치트 시트가 존재한다. 조금 더 자세히 알고 싶다면 이 [링크](https://perspectiverisk.com/mysql-sql-injection-practical-cheat-sheet/)를 확인해보자.
+
+### 주의 할 점
+
+&nbsp;프레임워크나 라이브러리에서 이스케이핑을 통해 방어해주더라도 무작정 신뢰할 수는 없다. 혹시 모를 사고에 대비하기 위해 추가적인 작업을 할 수 있다.
+
+* 파라미터 Validation
+* [apache-scalp](https://code.google.com/archive/p/apache-scalp/)와 같은 공격 로그 분석 툴을 사용한다.
 
 ## Cross-Site Scription (XSS)
 
@@ -127,6 +133,40 @@ $mysqli->query("SELECT * FROM users WHERE username='{$username}' AND password='{
 
 &nbsp;사실 XSS는 필터링만 잘하면 쉽게 막을 수 있는 공격이다. 특히 요즘은 프레임워크와 브라우저가 XSS 필터링을 통해 웬만한 공격은 막아주기 때문에 Stored XSS만 조심해도 큰 문제는 없을 것 같다. 하지만 여러 우회 방법이 개발되고 있고 서비스가 복잡해지는 만큼 XSS 취약점이 드러날 확률이 높다. 아주 조금의 틈이라도 있다면 여러 우회 방법을 통해 뚫릴 수 있으니 조심하자.
 
+### 주의 할 점
+
+&nbsp;최근엔 React나 Vue.js와 같은 프론트엔드 프레임워크, 라이브러리를 사용하여 XSS에 대한 방어가 어느정도 자동화된다. 그럼에도 불구하고 사용자의 실수로 취약점이 드러날 수 있다. 예를 들어, React에서 다음과 같은 실수를 할 수 있다.
+
+* `dangerouslySetInnerHTML` 속성을 사용한다.
+* `href`를 통한 XSS 공격 허용
+
+&nbsp;React는 문자열 변수를 자동으로 이스케이핑해주기 때문에 웬만하면 문제가 되지 않는다. 하지만 `dangerouslySetInnerHTML` 속성을 사용하면 문자열에 HTML 태그가 있더라도 그대로 출력하기 때문에 위험하다. 꼭 사용해야 한다면 절대로 사용자 입력이 들어올 수 없도록 조치하거나 자바스크립트 코드가 존재하는지 검증이 필요하다.
+
+&nbsp;이어서 외부 웹 페이지에 접속하기 위해 각 프레임워크가 제공해주는 Router가 아닌 앵커 태그를 쓸때가 있다. 앵커 태그의 `href` 속성은 `<a href='javascript:alert("xss");'>XSS</a>`처럼 자바스크립트 프로토콜을 사용하여 스크립트를 실행시킬 수 있다. 이를 막기 위해서 `href` 속성에 들어가는 값은 추가적인 필터링이 필요하다. 필터링에는 블랙리스트와 화이트리스트가 존재하는데 이 경우 화이트리스트를 통한 필터링을 추천한다. 다음과 같이 컴포넌트를 만들 수 있다. [코드 출처](https://medium.com/javascript-security/avoiding-xss-in-react-is-still-hard-d2b5c7ad9412)
+
+```jsx
+import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
+import URL from 'url-parse'
+class SafeURL extends Component {
+  isSafe(dangerousURL, text) {
+    const url = URL(dangerousURL, {})
+    if (url.protocol === 'javascript:') return false
+    if (url.protocol === '') return false
+    return true
+  }
+  render() {
+    const dangerousURL = this.props.dangerousURL
+    const safeURL = this.isSafe(dangerousURL) ? dangerousURL : null
+    return <a href={safeURL}>{this.props.text}</a>
+  }
+}
+ReactDOM.render(
+  <SafeURL dangerousURL=" javascript: alert(1)" text="Click me!" />,
+  document.getElementById('root')
+)
+```
+
 ## CSRF Attack
 
 &nbsp;Cross-Site Request Forgery라고 부른다. 공격자가 서비스 사용자를 이용하여 요청을 보내는 공격을 말한다.
@@ -142,12 +182,11 @@ $mysqli->query("SELECT * FROM users WHERE username='{$username}' AND password='{
 &nbsp;공격이 쉬운 만큼 방어도 꽤 쉬운편에 속한다. 대표적으로 다음 세 가지 방법이 있다.
 
 * **Referer Check**
-  * HTTP Referer를 확인하여 허용된 Referer의 요청만 허락하도록 설정하는 방어 방법이다. 가장 간단하지만 HTTP를 위조하면 그만이기 때문에 그다지 추천하지 않는다.
+  * HTTP Referer를 확인하여 허용된 Referer의 요청만 허락하도록 설정하는 방어 방법이다. 단, HTTP 변조를 통해 쉽게 뚫을 수 있으므로 추천하지 않는다.
 * **CSRF Token**
   * 모든 요청에 토큰을 발급하여 서버에서 검증하는 방어 방법이다. 발급된 토큰을 서버로 전달하지 않으면 요청이 허락되지 않기 때문에 효과적이다.
 * **CAPTCHA**
   * 캡챠는 사람이 요청한 것이 맞는지 검증하는 방법이지만 CSRF 공격에도 효과적이다. 사실상 CSRF Token이 하는 것과 똑같고 겸사겸사 로봇 여부 확인도 가능하다.
-
 ## Command Injection
 
 &nbsp;Command Injection은 쉘을 실행시키는 로직을 이용한 공격이다. 시스템 권한이 탈취되는 것이나 마찬가지기 때문에 매우 치명적이다.
@@ -191,6 +230,9 @@ $mysqli->query("SELECT * FROM users WHERE username='{$username}' AND password='{
 
 &nbsp;요즘은 클라우드 서비스가 제공해주는 파일 스토리지를 이용하기도하고 프레임워크에서 제공해주는 기능을 쉽게 이용할 수 있어서 예전보다 막기 쉬워졌다.
 
+### 주의 할 점
+
+&nbsp;HTTP는 조작될 수 있으므로 `Content-Type`을 믿지 않는 것이 좋다. 그리고 꼭 WebShell을 하기 위한 공격이 아닌 서버 자체를 죽이기 위해 대용량 파일을 계속해서 보낼 수도 있다. 이를 막기 위해 파일 크기 제한도 설정하자. 그리고 가급적 같은 서버가 아닌 파일 서버를 별도로 두는 것을 추천한다.
 ## JavaScript Injection
 
 &nbsp;브라우저에서 자바스크립트를 삽입시키는 공격이다. 브라우저에서 제공하는 Console을 통해 조작 가능하다. 만약 Client-Side에 민감한 데이터를 넣어놨다면 해당 공격을 통해 탈취가 가능하다.
@@ -227,7 +269,7 @@ $mysqli->query("SELECT * FROM users WHERE username='{$username}' AND password='{
 
 ## Dictionary Attack
 
-&nbsp;미리 데이터베이스에 등록해놓은 수많은 문자열을 암호로 대입하는 공격이다. Brute Force의 일종이다.
+&nbsp;미리 데이터베이스에 등록해놓은 수많은 문자열을 암호로 대입하는 공격이다. [Brute Force](https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B3%B5%EA%B2%A9)의 일종이다.
 
 <figure>
   <img src="/assets/img/2021-02-28-basic-web-hacking/dictionary-attack.png" />
@@ -266,7 +308,11 @@ $mysqli->query("SELECT * FROM users WHERE username='{$username}' AND password='{
 
 ## 마치며
 
-&nbsp;해킹은 뭔가 멋있지만 어려운 것이라고 느끼는 개발자가 많다. 하지만 공격을 막는 입장에서 본다면 방어는 생각보다 간단하는 것을 알 수 있다. 만약 필자처럼 소프트웨어를 만드는 개발자라면 무리해서 해킹 기법을 익힐 필욘는 없다. 그런 일은 더 뛰어난 보안 전문가가 해줄 것이다. 그럼에도 불구하고 우리가 만든 소프트웨어를 지키기 위해 최소한의 상식은 익혀두는 것은 좋다고 생각한다.
+&nbsp;해킹은 뭔가 멋있지만 어려운 것이라고 느끼는 개발자가 많다. 하지만 공격을 막는 입장에서 본다면 방어는 생각보다 간단하는 것을 알 수 있다. 만약 필자처럼 소프트웨어를 만드는 개발자라면 무리해서 해킹 기법을 익힐 필요는 없다. 그런 일은 더 뛰어난 보안 전문가가 해줄 것이다. 그럼에도 불구하고 우리가 만든 소프트웨어를 지키기 위해 최소한의 상식을 익혀두고 방어하는 것은 좋다고 생각한다. 필자가 생각하기에 마음가짐 세 가지만 기억한다면 충분하다.
+
+* 외부 요청은 모두 의심하자.
+* 특수문자 필터링은 매우 중요하다.
+* 프레임워크, 라이브러리, 브라우저가 잘해주지만 무작정 믿지는 말자.
 
 &nbsp;추가로 보안에 대해서 더 알고 싶다면 [https://owasp.org/](https://owasp.org/)에서 여러 사례를 읽어볼 수 있다. 그리고 OWASP에서 제공하는 [치트 시트](https://cheatsheetseries.owasp.org/index.html)도 있으니 다양한 공격 기법을 알고싶다면 해당 문서도 읽어보자.
 
