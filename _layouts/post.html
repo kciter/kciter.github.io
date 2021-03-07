@@ -39,8 +39,6 @@ layout: default
   {% endif %}
 </span>
 
-<!-- {% include social-sharing.html %} -->
-
 {% if page.comments %}
 <script src="https://utteranc.es/client.js"
   repo="kciter/kciter.github.io"
@@ -51,6 +49,6 @@ layout: default
 </script>
 {% endif %}
 
-
-<!-- {% include related-posts.html %} -->
-
+{% comment %}
+{% include related-posts.html %}
+{% endcomment %}
