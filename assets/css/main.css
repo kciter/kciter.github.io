@@ -172,6 +172,20 @@ hr {
   text-decoration: underline;
 }
 
+.post-content a.footnote {
+  color: #FF6F00;
+}
+
+/* .post-content a.footnote:before {
+  content: '[';
+  color: #FF6F00;
+}
+
+.post-content a.footnote:after {
+  content: ']';
+  color: #FF6F00;
+} */
+
 .posts {
   margin-bottom: 5rem;
   padding: 0px;
@@ -350,6 +364,22 @@ figcaption {
   }
 }
 
+/*
+  Footnotes
+*/
+.footnotes {
+  font-size: 12px;
+  border-top: 1px solid #eee;
+}
+
+.footnotes ol {
+  padding-left: 16px;
+  line-height: 16px;
+}
+
+.footnotes ol li::marker {
+  color: #FF6F00;
+}
 
 /*
   Code
@@ -604,4 +634,37 @@ th, td {
   border-radius: 12px;
   background: url(https://38.media.tumblr.com/546c0cd48d71f210f9b67a389003790d/tumblr_neq0yw9rMA1tm16jjo1_500.gif) no-repeat center center; 
   background-size: contain;
+}
+
+/*
+ Tooltip
+*/
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]:after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 0;
+  left: 10px;
+  display: none;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 16px;
+  color: #fff;
+  border-left: 6px solid #FF6F00;
+  border-radius: 2px;
+  background-color: #212b36;
+  box-shadow: 1px 2px 6px rgba(0,0,0,0.3);
+  z-index: 1000;
+  white-space: nowrap;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  pointer-events: none;
+}
+
+[data-tooltip]:hover:after, [data-tooltip]:focus:after {
+  display: block;
 }
