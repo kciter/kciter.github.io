@@ -6,7 +6,7 @@ categories: dev
 tags: [frontend, web, architecture]
 image: /assets/img/2021-03-07-effective-atomic-design/thumbnail.png
 comments: true
-# published: false
+published: false
 ---
 
 &nbsp;소프트웨어 개발 중 설계에서 가장 중요한 것은 **모듈화와 추상화** 두 가지라고 할 수 있다. 웹 프론트엔드 업계는 이미 React, Vue.js, Angular와 같은 오픈소스 프레임워크를 통해 끝을 달리는 추상화와 모듈화를 보여주고 있다. 특히 모듈화 측면에서 세 프레임워크는 컴포넌트 인터페이스를 매우 쉽게 제공하기 때문에 프레임워크 사용자는 효과적인 재사용성과 캡슐화된 컴포넌트를 아주 간단하게 만들 수 있다. 그렇기에 우리는 좋은 컴포넌트를 만들기 위해 올바른 방법과 규칙을 정하기만 하면 된다.
