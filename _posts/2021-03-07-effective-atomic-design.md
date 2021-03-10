@@ -13,8 +13,8 @@ published: false
 
 &nbsp;이번 포스팅의 핵심 키워드인 [Atomic Design](https://bradfrost.com/blog/post/atomic-web-design/)은 좀 더 효과적인 컴포넌트를 구성하기 위한 방법론이다. 최근에 굉장히 유행하고 많은 기업이 도입하는 방법론이지만 Brad Frost가 2013년에 처음 공개했으니 생각보다 오래됐다. 아마 본격적인 컴포넌트 주도 개발 방식이 자리 잡게 된 후에 새롭게 주목을 받을 것 같다. 블로그 글보다 좀 더 자세히 설명한 [책](https://shop.bradfrost.com/)을 따로 $10에 판매하기도 하니 관심이 있다면 구매해보는 것도 괜찮을 것 같다.
 
-&nbsp;본론으로 돌아와 이번 포스트에서 다룰 이야기는 **Atomic Design을 더 잘 쓰기 위한 구현 방법**에 대해 소개한다. 물론 그전에 Atomic Design이 무엇인지 간단히 알아보자.
-
+&nbsp;본론으로 돌아와 이번 포스트에서 다룰 이야기는 **Atomic Design을 더 잘 쓰기 위한 구현 방법**에 대해 소개한다. 물론 그전에 Atomic Design이 무엇인지 간단히 알아보고 진행하도록 하자.
+  
 ## Atomic Design이란?
 
 > Atomic design is methodology for creating design systems. <br />- Brad Frost

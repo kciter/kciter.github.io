@@ -47,7 +47,7 @@ comments: true
 
 &nbsp;데이터는 Document 기반으로 구성되어있고, ACID 대신 BASE를 택하여 성능과 가용성을 우선시한다. 그리고 오픈 소스라는 점 덕분에 무료로 이용이 가능하다.
 
-&nbsp;여담으로 MongoDB는 분명 몇 년전까진 AGPL 라이센스였는데 어느 순간 [SSPL(Server Side Public License)](https://en.wikipedia.org/wiki/Server_Side_Public_License)로 변경되었다. 아마 AWS(DocumentDB)나 Azure(CosmosDB)에서 별도 계약 없이 MongoDB를 이용해 돈을 벌었기 때문이 아닐까 싶다. ~~아무튼 아직 오픈 소스기는 하다~~. MongoDB의 발전을 위한다면 클라우드 서비스 내 제품 대신 [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)를 이용하는 것이 좋을 것 같다. 비용도 AWS DocumentDB보단 저렴하게 시작할 수 있다.
+&nbsp;여담으로 MongoDB는 분명 몇 년전까진 AGPL 라이센스였는데 어느 순간 [SSPL(Server Side Public License)](https://en.wikipedia.org/wiki/Server_Side_Public_License)로 변경되었다. 아마 AWS(DocumentDB)나 Azure(CosmosDB)에서 별도 계약 없이 MongoDB를 이용해 돈을 벌었기 때문이 아닐까 싶다. ~~아무튼 아직 오픈 소스기는 하다~~[^1]. MongoDB의 발전을 위한다면 클라우드 서비스 내 제품 대신 [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)를 이용하는 것이 좋을 것 같다. 비용도 AWS DocumentDB보단 저렴하게 시작할 수 있다.
 
 #### Document
 
@@ -74,7 +74,7 @@ comments: true
 
 &nbsp;`ObjectId`는 세 영역으로 나눠져있다. 각각 첫 4 byte는 UNIX Timestamp 정보를 담고있고 다음 5 byte는 랜덤한 값으로 이루어져 있는데 3 byte와 2 byte로 나뉜다. 첫 3 byte는 클라이언트의 머신별로 고유한 키(mac 주소나 ip 주소)를 이용하여 랜덤 값을 만들어 사용한다. 다음 2 byte는 process id를 이용한다. 5 byte를 채운 후 마지막 2 byte는 `Auto Increment`되는 값으로 구성된다.
 
-&nbsp;이쯤되면 `ObjectId`가 충돌날 가능성이 어느 정도일지 궁금할 수 있다. 충돌이 발생하려면 같은 시간, 기기에서 만들어낸 해시 값이 일치하고 우연히 같은 process id를 가지고 있으며 정말 우연히 increase된 count가 일치해야 한다. 확률은 계산해보지 않았지만 거의 충돌날 일은 없을 것 같다.
+&nbsp;이쯤되면 `ObjectId`가 충돌날 가능성이 어느 정도일지 궁금할 수 있다. 충돌이 발생하려면 같은 시간, 기기에서 만들어낸 해시 값이 일치하고 우연히 같은 process id를 가지고 있으며 정말 우연히 increase된 count가 일치해야 한다. 확률은 계산해보지 않았지만 거의 충돌날 일은 없을 것 같다.[^2]
 
 &nbsp;다음으로 MongoDB 데이터 조작에 대해서 알아보자. MongoDB와 같은 NoSQL은 이름처럼 SQL을 사용하지 않고 **별도로 제공하는 API**를 통해 데이터를 건들 수 있다. MongoDB의 경우 자바스크립트 엔진 `SpiderMonkey`를 사용하여 API를 제공한다. 따라서 자바스크립트를 조금은 알아야한다.
 
@@ -100,7 +100,7 @@ comments: true
 
 &nbsp;이처럼 BASE는 ACID와는 다르게 일관성을 어느정도 포기하고 가용성을 우선시한다. 즉, 데이터가 조금 맞지 않더라도 일단 내려준다는 뜻이다.
 
-&nbsp;참고로 굳이 왜 `Basically Avaliable`이나 `Eventually consistent`처럼 어렵게 표현했는지 의아했는데 Acid(산)과 대립되는 느낌을 주기 위해 억지로 Base(염기)로 맞췄다는 소리를 들었다. 물론 진짜인진 모르겠지만 꽤 재밌는 이야기같다.
+&nbsp;참고로 굳이 왜 `Basically Avaliable`이나 `Eventually consistent`처럼 어렵게 표현했는지 의아했는데 Acid(산)과 대립되는 느낌을 주기 위해 억지로 Base(염기)로 맞췄다는 소리를 들었다. 물론 진짜인진 모르겠지만 꽤 재밌는 이야기라고 생각한다.
 
 #### ACID?
 
@@ -595,3 +595,6 @@ comments: true
 &nbsp;MongoDB와 RDBMS는 적합한 사용처가 다르다. 내 개인적인 생각으론 MongoDB를 비롯한 NoSQL은 최대한 단순하게 사용하는 것이 옳은 방향이라고 생각한다. NoSQL은 **최대한 단순하면서 많은 데이터**, RDBMS는 복**잡하면서 무결성이 중요한 데이터**에 적합하다고 생각한다. 물론 데이터를 단순화하는 것도 쉬운 일은 아니기 때문에 만약 당신이 MongoDB를 사용할 계획이 있다면 꼭 위 모델링 패턴을 참고하여 데이터 구조를 잡는 것을 추천한다. 마지막으로 실제 스터디 때 사용된 발표 자료를 첨부한다.
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/jC6H4VCohIH9v7" width="100%" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+[^1]: 현재 소스는 [공개](https://github.com/mongodb/mongo)되어 있지만 오픈소스 이니셔티브에선 SSPL을 오픈소스로 인정하지 않는다고 한다.
+[^2]: 충돌이 발생하더라도 에러를 내려주기 때문에 괜찮다.
