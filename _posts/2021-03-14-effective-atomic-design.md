@@ -96,13 +96,15 @@ Atomic Design에 대한 설명만 본다면 컴포넌트를 나누는 단계가 
   <img src="/assets/img/2021-03-14-effective-atomic-design/button-example.png" />
 </figure>
 
-Atom의 범위는 디자인 원칙과 크게 맞닿아있다. 위에 첨부된 사진을 보면 디자인 원칙에 따라 어떤 역할이든 통일된 버튼을 사용할 수 있고 역할별로 다른 버튼을 사용할 수도 있다. 전자의 경우 적합한 Atom 컴포넌트를 하나 만들면 되지만 후자의 경우 역할 별로 Atom을 만들지 Atom 하나가 옵션에 따라 변할지 정해야 한다. 좋은 선택을 하기 위해선 확장 가능성, 수정될 가능성 등 디자인 관점에서 여러 가지 상황을 고려해야 한다. 그렇기 때문에 우리가 Atom 컴포넌트를 잘 만들기 위해선 어느 정도 서비스에 적용되는 **디자인 원칙[^2]을 이해할 필요**가 있다.
+Atom의 범위는 디자인 원칙과 크게 맞닿아있다. 위에 첨부된 사진을 보면 디자인 원칙에 따라 어떤 역할이든 통일된 버튼을 사용할 수 있고 역할별로 다른 버튼을 사용할 수도 있다. 전자의 경우 적합한 Atom 컴포넌트를 하나 만들면 되지만 후자의 경우 역할 별로 Atom을 만들지 Atom 하나가 옵션에 따라 변할지 정해야 한다. 좋은 선택을 하기 위해선 확장 가능성, 수정될 가능성 등 디자인 관점에서 여러 가지 상황을 고려해야 한다. 그렇기 때문에 우리가 Atom 컴포넌트를 잘 만들기 위해선 어느 정도 서비스에 적용되는 **디자인 원칙을 이해할 필요[^2]**가 있다.
 
 ## 이 컴포넌트는 Molecule, Organism 어느 쪽?
 
-Atomic Design 방법론으로 컴포넌트 시스템을 구성하다 보면 어느 순간 반드시 Molecule로 둘지 Organism에 둘지 고민하는 순간이 온다. 그런 경우에 보통 컴포넌트가 차지하는 영역이 크다면 Organism에 넣고 아닌 경우 Molecule에 넣는다. React 용 Atomic Design 기반 Starter Kit인 [ARc](https://arc.js.org/)는 일단 너무 고민하지 말고 [아무 곳에 넣고](https://github.com/diegohaz/arc/wiki/Atomic-Design#do-not-worry) 추후 어떤 레이어에 속해야 하는지 알게 되면 정리하라고 권한다.
+Atomic Design 방법론으로 컴포넌트 시스템을 구성하다 보면 어느 순간 반드시 Molecule로 둘지 Organism에 둘지 고민하는 순간이 온다. 그런 경우 무의식적으로 컴포넌트가 차지하는 영역이 크다면 Organism에 넣고 아닌 경우 Molecule에 넣을 때가 많지만 별로 좋은 방법은 아니다.
 
-소프트웨어 개발자는 항상 급하기 때문에 ARc의 구분 방법도 괜찮다고 생각한다. 하지만 필자가 생각하는 구분법은 다음과 같다.
+다른 사례를 보면 React 용 Atomic Design 기반 Starter Kit인 [ARc](https://arc.js.org/)는 일단 너무 고민하지 말고 [아무 곳에 넣고](https://github.com/diegohaz/arc/wiki/Atomic-Design#do-not-worry) 추후 어떤 레이어에 속해야 하는지 알게 되면 정리하라고 권한다.
+
+소프트웨어 개발자는 항상 바쁘기 때문에 ARc의 구분 방법도 괜찮다고 생각한다. 하지만 필자가 생각하는 구분법은 다음과 같다.
 
 * Molecule은 데이터를 표시하고 이벤트를 받을 수 있지만 "하나의 역할"만을 가진다.
 * Organism은 사용자에게 의미를 가지는 [기능적 요구사항](https://en.wikipedia.org/wiki/User_story)에 포함되는 경우에 해당되는 컴포넌트다.
