@@ -176,6 +176,17 @@ hr {
   color: #FF6F00;
 }
 
+.post-content p::first-letter {
+  margin-left: 0.3em;
+}
+
+sup {
+  position: relative;
+  top: -0.5em;
+  font-weight: normal;
+  vertical-align: top;
+}
+
 /* .post-content a.footnote:before {
   content: '[';
   color: #FF6F00;
@@ -224,6 +235,12 @@ hr {
 figure {
   margin: 24px 40px;
   text-align: center;
+}
+
+@media (max-width: 30em) {
+  figure {
+    margin: 24px 0;
+  }
 }
 
 figcaption {
@@ -669,4 +686,11 @@ th, td {
 
 [data-tooltip]:hover:after, [data-tooltip]:focus:after {
   display: block;
+}
+
+
+@media (max-width: 30em) {
+  [data-tooltip]:hover:after, [data-tooltip]:focus:after {
+    display: none;
+  }
 }
