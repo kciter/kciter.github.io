@@ -3,7 +3,7 @@ layout: post
 title: "Effective Atomic Design"
 author: "Lee Sun-Hyoup"
 categories: dev
-tags: [frontend, web, architecture]
+tags: [frontend, web, architecture, atomic-design]
 image: /assets/img/2021-03-14-effective-atomic-design/thumbnail.png
 comments: true
 # published: false
