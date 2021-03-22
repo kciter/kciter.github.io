@@ -81,7 +81,7 @@ comments: true
 
 사실 필자는 이유를 알기위해 많은 리서치를 했지만 딱히 명쾌한 이유은 없었다. 단지 [Stack Overflow 글 하나](https://stackoverflow.com/questions/24472979/what-is-so-special-about-unix-time/24472994#24472994)를 통해 유닉스를 개발한 데니스 리치의 인터뷰 기사를 하나 발견했는데 이를 통해 알아낸 이유는 다음과 같다.
 
-> "At the time we didn't have tapes and we had a couple of file-systems running and we kept changing the origin of time. So finally we said, 'Let's pick one thing that's not going to overflow for a while.' 1970 seemed to be as good as any." - Dennis Ritchie
+> "At the time we didn't have tapes and we had a couple of file-systems running and we kept changing the origin of time. So finally we said, 'Let's pick one thing that's not going to overflow for a while.' **1970 seemed to be as good as any.**" - Dennis Ritchie
 
 핵심만 해석하면 "그냥 1970년이 좋아 보였다"로 요약할 수 있다. 즉, 정리하자면 1970년 1월 1일인 이유에 별다른 이유는 없다.
 
@@ -89,7 +89,7 @@ comments: true
 
 시스템 시간은 [네트워크 타임 프로토콜(NTP)](https://www.ntp.org/)를 통해 현재 시간을 동기화할 수 있다. 당연하지만 네트워크 연결이 되어야하며 UDP 123번 포트를 통해 통신한다. NTP 서버는 [여러 곳](https://gist.github.com/mutin-sa/eea1c396b1e610a2da1e5550d94b0453)이 존재하며 이 서버가 기준 시간을 만들어낸다.
 
-NTP 서버는 트리 구조로 상위 NTP 서버에서 하위 NTP 서버로 동기화된다. 여기서 계층을 **Stratum**으로 표현하는데 가장 최상위에 해당하는 Stratum 0은 Primary Reference Clock(PRC)이라고도 부르며 정교한 원자 시계를 사용하여 매우 정밀한 시간을 만들 수 있다. 다음 계층인 Stratum 1은 물리적으로 Stratum 0과 동기화되며 기준 시간을 만드는 1차 타임 서버가 된다. 이후 Stratum 2 ~ 15에 해당하는 서버들은 상위 Stratum과 동기화되며 낮은 계층일수록 정밀도가 떨어진다.
+NTP 서버는 트리 구조로 상위 NTP 서버에서 하위 NTP 서버로 동기화된다. 여기서 계층을 **Stratum**으로 표현하는데 가장 최상위에 해당하는 Stratum 0은 Primary Reference Clock(PRC)이라고도 부르며 정교한 원자 시계를 사용하기에 매우 정밀한 시간을 만들 수 있다. 다음 계층인 Stratum 1은 물리적으로 Stratum 0과 동기화되며 기준 시간을 만드는 1차 타임 서버가 된다. 이후 Stratum 2 ~ 15에 해당하는 서버들은 상위 Stratum과 동기화되며 낮은 계층일수록 정밀도가 떨어진다.
 
 NTP 클라이언트는 NTP 서버를 주기적으로 Polling 하는데 클라이언트는 서버에서 받아온 데이터를 보정해야 한다. 이를 해결하기 위한 [식](https://en.wikipedia.org/wiki/Network_Time_Protocol#Clock_synchronization_algorithm)은 다음과 같다.
 
@@ -181,7 +181,7 @@ Europe/Paris
 * UI 시각 표시
 * 캘린더
 
-UI에 내려주는 데이터 예시를 보면 다음과 같이 내려줄 수 있다.
+UI에 내려주는 JSON 데이터 예시는 다음과 같다.
 
 ```js
 {
