@@ -7,6 +7,7 @@ title: About
   a { text-decoration: none; color: #5c6ac4; }
 </style>
 
+<!--
 <p>
   <a href="https://cobalt.run">
     <img src="https://badgen.net/badge/icon/Cobalt Developer?icon=https://caple-static.s3.ap-northeast-2.amazonaws.com/cobalt-badge.svg&label&color=5B69C3&labelColor=414C9A" />
@@ -16,13 +17,16 @@ title: About
     <img src="https://badgen.net/badge/icon/Buy a coffee?icon=kofi&label&color=29ABE0&labelColor=29ABE0" />
   </a>
 </p>
-
-<div class="avatar" style="width: 200px">
-  <img src="/assets/img/avatar.png" />
-</div>
+-->
+{% include me.html %}
 
 ## 💼 Currently working on
 * **Cobalt. Inc.** Lead Developer, 2018. 07 ~
+
+## ⌨️ My Keyboard
+<div style="max-width: 400px">
+  <img src="/assets/img/about/keyboard.jpg" />
+</div>
 
 ## 📘 Writing
 * [Vue.js 이 정도는 알아야지](http://www.yes24.com/24/goods/56894866)

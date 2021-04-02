@@ -740,11 +740,10 @@ th, td {
 .member-container {
   display: flex;
   padding: 24px 0;
-  border-top: 1px solid #dfe3e8;
 }
 
 .member-container .avatar {
-  flex: 0 1 120px;
+  flex: 0 1 160px;
 }
 
 .avatar img {
@@ -757,6 +756,24 @@ th, td {
   margin-left: 32px;
   font-size: 12px;
 }
+
+  .member-container {
+    display: block;
+  }
+
+  .member-container .avatar {
+    display: block;
+    max-width: 300px;
+    width: 50%;
+    margin: 0 auto;
+  }
+
+  .member-container .summary {
+    margin-left: 0;
+    font-size: 12px;
+    text-align: center;
+  }
+
 
 .summary .name {
   margin-top: 18px;
