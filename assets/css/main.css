@@ -823,7 +823,7 @@ th, td {
 }
 
 #comments {
-  display: none;
+  display: block;
 }
 
 @media (max-width: 30rem) {
