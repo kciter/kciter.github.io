@@ -1,6 +1,6 @@
 module.exports = {
   siteMetadata: {
-    siteUrl: 'https://kciter.so'
+    siteUrl: "https://kciter.so",
     title: `kciter.so | devlog`,
     description: `devlog`,
     author: `Lee Sun-Hyoup`,
