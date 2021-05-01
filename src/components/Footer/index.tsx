@@ -9,7 +9,7 @@ const Footer = () => {
         <Social />
 
         <div className="post-date">
-          <Link to="/menus/about">kciter.so | devlog by Lee Sun-Hyoup</Link>
+          <Link to="/about">kciter.so | devlog by Lee Sun-Hyoup</Link>
         </div>
       </footer>
     </>

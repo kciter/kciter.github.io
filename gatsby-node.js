@@ -1,30 +1,32 @@
 const { createFilePath } = require(`gatsby-source-filesystem`);
 const path = require("path");
+const dayjs = require("dayjs");
 
 exports.onCreateNode = ({ node, getNode, actions }) => {
   const { createNodeField } = actions;
   if (node.internal.type === `Mdx`) {
-    const { categories } = node.frontmatter;
-    const filename = createFilePath({ node, getNode, basePath: `posts` });
+    const type = node.fileAbsolutePath.includes("/posts") ? "post" : "snippet";
 
-    console.log(filename);
+    const filename = createFilePath({ node, getNode, basePath: `${type}s` });
 
     const [, date, title] = filename.match(
       /^\/([\d]{4}-[\d]{2}-[\d]{2})-{1}(.+)\/$/
     );
 
-    const slug = `/posts/${title}`;
+    const slug = `/${type}s/${title}`;
     createNodeField({ node, name: `slug`, value: slug });
     createNodeField({ node, name: `date`, value: date });
+    createNodeField({ node, name: `year`, value: dayjs(date).format("YYYY") });
+    createNodeField({ node, name: `type`, value: type });
   }
 };
 
-exports.createPages = async ({ graphql, actions }) => {
+exports.createPages = ({ graphql, actions }) => {
   const { createPage } = actions;
 
-  const result = await graphql(`
+  graphql(`
     {
-      allMdx {
+      allMdx(filter: { fileAbsolutePath: { glob: "**/posts/*.(md|mdx)" } }) {
         edges {
           node {
             fields {
@@ -38,21 +40,43 @@ exports.createPages = async ({ graphql, actions }) => {
         }
       }
     }
-  `);
+  `).then(result => {
+    result.data.allMdx.edges.forEach(({ node }) => {
+      createPage({
+        path: node.fields.slug,
+        component: path.resolve(`src/templates/post.tsx`),
+        context: {
+          slug: node.fields.slug,
+        },
+      });
+    });
+  });
 
-  if (result.errors) {
-    return Promise.reject(result.errors);
-  }
-
-  const markdownItems = result.data.allMdx.edges;
-
-  markdownItems.forEach(({ node }) => {
-    createPage({
-      path: node.fields.slug,
-      component: path.resolve(`src/templates/post.tsx`),
-      context: {
-        slug: node.fields.slug,
-      },
+  graphql(`
+    {
+      allMdx(filter: { fileAbsolutePath: { glob: "**/snippets/*.(md|mdx)" } }) {
+        edges {
+          node {
+            fields {
+              slug
+            }
+            frontmatter {
+              title
+              categories
+            }
+          }
+        }
+      }
+    }
+  `).then(result => {
+    result.data.allMdx.edges.forEach(({ node }) => {
+      createPage({
+        path: node.fields.slug,
+        component: path.resolve(`src/templates/snippet.tsx`),
+        context: {
+          slug: node.fields.slug,
+        },
+      });
     });
   });
 };

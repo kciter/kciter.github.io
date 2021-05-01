@@ -77,7 +77,7 @@ const SEO = ({ title, description, meta }: SEOProps) => {
         },
         {
           name: `twitter:creator`,
-          content: site.siteMetadata?.author || ``,
+          content: "Lee Sun-Hyoup",
         },
         {
           name: `twitter:title`,

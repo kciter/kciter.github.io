@@ -1,5 +1,5 @@
-import React, { useLayoutEffect } from "react";
-import { graphql, PageProps, useStaticQuery } from "gatsby";
+import React from "react";
+import { graphql, PageProps } from "gatsby";
 import DefaultTemplate from "./default";
 import SEO from "@components/SEO";
 import dayjs from "dayjs";
@@ -15,7 +15,7 @@ import { useState } from "react";
 
 dayjs.extend(require("dayjs/plugin/localizedFormat"));
 
-const PostTemplate = ({ data, location }: PageProps) => {
+const SnippetTemplate = ({ data, location }: PageProps) => {
   const {
     body,
     tableOfContents,
@@ -57,13 +57,6 @@ const PostTemplate = ({ data, location }: PageProps) => {
     });
   }, []);
 
-  const [posts, setPosts] = useState();
-  useEffect(() => {
-    setPosts(
-      (data as any).allMdx.edges.sort(() => Math.random() - 0.5).splice(0, 6)
-    );
-  }, []);
-
   return (
     <DefaultTemplate>
       <SEO
@@ -73,10 +66,6 @@ const PostTemplate = ({ data, location }: PageProps) => {
           {
             name: `article:published_time`,
             content: dayjs(fields.date).locale("ko").format(),
-          },
-          {
-            name: `og:image`,
-            content: `https://kciter.so${frontmatter.image}`,
           },
         ]}
       />
@@ -93,12 +82,6 @@ const PostTemplate = ({ data, location }: PageProps) => {
         Written on {dayjs(fields.date).locale("en").format("LL")}
       </span>
 
-      <img src={frontmatter.image} />
-
-      {tableOfContents.items && (
-        <TableOfContents items={tableOfContents.items} />
-      )}
-
       <div className="post-content">
         {/* <MDXProvider> */}
         <MDXRenderer>{body}</MDXRenderer>
@@ -106,15 +89,14 @@ const PostTemplate = ({ data, location }: PageProps) => {
       </div>
 
       <PostFooter tags={frontmatter.tags} comment={frontmatter.comments} />
-      {posts && <RelatedPost posts={posts} current={fields.slug} />}
     </DefaultTemplate>
   );
 };
 
-export default PostTemplate;
+export default SnippetTemplate;
 
-export const pageQuery = graphql`
-  query PostBySlug($slug: String!) {
+export const snippetQuery = graphql`
+  query SnippetBySlug($slug: String!) {
     site {
       siteMetadata {
         title
@@ -130,24 +112,9 @@ export const pageQuery = graphql`
       }
       frontmatter {
         title
-        categories
         tags
         image
         comments
-      }
-    }
-    allMdx(filter: { fields: { type: { eq: "post" } } }) {
-      edges {
-        node {
-          fields {
-            date
-            slug
-          }
-          frontmatter {
-            title
-            image
-          }
-        }
       }
     }
   }

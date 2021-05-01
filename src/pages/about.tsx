@@ -1,5 +1,4 @@
 import React from "react";
-import Bio from "@components/Bio";
 import DefaultTemplate from "@templates/default";
 import SEO from "@components/SEO";
 
@@ -59,12 +58,8 @@ const About = () => {
       text: "Vue.js와 Reactive Programming",
     },
     {
-      href: "https://news.realm.io/kr/news/reactive-programming-with-rxswift/",
-      text: "Reactive Programming With Swift",
-    },
-    {
-      href: "Tour of Vue.js",
-      text: "https://www.slideshare.net/sunhyouplee/tour-of-vuejs-70654520",
+      href: "https://www.slideshare.net/sunhyouplee/tour-of-vuejs-70654520",
+      text: "Tour of Vue.js",
     },
     {
       href:
@@ -107,8 +102,6 @@ const About = () => {
   return (
     <DefaultTemplate>
       <SEO title="About" />
-
-      {/* <Bio /> */}
 
       <h2>💼 Currently working on</h2>
       <ul>

@@ -4,8 +4,9 @@ import { Link } from "gatsby";
 
 const Header = () => {
   const menus = [
-    { name: "Writing", path: "writing" },
-    { name: "About", path: "about" },
+    { name: "Writing", path: "/writing" },
+    { name: "Snippet", path: "/snippets" },
+    { name: "About", path: "/about" },
   ];
 
   return (
@@ -22,7 +23,7 @@ const Header = () => {
             </a>
             {menus.map(item => (
               <React.Fragment key={item.name}>
-                <Link to={`/menus/${item.path}`}>{item.name}</Link>
+                <Link to={item.path}>{item.name}</Link>
               </React.Fragment>
             ))}
           </nav>

@@ -11,7 +11,10 @@ interface PostsProps {
 const RelatedPost = ({ page = 1 }: PostsProps) => {
   const result = useStaticQuery(graphql`
     {
-      allMdx(sort: { fields: [fields___date], order: DESC }) {
+      allMdx(
+        sort: { fields: [fields___date], order: DESC }
+        filter: { fields: { type: { eq: "post" } } }
+      ) {
         edges {
           node {
             excerpt(truncate: true)
@@ -55,11 +58,6 @@ const RelatedPost = ({ page = 1 }: PostsProps) => {
               {Math.round(post.node.fields.readingTime.minutes)} minute read
             </span>
           </p>
-          {/* <a href={post.node.fields.slug}>
-              <img src={post.node.frontmatter.image} />
-              <div className="title">{post.node.frontmatter.title}</div>
-              <small>{post.node.fields.date}</small>
-            </a> */}
         </div>
       ))}
     </div>
