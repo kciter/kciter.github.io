@@ -1,5 +1,5 @@
-import React from "react";
-import { graphql, PageProps } from "gatsby";
+import React, { useLayoutEffect } from "react";
+import { graphql, PageProps, useStaticQuery } from "gatsby";
 import DefaultTemplate from "./default";
 import SEO from "@components/SEO";
 import dayjs from "dayjs";
@@ -9,6 +9,9 @@ import PostFooter from "@components/PostFooter";
 import RelatedPost from "@components/RelatedPost";
 import TableOfContents from "@components/TableOfContents";
 import { Helmet } from "react-helmet";
+import $ from "jquery";
+import { useEffect } from "react";
+import { useState } from "react";
 
 dayjs.extend(require("dayjs/plugin/localizedFormat"));
 
@@ -39,6 +42,28 @@ const PostTemplate = ({ data, location }: PageProps) => {
     "@context": "https://schema.org",
   };
 
+  useEffect(() => {
+    if (typeof document === undefined) return;
+
+    $(document).ready(function () {
+      $(".post-container a.footnote-ref").each((_, item) => {
+        const href = $(item).attr("href")?.slice(1);
+        const text = $("#" + href)
+          .text()
+          .replace("↩", "");
+
+        $(item).attr("data-tooltip", text);
+      });
+    });
+  }, []);
+
+  const [posts, setPosts] = useState();
+  useEffect(() => {
+    setPosts(
+      (data as any).allMdx.edges.sort(() => Math.random() - 0.5).splice(0, 6)
+    );
+  }, []);
+
   return (
     <DefaultTemplate>
       <SEO
@@ -51,7 +76,7 @@ const PostTemplate = ({ data, location }: PageProps) => {
           },
           {
             name: `og:image`,
-            content: `${location.href}${frontmatter.image}`,
+            content: `https://kciter.so${frontmatter.image}`,
           },
         ]}
       />
@@ -70,16 +95,18 @@ const PostTemplate = ({ data, location }: PageProps) => {
 
       <img src={frontmatter.image} />
 
-      <TableOfContents items={tableOfContents.items} />
+      {tableOfContents.items && (
+        <TableOfContents items={tableOfContents.items} />
+      )}
 
       <div className="post-content">
-        <MDXProvider>
-          <MDXRenderer>{body}</MDXRenderer>
-        </MDXProvider>
+        {/* <MDXProvider> */}
+        <MDXRenderer>{body}</MDXRenderer>
+        {/* </MDXProvider> */}
       </div>
 
       <PostFooter tags={frontmatter.tags} comment={frontmatter.comments} />
-      <RelatedPost current={fields.slug} />
+      {posts && <RelatedPost posts={posts} current={fields.slug} />}
     </DefaultTemplate>
   );
 };
@@ -108,6 +135,20 @@ export const pageQuery = graphql`
         tags
         image
         comments
+      }
+    }
+    allMdx {
+      edges {
+        node {
+          fields {
+            date
+            slug
+          }
+          frontmatter {
+            title
+            image
+          }
+        }
       }
     }
   }

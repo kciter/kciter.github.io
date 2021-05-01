@@ -4,7 +4,6 @@ import Footer from "@components/Footer";
 import { Helmet } from "react-helmet";
 import "../assets/styles/main.css";
 import "../assets/styles/prismjs-theme.css";
-import "../assets/scripts/footnote";
 
 interface DefaultTemplateProps {
   children: React.ReactNode;

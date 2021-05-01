@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "react";
 import Sticky from "sticky-js";
 
 interface Item {
@@ -28,7 +29,10 @@ const List = ({ items }: TableOfContentsProps) => {
 };
 
 const TableOfContents = ({ items }: TableOfContentsProps) => {
-  new Sticky(".toc");
+  useEffect(() => {
+    if (typeof document === undefined) return;
+    new Sticky(".toc");
+  }, []);
 
   return (
     <div className="toc" data-margin-top="50">

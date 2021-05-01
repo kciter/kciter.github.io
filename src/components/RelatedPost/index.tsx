@@ -2,33 +2,14 @@ import { graphql, useStaticQuery } from "gatsby";
 import React from "react";
 
 interface RelatedPostProps {
+  posts: any;
   current?: string;
+  style?: React.CSSProperties;
 }
 
-const RelatedPost = ({ current }: RelatedPostProps) => {
-  const result = useStaticQuery(graphql`
-    {
-      allMdx {
-        edges {
-          node {
-            fields {
-              date
-              slug
-            }
-            frontmatter {
-              title
-              image
-            }
-          }
-        }
-      }
-    }
-  `);
-
-  const posts = result.allMdx.edges;
-
+const RelatedPost = ({ posts, current, style }: RelatedPostProps) => {
   return (
-    <div className="related">
+    <div className="related" style={style}>
       <div className="related-posts">
         {posts.map(
           (post: any) =>

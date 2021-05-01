@@ -1,4 +1,4 @@
-import React, { createRef, useLayoutEffect } from "react";
+import React, { createRef, useEffect, useLayoutEffect } from "react";
 
 const src = "https://utteranc.es/client.js";
 
@@ -10,7 +10,7 @@ export interface IUtterancesProps {
 const Utterances: React.FC<IUtterancesProps> = React.memo(({ repo, theme }) => {
   const containerRef = createRef<HTMLDivElement>();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const utterances = document.createElement("script");
 
     const attributes = {

@@ -20,11 +20,11 @@ const PostFooter = ({ tags, comment }: PostFooterProps) => {
           </div>
         )}
 
-        {comment && (
+        {/* {comment && (
           <div id="comment-button-wrapper">
             <div id="comment-button">댓글 닫기</div>
           </div>
-        )}
+        )} */}
       </div>
 
       {comment && (
@@ -33,7 +33,7 @@ const PostFooter = ({ tags, comment }: PostFooterProps) => {
             <Utterances repo="kciter/kciter.github.io" theme="github-light" />
           </div>
 
-          <script
+          {/* <script
             async
             dangerouslySetInnerHTML={{
               __html: `
@@ -50,7 +50,7 @@ $(function() {
 });
 `,
             }}
-          />
+          /> */}
         </>
       )}
     </>

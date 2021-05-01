@@ -41,7 +41,7 @@ const SEO = ({ title, description, meta }: SEOProps) => {
         ko: "ko",
       }}
       title={metaTitle}
-      titleTemplate={`%s | kciter.so`}
+      titleTemplate={title ? `%s | kciter.so` : undefined}
       meta={[
         {
           name: `description`,
@@ -86,6 +86,10 @@ const SEO = ({ title, description, meta }: SEOProps) => {
         {
           name: `twitter:description`,
           content: metaDescription,
+        },
+        meta.find((item: any) => item.name === "og:image") ?? {
+          name: `og:image`,
+          content: "https://kciter.so/images/og.png",
         },
       ].concat(meta)}
     />

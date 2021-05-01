@@ -108,7 +108,7 @@ const About = () => {
     <DefaultTemplate>
       <SEO title="About" />
 
-      <Bio />
+      {/* <Bio /> */}
 
       <h2>💼 Currently working on</h2>
       <ul>
