@@ -764,6 +764,7 @@ th, td {
   display: inline-block;
   height: 20px;
   padding: 0 8px;
+  margin-right: 4px;
   font-size: 10px;
   line-height: 20px;
   color: #888;
