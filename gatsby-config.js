@@ -88,5 +88,12 @@ module.exports = {
         ],
       },
     },
+    {
+      resolve: "gatsby-plugin-google-tagmanager",
+      options: {
+        id: "G-7M8K7EBEDX",
+        includeInDevelopment: true,
+      },
+    },
   ],
 };
