@@ -1,5 +1,6 @@
 module.exports = {
   siteMetadata: {
+    siteUrl: 'https://kciter.so'
     title: `kciter.so | devlog`,
     description: `devlog`,
     author: `Lee Sun-Hyoup`,
@@ -95,5 +96,6 @@ module.exports = {
         includeInDevelopment: true,
       },
     },
+    `gatsby-plugin-cname`,
   ],
 };

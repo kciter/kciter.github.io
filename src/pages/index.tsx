@@ -27,7 +27,7 @@ const Index = ({ data }: PageProps) => {
 
 export const relatedPostQuery = graphql`
   query RelatedPost {
-    allMdx {
+    allMdx(filter: { fields: { type: { eq: "post" } } }) {
       edges {
         node {
           fields {
