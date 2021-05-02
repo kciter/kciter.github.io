@@ -29,7 +29,7 @@ code[class*="language-"] {
   -ms-hyphens: none;
   hyphens: none;
   font-family: "Source Code Pro", monospace;
-  font-size: 0.8rem;
+  /* font-size: 0.8rem; */
 }
 pre[class*="language-"]::selection,
 code[class*="language-"]::selection,
@@ -174,7 +174,6 @@ pre[class*="language-"] > code[class*="language-"] {
 
 .gatsby-highlight {
   /* background-color: #fdf6e3; */
-  width: 90%;
   border-radius: 0.3em;
   margin: 32px auto;
   padding: 1em;

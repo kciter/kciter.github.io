@@ -816,5 +816,17 @@ th, td {
 }
 
 .gatsby-highlight {
-  font-size: 14px !important;
+  width: 95%;
+  padding: 0;
+}
+
+.gatsby-highlight pre[class*=language-] {
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 30em) {
+  .gatsby-highlight {
+    width: 100%;
+  }
 }

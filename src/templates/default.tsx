@@ -2,8 +2,8 @@ import React from "react";
 import Header from "@components/Header";
 import Footer from "@components/Footer";
 import { Helmet } from "react-helmet";
-import "../assets/styles/main.css";
 import "../assets/styles/prismjs-theme.css";
+import "../assets/styles/main.css";
 
 interface DefaultTemplateProps {
   children: React.ReactNode;
