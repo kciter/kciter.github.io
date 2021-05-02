@@ -814,3 +814,7 @@ th, td {
   font-weight: bold;
   color: #212b36;
 }
+
+.gatsby-highlight {
+  font-size: 14px !important;
+}
