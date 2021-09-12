@@ -257,8 +257,6 @@ export default () => {
 ```jsx
 // Good : 더러운 컴포넌트에서 주입하는 것을 추천
 const Component = ({ onClick, modal }) => {
-  const [visible, setVisible] = useState(false);
-
   return (
     <div>
       <button onClick={onClick}>Click me</button>
@@ -282,7 +280,7 @@ const Wrapped = () => {
 
   return (
     <div>
-      <Component modal={<ModalComponent onClick={handleClick} visible={visible} />} />
+      <Component onClick={handleClick} modal={<ModalComponent visible={visible} />} />
     </div>
   );
 };
