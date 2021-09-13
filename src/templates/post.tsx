@@ -136,7 +136,12 @@ export const pageQuery = graphql`
         comments
       }
     }
-    allMdx(filter: { fields: { type: { eq: "post" } } }) {
+    allMdx(
+      filter: {
+        fields: { type: { eq: "post" } }
+        frontmatter: { draft: { ne: true } }
+      }
+    ) {
       edges {
         node {
           fields {

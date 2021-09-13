@@ -1,4 +1,5 @@
 const { createFilePath } = require(`gatsby-source-filesystem`);
+const { GraphQLBoolean } = require("gatsby/graphql");
 const path = require("path");
 const dayjs = require("dayjs");
 
@@ -35,6 +36,7 @@ exports.createPages = ({ graphql, actions }) => {
             frontmatter {
               title
               categories
+              draft
             }
           }
         }
