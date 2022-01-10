@@ -22,3 +22,6 @@ jobs:
 
       - name: Deploy
         run: yarn deploy
+        env:
+          NODE_ENV: production
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
