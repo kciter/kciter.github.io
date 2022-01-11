@@ -14,6 +14,7 @@ const RelatedPost = ({ page = 1 }: PostsProps) => {
       allMdx(
         sort: { fields: [fields___date], order: DESC }
         filter: { fields: { type: { eq: "post" } } }
+        frontmatter: { draft: { ne: true } }
       ) {
         edges {
           node {
