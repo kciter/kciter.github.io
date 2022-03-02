@@ -851,3 +851,20 @@ th, td {
     width: 100%;
   }
 }
+
+/*
+ hire
+*/
+.hire {
+  margin: 8px 0;
+  padding: 16px;
+  font-size: 14px;
+  line-height: 22px;
+  border: 1px solid #5c6ac4;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.hire a {
+  color: #5c6ac4;
+}
