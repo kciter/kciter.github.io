@@ -10,7 +10,7 @@ const Image = ({ src, caption, width }: ImageProps) => {
   return (
     <figure>
       <img src={src} width={width} />
-      {caption && <figcaption>{caption}</figcaption>}
+      {caption && <figcaption dangerouslySetInnerHTML={{ __html: caption }} />}
     </figure>
   );
 };
