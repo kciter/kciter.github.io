@@ -1,0 +1,117 @@
+---
+title: "Polymorphic한 React 컴포넌트 만들기"
+categories: book-report
+tags: [book]
+image: /images/2022-08-14-polymorphic-react-component/thumbnail.png
+comments: true
+draft: true
+---
+
+import Image from '@components/Image';
+
+들어가기에 앞서 **Polymorphism**은 한국어로 다형성이라고 부르는데, `여러 개의 형태를 가진다`라는 의미를 가진 그리스어에서 유래된 단어다. 그럼 이 글의 제목에 포함된 **Polymorphic**은 `다형의` 혹은 `다양한 형태의` 등으로 표현할 수 있을 것이다. 컴퓨터 과학에서 다형성은 프로그래밍적인 요소가 여러 형태로 될 수 있는 것을 의미하는데 보통 객체가 여러 자료형으로 나타날 수 있음을 표현할 때 사용한다.
+
+그럼 Polymorphic한 UI 컴포넌트는 `다양한 형태의 UI 컴포넌트`라고 바꿔 말할 수 있을 것이다. 필자는 이 말이 다음과 같이 내용을 담고 있다고 생각한다.
+
+* 다양한 Semantic을 표현할 수 있는 UI 컴포넌트
+* 다양한 속성을 가질 수 있는 UI 컴포넌트
+* 다양한 스타일을 가질 수 있는 UI 컴포넌트
+
+좀 더 풀어서 설명하자면 웹 프론트엔드에서의 Polymorphic 컴포넌트는 코드에 따라 어떠한 요소(Element)도 될 수 있고 그에 따른 속성(Attribute)도 사용할 수 있다. 즉, 상황에 맞는 Semantic을 사용할 수 있고 앵커 태그처럼 특수한 용도로 사용되는 컴포넌트가 될 수도 있다. 결국 **無의 형태**에서 **무엇이든지 될 수 있는 컴포넌트**가 되는 것이 Polymorphic 컴포넌트라고 볼 수 있다.
+
+그래서 이러한 Polymorphic 컴포넌트는 React와 관련된 UIKit을 뜯어보면 높은 확률로 사용되고 있는 패턴이다. 예를 들면, MUI의 [Box](https://mui.com/material-ui/react-box/) 컴포넌트나 Mantine의 [Box](https://mantine.dev/core/focus-trap/) 컴포넌트를 예시로 들 수 있다. 두 UI 라이브러리는 Box라는 Polymorphic한 컴포넌트를 이용하여 재사용성을 높이고 다양한 컴포넌트를 확장성 있게 구현하고 있다. 굉장히 유용한 컴포넌트기 때문에 필자가 재직 중인 회사에서 만들고 사용하는 [디자인 시스템](https://github.com/cobaltinc/co-design)에도 View 컴포넌트를 구현하여 비슷하게 사용하고 있다.
+
+아쉽게도 Polymorphic 컴포넌트와 관련된 자료는 한국어로 작성된 자료가 거의 없고 동적인 스타일 생성까지 하는 경우는 영문 자료로도 찾기 힘들어 이번 기회에 관련된 자료를 만들어보기로 했다.
+
+# 왜 필요할까?
+
+실제 사례를 보지 않는다면 이 컴포넌트가 왜 필요한지 모를 수 있다. 다음 코드를 살펴보자.
+
+```jsx
+// Button.jsx
+export const Button = ({ ...props }) => {
+  return (
+    <button 
+      style={{ backgroundColor: 'black', color: 'white' }} 
+      {...props} 
+    />
+  );
+}
+
+// App.jsx
+import { Button } from './Button';
+
+const App = () => {
+  return (
+    <div>
+      <Button onClick={() => alert('Good!')}>Click Me!</Button>
+    </div>
+  );
+}
+```
+
+설명할 필요가 없을 정도로 아주 간단한 코드다. 단순하게 표현했지만 위 코드처럼 스타일만 공통으로 적용한 컴포넌트는 실제로도 많이 사용되는 컴포넌트다. Button 컴포넌트는 prop으로 넘기는 값을 button 속성으로 전부 넘기기 때문에 꽤 확장성있게 사용할 수 있는 컴포넌트라고 생각할 수 있다. 그런데 만약 버튼에 링크를 추가하고 싶다면 어떻게 해야할까?
+
+```jsx
+import { Button } from './Button';
+
+const App = () => {
+  return (
+    <div>
+      <a href="https://kciter.so">
+        <Button>Click Me!</Button>
+      </a>
+    </div>
+  );
+}
+```
+
+위 처럼 작성할 수도 있겠지만 재사용성 측면에선 그다지 좋은 방법은 아니다. 추후 재사용을 고려하여 새로운 컴포넌트를 만들 수도 있다.
+
+```jsx
+// Button.jsx
+export const Button = ({ ...props }) => {
+  return (
+    <button 
+      style={{ backgroundColor: 'black', color: 'white' }} 
+      {...props} 
+    />
+  );
+}
+
+// LinkButton.jsx
+import { Button } from './Button';
+
+export const LinkButton = ({ href, ...props }) => {
+  return (
+    <a href={href}>
+      <Button {...props} />
+    </a>
+  );
+}
+
+// App.jsx
+import { LinkButton } from './LinkButton';
+
+const App = () => {
+  return (
+    <div>
+      <LinkButton href="https://kciter.so">Click Me!</LinkButton>
+    </div>
+  );
+}
+```
+
+위와 같이 작성할 수도 있지만 이 경우 앵커 태그가 확장되지 않는다는 문제점이 있고 컴포넌트의 의존 관계가 새롭게 추가된다는 문제점이 있다. 그리고 만약 react-router나 Next.js를 사용하여 SPA를 위한 Link 컴포넌트를 사용한다면 또 새로운 컴포넌트를 만들어줄 수 밖에 없다. 이 문제의 해결법으로 Polymorphic 컴포넌트를 사용할 수 있다.
+
+# JavaScript에서 구현하기
+
+사실 JavaScript에선 Type-safe에 자유롭기 때문에 Polymorphic 컴포넌트를 구현하는 것이 어렵지 않다. 이런 부분은 JavaScript 약점이지만 한편으로는 구현의 편리함으로서 강점이 될 수도 있다.
+
+
+
+# TypeScript에서 구현하기
+
+TypeScript를 쓰다가 JavaScript를 쓸 때 아쉬운 점은 IntelliSense[^1]를 사용할 수 없다는 점이다. 어느정도 자동 완성을 해주긴하지만 TypeScript의 강력함에 비하면 좀 아쉽다.
+
+[^1]: Visual Studio 계열 IDE에서 제공하는 자동 완성 기능
