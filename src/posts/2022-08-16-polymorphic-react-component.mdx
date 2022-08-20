@@ -9,9 +9,9 @@ draft: true
 
 import Image from '@components/Image';
 
-들어가기에 앞서 **Polymorphism**은 한국어로 다형성이라고 부르는데, `여러 개의 형태를 가진다`라는 의미를 가진 그리스어에서 유래된 단어다. 그럼 이 글의 제목에 포함된 **Polymorphic**은 `다형의` 혹은 `다양한 형태의` 등으로 표현할 수 있을 것이다. 컴퓨터 과학에서 다형성은 프로그래밍적인 요소가 여러 형태로 될 수 있는 것을 의미하는데 보통 객체가 여러 자료형으로 나타날 수 있음을 표현할 때 사용한다.
+들어가기에 앞서 **Polymorphism**은 한국어로 다형성이라고 부르는데, `여러 개의 형태를 가진다`라는 의미를 가진 그리스어에서 유래된 단어다. 그럼 이 글의 제목에 포함된 **Polymorphic**은 `다형의` 혹은 `다양한 형태의` 등으로 표현할 수 있을 것이다. 컴퓨터 과학에서 다형성은 프로그래밍적인 요소가 여러 형태로 표현 될 수 있는 것을 의미하는데 보통은 객체가 여러 자료형으로 나타날 수 있음을 표현할 때 사용한다.
 
-그럼 Polymorphic한 UI 컴포넌트는 `다양한 형태의 UI 컴포넌트`라고 바꿔 말할 수 있을 것이다. 필자는 이 말이 다음과 같이 내용을 담고 있다고 생각한다.
+그럼 Polymorphic한 UI 컴포넌트는 `다양한 형태의 UI 컴포넌트`라고 바꿔 말할 수 있을 것이다. 필자는 이 말이 다음과 같은 내용을 담고 있다고 생각한다.
 
 * 다양한 Semantic을 표현할 수 있는 UI 컴포넌트
 * 다양한 속성을 가질 수 있는 UI 컴포넌트
@@ -23,12 +23,14 @@ import Image from '@components/Image';
 
 아쉽게도 Polymorphic 컴포넌트와 관련된 자료는 한국어로 작성된 자료가 거의 없고 동적인 스타일 생성까지 하는 경우는 영문 자료로도 찾기 힘들어 이번 기회에 관련된 자료를 만들어보기로 했다.
 
-# 왜 필요할까?
+# 문제 인식하기
 
 실제 사례를 보지 않는다면 이 컴포넌트가 왜 필요한지 모를 수 있다. 다음 코드를 살펴보자.
 
 ```jsx
-// Button.jsx
+/**
+ * Button.jsx
+ */
 export const Button = ({ ...props }) => {
   return (
     <button 
@@ -38,7 +40,9 @@ export const Button = ({ ...props }) => {
   );
 }
 
-// App.jsx
+/**
+ * App.jsx
+ */
 import { Button } from './Button';
 
 const App = () => {
@@ -50,7 +54,7 @@ const App = () => {
 }
 ```
 
-설명할 필요가 없을 정도로 아주 간단한 코드다. 단순하게 표현했지만 위 코드처럼 스타일만 공통으로 적용한 컴포넌트는 실제로도 많이 사용되는 컴포넌트다. Button 컴포넌트는 prop으로 넘기는 값을 button 속성으로 전부 넘기기 때문에 꽤 확장성있게 사용할 수 있는 컴포넌트라고 생각할 수 있다. 그런데 만약 버튼에 링크를 추가하고 싶다면 어떻게 해야할까?
+설명할 필요가 없을 정도로 아주 간단한 코드다. 단순하게 표현했지만 위 코드처럼 스타일만 공통으로 적용한 컴포넌트는 실제로도 많이 사용되는 컴포넌트다. `Button` 컴포넌트는 prop으로 넘기는 값을 button 태그의 속성으로 전부 넘기기 때문에 꽤 확장성있게 사용할 수 있는 컴포넌트라고 생각할 수 있다. 그런데 만약 버튼에 링크를 추가하고 싶다면 어떻게 해야할까?
 
 ```jsx
 import { Button } from './Button';
@@ -69,7 +73,9 @@ const App = () => {
 위 처럼 작성할 수도 있겠지만 재사용성 측면에선 그다지 좋은 방법은 아니다. 추후 재사용을 고려하여 새로운 컴포넌트를 만들 수도 있다.
 
 ```jsx
-// Button.jsx
+/**
+ * Button.jsx
+ */
 export const Button = ({ ...props }) => {
   return (
     <button 
@@ -79,7 +85,9 @@ export const Button = ({ ...props }) => {
   );
 }
 
-// LinkButton.jsx
+/**
+ * LinkButton.jsx
+ */
 import { Button } from './Button';
 
 export const LinkButton = ({ href, ...props }) => {
@@ -90,7 +98,9 @@ export const LinkButton = ({ href, ...props }) => {
   );
 }
 
-// App.jsx
+/**
+ * App.jsx
+ */
 import { LinkButton } from './LinkButton';
 
 const App = () => {
@@ -106,12 +116,81 @@ const App = () => {
 
 # JavaScript에서 구현하기
 
-사실 JavaScript에선 Type-safe에 자유롭기 때문에 Polymorphic 컴포넌트를 구현하는 것이 어렵지 않다. 이런 부분은 JavaScript 약점이지만 한편으로는 구현의 편리함으로서 강점이 될 수도 있다.
+사실 JavaScript에선 Type-safe에 자유롭기 때문에 Polymorphic 컴포넌트를 구현하는 것이 어렵지 않다. 이런 부분은 JavaScript 약점이지만 한편으로는 구현의 편리함으로서 강점이 될 수도 있다. 다음과 같이 아주 간단하게 Polymorphic한 컴포넌트를 만들 수 있다.
 
+```jsx
+export const View = forwardRef(({ as, ...props }, ref) => {
+  const Element = as || "div";
+  return <Element ref={ref} {...props} />;
+});
+```
 
+View 컴포넌트는 `as`를 통해 어떤 요소로 사용될지 결정된다. 만약 생략한다면 기본적으로 `div`를 사용하게 된다. 이때, 필요한 속성이 있다면 자유롭게 넘길 수 있도록 컴포넌트를 작성하고 `forwardRef`를 통해 부모 컴포넌트에서 요소에 접근할 수 있도록 만들었다. 이 컴포넌트는 다음과 같이 사용할 수 있다.
+
+```jsx
+import { View } from './View';
+
+const App = () => {
+  return (
+    <div>
+      <View as="a" href="https://kciter.so">Click Me!</View>
+    </div>
+  );
+}
+```
+
+코드를 살펴보면 `as`를 통해 View 컴포넌트에 사용되는 요소를 a 태그로 변경하고 `href` 속성을 사용한 것을 볼 수 있다. 그럼 이 코드를 실행하면 [Click Me!](https://kciter.so)라는 링크가 보이게 된다. 사실 이렇게만 사용하면 왜 사용하는지 이해가 안가는 것이 당연하다. 그냥 바로 a 태그를 쓰면 되니 번거롭게 컴포넌트를 만들 필요가 없기 때문이다. 그렇지만 위 코드를 응용하여 다음과 같이 사용하는 것도 가능하다.
+
+```jsx
+/**
+ * Button.jsx
+ */
+import View from './View';
+
+export const Button = ({ as, ...props }) => {
+  return (
+    // 위에서 만들어둔 View 컴포넌트를 이용했다.
+    <View as={as || 'button'}
+      style={{ backgroundColor: 'black', color: 'white' }} 
+      {...props} 
+    />
+  );
+}
+
+// 혹은 다음과 같이 작성할 수 있다.
+export const Button = ({ as, ...props }) => {
+  const Element = as || 'button';
+  return (
+    <Element
+      style={{ backgroundColor: 'black', color: 'white' }} 
+      {...props} 
+    />
+  );
+}
+
+/**
+ * App.jsx
+ */
+import { Button } from './Button';
+
+const App = () => {
+  return (
+    <div>
+      // 마치 앵커 태그처럼 사용할 수 있다.
+      <Button as="a" href="https://kciter.so">Click Me!</Button>
+    </div>
+  );
+}
+```
+
+다시 [문제 인식하기](#문제-인식하기) 부분을 살펴보면 이때는 `LinkButton`이라는 컴포넌트를 만드는 것으로 요구사항을 충족했었다. 만약 위 코드처럼 Polymorphic하도록 컴포넌트를 작성한다면 중복 코드를 제거하고 조금 더 유연하게 컴포넌트를 사용할 수 있게 된다. 생각보다 이런 사례가 많고 구현이 간단하기 때문에 좋은 컴포넌트 설계라고 볼 수 있다.
 
 # TypeScript에서 구현하기
 
-TypeScript를 쓰다가 JavaScript를 쓸 때 아쉬운 점은 IntelliSense[^1]를 사용할 수 없다는 점이다. 어느정도 자동 완성을 해주긴하지만 TypeScript의 강력함에 비하면 좀 아쉽다.
+JavaScript를 쓸 때 아쉬운 점은 IntelliSense[^1]를 사용할 수 없다는 점이다. 어느정도 자동 완성을 해주긴하지만 TypeScript의 강력함에 비하면 좀 아쉽다. 위 코드도 `as`를 통해 다른 요소를 사용하도록 변경했지만 어떤 속성을 넘길 수 있을지는 개발자가 잘 판단하여야 한다. 이런 문제점은 TypeScript에서 Polymorphic한 컴포넌트를 구현하면 해결할 수 있다. 단, JavaScript에서 구현하는 것보다 이해하기 복잡하다는 점이 있다.
+
+결국은 타입을 정의해야 한다. 다음 코드를 확인해보자.
+
+# 동적 스타일 생성
 
 [^1]: Visual Studio 계열 IDE에서 제공하는 자동 완성 기능
