@@ -17,7 +17,7 @@ import Image from '@components/Image';
 * 다양한 속성을 가질 수 있는 UI 컴포넌트
 * 다양한 스타일을 가질 수 있는 UI 컴포넌트
 
-좀 더 풀어서 설명하자면 웹 프론트엔드에서의 Polymorphic 컴포넌트는 코드에 따라 어떠한 요소(Element)도 될 수 있고 그에 따른 속성(Attribute)도 사용할 수 있다. 즉, 상황에 맞는 Semantic을 사용할 수 있고 앵커 태그처럼 특수한 용도로 사용되는 컴포넌트가 될 수도 있다. 결국 **無의 형태**에서 **무엇이든지 될 수 있는 컴포넌트**가 되는 것이 Polymorphic 컴포넌트라고 볼 수 있다.
+좀 더 풀어서 설명하자면 웹 프론트엔드에서의 Polymorphic 컴포넌트는 코드에 따라 어떠한 요소(Element)도 될 수 있고 그에 따른 속성(Attribute)도 사용할 수 있다. 즉, 상황에 맞는 Semantic을 사용할 수 있고 앵커 태그처럼 특수한 용도로 사용되는 컴포넌트가 될 수도 있다. 결국 **無의 형태**에서 **무엇이든지 될 수 있는 컴포넌트**가 되는 것이 Polymorphic 컴포넌트고 가장 추상화된 형태의 컴포넌트라고 볼 수 있다.
 
 그래서 이러한 Polymorphic 컴포넌트는 React와 관련된 UIKit을 뜯어보면 높은 확률로 사용되고 있는 패턴이다. 예를 들면, MUI의 [Box](https://mui.com/material-ui/react-box/) 컴포넌트나 Mantine의 [Box](https://mantine.dev/core/focus-trap/) 컴포넌트를 예시로 들 수 있다. 두 UI 라이브러리는 Box라는 Polymorphic한 컴포넌트를 이용하여 재사용성을 높이고 다양한 컴포넌트를 확장성 있게 구현하고 있다. 굉장히 유용한 컴포넌트기 때문에 필자가 재직 중인 회사에서 만들고 사용하는 [디자인 시스템](https://github.com/cobaltinc/co-design)에도 View 컴포넌트를 구현하여 비슷하게 사용하고 있다.
 
@@ -187,9 +187,73 @@ const App = () => {
 
 # TypeScript에서 구현하기
 
-JavaScript를 쓸 때 아쉬운 점은 IntelliSense[^1]를 사용할 수 없다는 점이다. 어느정도 자동 완성을 해주긴하지만 TypeScript의 강력함에 비하면 좀 아쉽다. 위 코드도 `as`를 통해 다른 요소를 사용하도록 변경했지만 어떤 속성을 넘길 수 있을지는 개발자가 잘 판단하여야 한다. 이런 문제점은 TypeScript에서 Polymorphic한 컴포넌트를 구현하면 해결할 수 있다. 단, JavaScript에서 구현하는 것보다 이해하기 복잡하다는 점이 있다.
+JavaScript를 쓸 때 아쉬운 점은 IntelliSense[^1]를 사용할 수 없다는 점이다. 어느정도 자동 완성을 해주긴하지만 TypeScript의 강력함에 비하면 좀 아쉽다. 위 코드도 `as`를 통해 다른 요소를 사용하도록 변경했지만 어떤 속성을 넘길 수 있을지는 개발자가 잘 판단하여야 한다. 이런 문제점은 TypeScript에서 Polymorphic한 컴포넌트를 구현하면 해결할 수 있다.
 
-결국은 타입을 정의해야 한다. 다음 코드를 확인해보자.
+## 요소와 속성 표현하기
+
+JavaScript에서 사용한 코드와 똑같이 사용할 수 있도록 만들면서 자동 완성 기능까지 사용하려면 타입 정의가 필요하다. 우선 다음 코드를 확인해보자.
+
+```tsx
+/**
+ * View.tsx
+ */
+interface ViewProps<T extends React.ElementType> {
+  as?: T;
+}
+
+export const View = <T extends React.ElementType = "div">({
+  as,
+  ...props
+}: ViewProps<T>) => {
+  const Element = as || "div";
+  return <Element {...props} />;
+};
+
+/**
+ * App.tsx
+ */
+import { View } from "./components/View";
+
+function App() {
+  return (
+    // 컴포넌트 부분에 에러가 발생한다.
+    <View as="a" href="https://kciter.so">
+      Link
+    </View>
+  );
+}
+
+export default App;
+```
+
+`React.ElementType`은 JSX 내장 컴포넌트 또는 사용자 정의 컴포넌트를 둘 다 받을 수 있는 타입으로 `string | React.ComponentType<any>`로 정의되어있다. 이 타입과 제네릭을 사용하면 위 JavaScript 코드에서 했던 것 처럼 `as`를 통해 사용하려는 요소를 바꿀 수 있게 된다.
+
+하지만 위와 같이 `View` 컴포넌트를 작성하면 `as`를 통해 사용하려한 요소가 어떤 것인지 알 수가 없다. 따라서 다음과 같은 에러가 발생하게 된다.
+
+> '{ children: string; as: "a"; href: string; }' 형식은 'IntrinsicAttributes & ViewProps<"a">' 형식에 할당할 수 없습니다.<br />
+> 'IntrinsicAttributes & ViewProps<"a">' 형식에 'children' 속성이 없습니다.
+
+에러 메시지를 살펴보면 prop으로 넘긴 값들이 타입에 맞지 않는다는 것을 알 수 있다. 이를 위해 다음과 같이 `View` 컴포넌트를 수정할 수 있다.
+
+```tsx
+interface ViewProps<T extends React.ElementType> {
+  as?: T;
+}
+
+export const View = <T extends React.ElementType = "div">({
+  as,
+  ...props
+}: ViewProps<T> & React.ComponentPropsWithoutRef<T>) => {
+  const Element = as || "div";
+  return <Element {...props} />;
+};
+```
+
+`React.ComponentPropsWithoutRef`은 `ref`를 제외한 나머지 속성을 정의할 수 있게 해주는 타입이다. 이 타입을 이용하면 제네릭을 통해 나머지 속성에 대한 것을 알 수 있게된다. 하지만 아직 `ref`는 받아올 수 없다.
+
+## ref 받아오기
+
+사실 여기까지는 이해하는 것이 어렵지는 않았을 것이다. 코드양이 많은 것도 아니기 때문에 생각보다 쉽게 구현할 수 있다. 그렇지만 `ref`까지 사용하게 된다면 구현 난이도가 올라가게 된다.
 
 # 동적 스타일 생성
 
