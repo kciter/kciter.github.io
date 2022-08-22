@@ -4,7 +4,7 @@ categories: book-report
 tags: [book]
 image: /images/2022-08-16-polymorphic-react-component/thumbnail.png
 comments: true
-draft: true
+draft: false
 ---
 
 import Image from '@components/Image';
@@ -19,7 +19,7 @@ import Image from '@components/Image';
 
 좀 더 풀어서 설명하자면 웹 프론트엔드에서의 Polymorphic 컴포넌트는 코드에 따라 어떠한 요소(Element)도 될 수 있고 그에 따른 속성(Attribute)도 사용할 수 있다. 즉, 상황에 맞는 Semantic을 사용할 수 있고 앵커 태그처럼 특수한 용도로 사용되는 컴포넌트가 될 수도 있다. 결국 **無의 형태**에서 **무엇이든지 될 수 있는 컴포넌트**가 되는 것이 Polymorphic 컴포넌트고 가장 추상화된 형태의 컴포넌트라고 볼 수 있다.
 
-그래서 이러한 Polymorphic 컴포넌트는 React와 관련된 UIKit을 뜯어보면 높은 확률로 사용되고 있는 패턴이다. 예를 들면, MUI의 [Box](https://mui.com/material-ui/react-box/) 컴포넌트나 Mantine의 [Box](https://mantine.dev/core/focus-trap/) 컴포넌트를 예시로 들 수 있다. 두 UI 라이브러리는 Box라는 Polymorphic한 컴포넌트를 이용하여 재사용성을 높이고 다양한 컴포넌트를 확장성 있게 구현하고 있다. 굉장히 유용한 컴포넌트기 때문에 필자가 재직 중인 회사에서 만들고 사용하는 [디자인 시스템](https://github.com/cobaltinc/co-design)에도 View 컴포넌트를 구현하여 비슷하게 사용하고 있다.
+그래서 이러한 Polymorphic 컴포넌트는 React와 관련된 UIKit을 뜯어보면 높은 확률로 사용되고 있는 패턴이다. 예를 들면, MUI의 [Box](https://mui.com/material-ui/react-box/) 컴포넌트나 Mantine의 [Box](https://mantine.dev/core/box/) 컴포넌트를 예시로 들 수 있다. 두 UI 라이브러리는 Box라는 Polymorphic한 컴포넌트를 이용하여 재사용성을 높이고 다양한 컴포넌트를 확장성 있게 구현하고 있다. 굉장히 유용한 컴포넌트기 때문에 필자가 재직 중인 회사에서 만들고 사용하는 [디자인 시스템](https://github.com/cobaltinc/co-design)에도 View 컴포넌트를 구현하여 비슷하게 사용하고 있다.
 
 아쉽게도 Polymorphic 컴포넌트와 관련된 자료는 한국어로 작성된 자료가 거의 없고 영문으로도 구체적인 설명한 자료는 찾기 힘들어 이번 기회에 관련된 내용을 포스팅 해보기로 했다.
 
@@ -187,7 +187,7 @@ const App = () => {
 
 # TypeScript에서 구현하기
 
-JavaScript를 쓸 때 아쉬운 점은 IntelliSense[^1]를 사용할 수 없다는 점이다. 어느 정도 자동 완성을 해주긴 하지만 TypeScript의 강력함에 비하면 좀 아쉽다. 위 코드도 `as`를 통해 다른 요소를 사용하도록 변경했지만 어떤 속성을 넘길 수 있을지는 개발자가 잘 판단하여야 한다. 이런 문제점은 TypeScript에서 Polymorphic한 컴포넌트를 구현하면 해결할 수 있다.
+JavaScript를 쓸 때 아쉬운 점은 IntelliSense[^1]를 사용할 수 없다는 점이다. 어느 정도 자동 완성을 해주긴 하지만 TypeScript의 강력함에 비하면 좀 아쉽다. 위 코드도 `as`를 통해 다른 요소를 사용하도록 변경했지만 어떤 속성을 넘길 수 있을지는 개발자가 잘 판단하여야 한다. 혹은 개발자가 오타를 내어 잘못된 값을 `as`로 전달할 수도 있다. 이런 문제점은 TypeScript를 통해 Type-safe한 Polymorphic 컴포넌트를 구현하면 해결할 수 있다.
 
 ## 요소와 속성 표현하기
 
@@ -214,7 +214,7 @@ export const View = <T extends React.ElementType = "div">({
  */
 import { View } from "./components/View";
 
-function App() {
+const App = () => {
   return (
     // 컴포넌트 부분에 에러가 발생한다.
     <View as="a" href="https://kciter.so">
@@ -235,14 +235,14 @@ export default App;
 에러 메시지를 살펴보면 prop으로 넘긴 값들이 타입에 맞지 않는다는 것을 알 수 있다. 이를 위해 다음과 같이 View 컴포넌트를 수정할 수 있다.
 
 ```tsx
-interface ViewProps<T extends React.ElementType> {
+type ViewProps<T extends React.ElementType> = {
   as?: T;
-}
+} & React.ComponentPropsWithoutRef<T>;
 
 export const View = <T extends React.ElementType = "div">({
   as,
   ...props
-}: ViewProps<T> & React.ComponentPropsWithoutRef<T>) => {
+}: ViewProps<T>) => {
   const Element = as || "div";
   return <Element {...props} />;
 };
@@ -252,18 +252,17 @@ export const View = <T extends React.ElementType = "div">({
 
 ## ref 받아오기
 
-여기까지는 이해하는 것이 어렵지는 않았을 것이다. 코드 양이 많은 것도 아니기 때문에 생각보다 쉽게 구현할 수 있다. 그렇지만 `ref`까지 사용하게 된다면 구현 난이도가 올라가게 된다. 일단 다음 코드를 살펴보자.
+여기까지는 이해하는 것이 어렵지는 않았을 것이다. 코드 양이 많은 것도 아니기 때문에 생각보다 쉽게 구현할 수 있다. 그렇지만 `ref`까지 사용하게 된다면 조금 복잡해진다. 일단 다음 코드를 살펴보자.
 
 ```tsx
-interface ViewProps<T extends React.ElementType> {
+type ViewProps<T extends React.ElementType> = {
   as?: T;
-}
+} & React.ComponentPropsWithoutRef<T>;
 
 export const View = forwardRef(
   <T extends React.ElementType = "div">(
-    { as, ...props }: ViewProps<T> & React.ComponentPropsWithoutRef<T>,
-    // ref만 받아온다
-    ref: React.ComponentPropsWithRef<T>["ref"]
+    { as, ...props }: ViewProps<T>,
+    ref: React.ComponentPropsWithRef<T>["ref"] // ref만 받아오도록
   ) => {
     const Element = as || "div";
     return <Element ref={ref} {...props} />;
@@ -275,6 +274,140 @@ export const View = forwardRef(
 
 <Image src="/images/2022-08-16-polymorphic-react-component/ref-unknown-type.png" caption="잘못된 타입인 ref가 들어갔음에도 에러가 발생하지 않는다" />
 
-# 동적 스타일 생성
+이런 일이 발생한 이유는 아직 `forwardRef`에 대한 타입이 모호하기 때문이다. 제대로 정의된 것 처럼 보이지만 제네릭은 함수 파라메터에만 적용되었을 뿐 함수 자체엔 적용되지 않았다. 따라서 `forwardRef`에 대한 제네릭 타입 정의가 필요하다. 타입 정의를 위해 `forwardRef` 함수가 어떻게 정의되었는지 확인해보자.
+
+```ts
+function forwardRef<T, P = {}>(render: ForwardRefRenderFunction<T, P>): ForwardRefExoticComponent<PropsWithoutRef<P> & RefAttributes<T>>;
+
+interface ForwardRefExoticComponent<P> extends NamedExoticComponent<P> {
+  defaultProps?: Partial<P> | undefined;
+  propTypes?: WeakValidationMap<P> | undefined;
+}
+
+interface NamedExoticComponent<P = {}> extends ExoticComponent<P> {
+  displayName?: string | undefined;
+}
+
+interface ExoticComponent<P = {}> {
+  (props: P): (ReactElement|null);
+  readonly $$typeof: symbol;
+}
+```
+
+여기서 `forwardRef` 함수의 반환 타입을 살펴보면 `ForwardRefExoticComponent<PropsWithoutRef<P> & RefAttributes<T>>`으로 되어있다. `ForwardRefExoticComponent`는 최종적으로 `ExoticComponent` 인터페이스를 상속받는데 내용을 살펴보면 결국 함수 컴포넌트의 형태가 되는 것을 알 수 있다.
+
+따라서 `PropsWithoutRef<P> & RefAttributes<T>`를 View 컴포넌트의 타입으로 만들어주면 된다. `RefAttributes`는 다음과 같이 정의되어 있다.
+
+```ts
+interface RefAttributes<T> extends Attributes {
+  ref?: Ref<T> | undefined;
+}
+```
+
+`ComponentPropsWithRef`에는 이미 `RefAttributes`이 결합되어 있기 때문에 다음과 같이 선언하여 View 컴포넌트를 완성할 수 있다.
+
+```tsx
+type ViewProps<T extends React.ElementType> = {
+  as?: T;
+} & React.ComponentPropsWithoutRef<T>;
+
+type ViewComponent = <C extends React.ElementType = "div">(
+  props: ViewProps<C> & {
+    ref?: React.ComponentPropsWithRef<C>["ref"];
+  }
+) => React.ReactElement | null;
+
+export const View: ViewComponent = forwardRef(
+  <T extends React.ElementType = "div">(
+    { as, ...props }: ViewProps<T>,
+    ref: React.ComponentPropsWithRef<T>["ref"]
+  ) => {
+    const Element = as || "div";
+    return <Element ref={ref} {...props} />;
+  }
+);
+```
+
+위 코드를 반영하고나서 다시 App 컴포넌트를 확인하면 다음과 같은 에러가 발생하는 것을 확인할 수 있다.
+
+<Image src="/images/2022-08-16-polymorphic-react-component/ref-unknown-type.png" caption="잘못된 ref가 들어가 에러가 발생한다" />
+
+이제 `useRef`의 제네릭 타입을 `HTMLAnchorElement`로 변경해주면 정상적으로 실행되는 것을 볼 수 있다.
+
+## 범용성 있게 사용하기
+
+여기까지 왔으면 대체로 복잡한 내용은 끝난 셈이다. 지금까지는 View 컴포넌트만을 위하여 타입을 정의했는데 타입을 한 단계 더 추상화하여 조금 더 범용적으로 쓸 수 있게 만들어보자.
+
+```ts
+// 기존 작성한 ViewProps에서 as를 분리한다.
+type AsProp<T extends React.ElementType> = {
+  as?: T;
+};
+
+// 직관적인 이름을 붙여서 타입으로 만들어준다.
+export type PolymorphicRef<T extends React.ElementType> =
+  React.ComponentPropsWithRef<T>["ref"];
+
+// 결합 타입을 만든다.
+export type PolymorphicComponentProps<
+  T extends React.ElementType,
+  Props = {}
+> = AsProp<T> & React.ComponentPropsWithoutRef<T> & Props & {
+  ref?: PolymorphicRef<T>;
+};
+```
+
+기존 `ViewProps` 타입을 분해하고 `PolymorphicComponentProps`라는 제네릭 타입을 만들어서 필요한 속성을 추가할 수 있도록 만들었다. 이렇게 만든 타입을 통해 새로운 컴포넌트를 만들어보자.
+
+```tsx
+type _TextProps = {
+  size: number;
+  color: string;
+};
+
+export type TextProps<T extends React.ElementType> = 
+  PolymorphicComponentProps<T, _TextProps>;
+
+type TextComponent = <T extends React.ElementType = "span">(
+  props: TextProps<T>
+) => React.ReactElement | null;
+
+export const Text: TextComponent = forwardRef(
+  <T extends React.ElementType = "span">(
+    { as, size, color, ...props }: TextProps<T>,
+    ref: PolymorphicRef<T>["ref"]
+  ) => {
+    const Element = as || "span";
+    // size와 color를 style로 적용
+    return <Element ref={ref} {...props} style={{ fontSize: size, color }} />;
+  }
+);
+```
+
+`PolymorphicComponentProps`를 통해 속성 확장 가능한 Polymorphic 컴포넌트를 아주 쉽게 만들어냈다. 여기서는 `size`와 `color`를 새롭게 추가했다. 다음과 같이 사용할 수 있다.
+
+```tsx
+const App = () => {
+  return (
+    <View>
+      <View as="a" href="https://kciter.so">
+        Link
+      </View>
+      <Text as="div" color="red" size={50}>
+        Text
+      </Text>
+    </View>
+  );
+};
+```
+
+결과 화면을 살펴보면 다음과 같이 제대로 적용된 것을 확인할 수 있다.
+
+<Image src="/images/2022-08-16-polymorphic-react-component/result.png" caption="업데이트가 거슬리는 분께는 심심한 사과를 드린다" />
+
+# 마치며
+이렇게 꽤 다양한 곳에서 활용 가능한 Polymorphic 컴포넌트를 구현할 수 있다. 이런 컴포넌트를 만드는 패턴은 요즘 유행하는 UI 라이브러리에선 대부분 사용하고 있기 때문에 알아두면 도움이 될 것이다. 이 포스팅을 통해 만들어진 최종적인 코드는 [GitHub 저장소](https://github.com/kciter/polymorphic-react-component-sample)에서 확인할 수 있다.
+
+아직 포스팅을 시작하며 소개한 MUI의 [Box](https://mui.com/material-ui/react-box/) 컴포넌트나 Mantine의 [Box](https://mantine.dev/core/box/) 컴포넌트처럼 **스타일 확장 가능한 컴포넌트**까지는 다루지 못했다. 원래 이 부분까지 다루는 것이 필자의 목표였으나 너무 길어져서 완성하는데 오래걸릴 것 같아 빠른 시일 내에 추가 포스팅을 하기로 했다. 만약 해당 내용을 기대하는 독자가 있다면 조금만 기다려주시면 감사하겠다.
 
 [^1]: Visual Studio 계열 IDE에서 제공하는 자동 완성 기능
