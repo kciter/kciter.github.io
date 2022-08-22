@@ -21,7 +21,7 @@ import Image from '@components/Image';
 
 그래서 이러한 Polymorphic 컴포넌트는 React와 관련된 UIKit을 뜯어보면 높은 확률로 사용되고 있는 패턴이다. 예를 들면, MUI의 [Box](https://mui.com/material-ui/react-box/) 컴포넌트나 Mantine의 [Box](https://mantine.dev/core/focus-trap/) 컴포넌트를 예시로 들 수 있다. 두 UI 라이브러리는 Box라는 Polymorphic한 컴포넌트를 이용하여 재사용성을 높이고 다양한 컴포넌트를 확장성 있게 구현하고 있다. 굉장히 유용한 컴포넌트기 때문에 필자가 재직 중인 회사에서 만들고 사용하는 [디자인 시스템](https://github.com/cobaltinc/co-design)에도 View 컴포넌트를 구현하여 비슷하게 사용하고 있다.
 
-아쉽게도 Polymorphic 컴포넌트와 관련된 자료는 한국어로 작성된 자료가 거의 없고 동적인 스타일 생성까지 하는 경우는 영문 자료로도 찾기 힘들어 이번 기회에 관련된 자료를 만들어보기로 했다.
+아쉽게도 Polymorphic 컴포넌트와 관련된 자료는 한국어로 작성된 자료가 거의 없고 영문으로도 구체적인 설명한 자료는 찾기 힘들어 이번 기회에 관련된 내용을 포스팅 해보기로 했다.
 
 # 문제 인식하기
 
@@ -54,7 +54,7 @@ const App = () => {
 }
 ```
 
-설명이 필요 없을 정도로 간단한 코드다. 단순하게 표현했지만 위 코드처럼 스타일만 적용한 컴포넌트는 실제로도 많이 사용된다. Button 컴포넌트는 prop으로 넘기는 값을 button 태그의 속성으로 전부 넘기기 때문에 꽤 확장성있게 사용할 수 있는 컴포넌트라고 생각할 수 있다. 그런데 만약 버튼에 페이지 링크를 추가하고 싶다면 어떻게 해야할까?
+설명이 필요 없을 정도로 간단한 코드다. 단순하게 표현했지만 위 코드처럼 스타일만 적용한 컴포넌트는 실제로도 많이 사용된다. Button 컴포넌트는 prop으로 넘기는 값을 button 태그의 속성으로 전부 넘기기 때문에 꽤 확장성 있게 사용할 수 있는 컴포넌트라고 생각할 수 있다. 그런데 만약 버튼에 페이지 링크를 추가하고 싶다면 어떻게 해야 할까?
 
 ```jsx
 import { Button } from './Button';
@@ -125,7 +125,7 @@ export const View = forwardRef(({ as, ...props }, ref) => {
 });
 ```
 
-View 컴포넌트는 `as`를 통해 어떤 요소로 사용될지 결정된다. 만약 생략한다면 기본적으로 `div`를 사용하게 된다. 이때, 필요한 속성이 있다면 자유롭게 넘길 수 있도록 컴포넌트를 작성하고 `forwardRef`를 통해 부모 컴포넌트에서 요소에 접근할 수 있도록 만들었다. 이 컴포넌트는 다음과 같이 사용할 수 있다.
+여기서 구현한 View 컴포넌트는 React에서 가장 추상적인 컴포넌트다. `as`를 통해 기본 내장된 컴포넌트를 포함하여 어떠한 컴포넌트로도 될 수 있다. 만약 생략한다면 기본적으로 `div`를 사용하게 된다. 이때, 필요한 속성이 있다면 자유롭게 넘길 수 있도록 컴포넌트를 작성하고 `forwardRef`를 통해 부모 컴포넌트에서 요소에 접근할 수 있도록 만들었다. 이 컴포넌트는 다음과 같이 사용할 수 있다.
 
 ```jsx
 import { View } from './View';
@@ -183,11 +183,11 @@ const App = () => {
 }
 ```
 
-다시 [문제 인식하기](#문제-인식하기) 부분을 살펴보면 이때는 `LinkButton`이라는 컴포넌트를 만드는 것으로 요구사항을 충족했었다. 만약 위 코드처럼 Polymorphic하도록 컴포넌트를 작성한다면 중복 코드를 제거하고 조금 더 유연하게 컴포넌트를 사용할 수 있게 된다. 생각보다 이런 사례가 많고 구현이 간단하기 때문에 좋은 컴포넌트 설계라고 볼 수 있다.
+다시 [문제 인식하기](#문제-인식하기) 부분을 살펴보면 이때는 `LinkButton`이라는 컴포넌트를 만드는 것으로 요구사항을 충족했었다. 만약 위 코드처럼 Polymorphic 하도록 컴포넌트를 작성한다면 중복 코드를 제거하고 조금 더 유연하게 컴포넌트를 사용할 수 있게 된다. 생각보다 이런 사례가 많고 구현이 간단하기 때문에 좋은 컴포넌트 설계라고 볼 수 있다.
 
 # TypeScript에서 구현하기
 
-JavaScript를 쓸 때 아쉬운 점은 IntelliSense[^1]를 사용할 수 없다는 점이다. 어느정도 자동 완성을 해주긴하지만 TypeScript의 강력함에 비하면 좀 아쉽다. 위 코드도 `as`를 통해 다른 요소를 사용하도록 변경했지만 어떤 속성을 넘길 수 있을지는 개발자가 잘 판단하여야 한다. 이런 문제점은 TypeScript에서 Polymorphic한 컴포넌트를 구현하면 해결할 수 있다.
+JavaScript를 쓸 때 아쉬운 점은 IntelliSense[^1]를 사용할 수 없다는 점이다. 어느 정도 자동 완성을 해주긴 하지만 TypeScript의 강력함에 비하면 좀 아쉽다. 위 코드도 `as`를 통해 다른 요소를 사용하도록 변경했지만 어떤 속성을 넘길 수 있을지는 개발자가 잘 판단하여야 한다. 이런 문제점은 TypeScript에서 Polymorphic한 컴포넌트를 구현하면 해결할 수 있다.
 
 ## 요소와 속성 표현하기
 
@@ -226,12 +226,11 @@ function App() {
 export default App;
 ```
 
-`React.ElementType`은 JSX 내장 컴포넌트 또는 사용자 정의 컴포넌트를 둘 다 받을 수 있는 타입으로 `string | React.ComponentType<any>`로 정의되어있다. 이 타입과 제네릭을 사용하면 위 JavaScript 코드에서 했던 것 처럼 `as`를 통해 사용하려는 요소를 바꿀 수 있게 된다.
+`React.ElementType`은 JSX 내장 컴포넌트 또는 사용자 정의 컴포넌트를 둘 다 받을 수 있는 타입으로 `string | React.ComponentType<any>`로 정의되어있다. 이 타입과 제네릭을 사용하면 위 JavaScript 코드에서 했던 것처럼 `as`를 통해 사용하려는 요소를 바꿀 수 있게 된다.
 
 하지만 위와 같이 View 컴포넌트를 작성하면 `as`를 통해 사용하려한 요소가 어떤 것인지 알 수가 없다. 따라서 다음과 같은 에러가 발생하게 된다.
 
-> '{ children: string; as: "a"; href: string; }' 형식은 'IntrinsicAttributes & ViewProps<"a">' 형식에 할당할 수 없습니다.<br />
-> 'IntrinsicAttributes & ViewProps<"a">' 형식에 'children' 속성이 없습니다.
+<Image src="/images/2022-08-16-polymorphic-react-component/error-message-1.png" />
 
 에러 메시지를 살펴보면 prop으로 넘긴 값들이 타입에 맞지 않는다는 것을 알 수 있다. 이를 위해 다음과 같이 View 컴포넌트를 수정할 수 있다.
 
@@ -249,11 +248,32 @@ export const View = <T extends React.ElementType = "div">({
 };
 ```
 
-`React.ComponentPropsWithoutRef`은 `ref`를 제외한 나머지 속성을 정의할 수 있게 해주는 타입이다. 이 타입을 이용하면 제네릭을 통해 나머지 속성에 대한 것을 알 수 있게된다. 하지만 아직 `ref`는 받아올 수 없다.
+`React.ComponentPropsWithoutRef`은 `ref`를 제외한 나머지 속성을 정의할 수 있게 해주는 타입이다. 이 타입을 이용하면 제네릭을 통해 나머지 속성에 대한 것을 알 수 있게 된다. 하지만 아직 `ref`는 받아올 수 없다.
 
 ## ref 받아오기
 
-사실 여기까지는 이해하는 것이 어렵지는 않았을 것이다. 코드양이 많은 것도 아니기 때문에 생각보다 쉽게 구현할 수 있다. 그렇지만 `ref`까지 사용하게 된다면 구현 난이도가 올라가게 된다.
+여기까지는 이해하는 것이 어렵지는 않았을 것이다. 코드 양이 많은 것도 아니기 때문에 생각보다 쉽게 구현할 수 있다. 그렇지만 `ref`까지 사용하게 된다면 구현 난이도가 올라가게 된다. 일단 다음 코드를 살펴보자.
+
+```tsx
+interface ViewProps<T extends React.ElementType> {
+  as?: T;
+}
+
+export const View = forwardRef(
+  <T extends React.ElementType = "div">(
+    { as, ...props }: ViewProps<T> & React.ComponentPropsWithoutRef<T>,
+    // ref만 받아온다
+    ref: React.ComponentPropsWithRef<T>["ref"]
+  ) => {
+    const Element = as || "div";
+    return <Element ref={ref} {...props} />;
+  }
+);
+```
+
+만약 위에와 같이 이미 제공되는 `React.ComponentPropsWithRef` 타입을 사용하면 쉽게 해결됐다고 생각할 수 있겠지만 다음과 같이 `unknown`으로 타입을 알 수 없다는 것을 알 수 있다.
+
+<Image src="/images/2022-08-16-polymorphic-react-component/ref-unknown-type.png" caption="잘못된 타입인 ref가 들어갔음에도 에러가 발생하지 않는다" />
 
 # 동적 스타일 생성
 
