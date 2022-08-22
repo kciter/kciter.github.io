@@ -12,7 +12,6 @@ import { Helmet } from "react-helmet";
 import $ from "jquery";
 import { useEffect } from "react";
 import { useState } from "react";
-import Hire from "@components/Hire";
 
 dayjs.extend(require("dayjs/plugin/localizedFormat"));
 
@@ -105,8 +104,6 @@ const PostTemplate = ({ data, location }: PageProps) => {
         <MDXRenderer>{body}</MDXRenderer>
         {/* </MDXProvider> */}
       </div>
-
-      <Hire />
 
       <PostFooter tags={frontmatter.tags} comment={frontmatter.comments} />
 
