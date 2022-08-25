@@ -272,7 +272,7 @@ export const View = forwardRef(
 );
 ```
 
-만약 위에와 같이 이미 제공되는 `React.ComponentPropsWithRef` 타입을 사용하면 쉽게 해결됐다고 생각할 수 있겠지만 다음과 같이 `unknown`으로 타입을 알 수 없다는 것을 알 수 있다.
+만약 위에와 같이 이미 제공되는 `React.ComponentPropsWithRef` 타입을 사용하면 쉽게 해결됐다고 생각할 수 있겠지만 다음과 같이 `unknown`으로 타입을 알 수 없다는 것을 알 수 있다. 이러면 제대로된 타입이 아니어도 에러가 발생하지 않는다.
 
 <Image src="/images/2022-08-16-polymorphic-react-component/ref-unknown-type.png" caption="잘못된 타입인 ref가 들어갔음에도 에러가 발생하지 않는다" />
 
@@ -330,9 +330,9 @@ export const View: ViewComponent = forwardRef(
 );
 ```
 
-위 코드를 반영하고나서 다시 App 컴포넌트를 확인하면 다음과 같은 에러가 발생하는 것을 확인할 수 있다.
+위 코드를 반영하고나서 다시 App 컴포넌트를 확인하면 ref의 타입을 `HTMLDivElement`로 사용하여 컴포넌트 타입과 일치하지 않기 때문에 에러가 발생하는 것을 확인할 수 있다.
 
-<Image src="/images/2022-08-16-polymorphic-react-component/ref-unknown-type.png" caption="잘못된 ref가 들어가 에러가 발생한다" />
+<Image src="/images/2022-08-16-polymorphic-react-component/error-message-2.png" caption="잘못된 ref가 들어가 에러가 발생한다" />
 
 이제 `useRef`의 제네릭 타입을 `HTMLAnchorElement`로 변경해주면 정상적으로 실행되는 것을 볼 수 있다.
 
