@@ -106,7 +106,9 @@ const About = () => {
       <h2>💼 Currently working on</h2>
       <ul>
         <li>
-          <strong>Cobalt. Inc.</strong> Lead Developer, 2018. 07 ~
+          <strong>Cobalt. Inc.</strong> CTO, 2018. 07 ~ <br />
+          Developed document communicating platform,{" "}
+          <a href="https://present.do">Present</a>
         </li>
       </ul>
 
