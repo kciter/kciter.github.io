@@ -60,7 +60,10 @@ const PostTemplate = ({ data, location }: PageProps) => {
   const [posts, setPosts] = useState();
   useEffect(() => {
     setPosts(
-      (data as any).allMdx.edges.sort(() => Math.random() - 0.5).splice(0, 7)
+      (data as any).allMdx.edges
+        .filter((item: any) => item.node.fields.slug !== fields.slug)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 6)
     );
   }, []);
 

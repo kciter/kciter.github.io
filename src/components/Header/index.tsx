@@ -5,7 +5,7 @@ import { Link } from "gatsby";
 const Header = () => {
   const menus = [
     { name: "Writing", path: "/writing" },
-    { name: "Snippet", path: "/snippets" },
+    // { name: "Snippet", path: "/snippets" },
     { name: "About", path: "/about" },
   ];
 
