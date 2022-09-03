@@ -1,3 +1,4 @@
+import SpecialThanks from "@components/SpecialThanks";
 import Utterances from "@components/Utterances";
 import React from "react";
 
@@ -26,6 +27,8 @@ const PostFooter = ({ tags, comment }: PostFooterProps) => {
           </div>
         )} */}
       </div>
+
+      <SpecialThanks />
 
       {comment && (
         <>

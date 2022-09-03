@@ -17,6 +17,7 @@ const DefaultTemplate = ({ children }: DefaultTemplateProps) => {
         <meta charSet="utf-8" />
         <meta name="robots" content="index,follow" />
         <meta name="googlebot" content="index,follow" />
+        <meta name="color-scheme" content="light" />
 
         <link
           rel="stylesheet"
