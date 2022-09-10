@@ -47,20 +47,22 @@ const RelatedPost = ({ page = 1 }: PostsProps) => {
           <h1>
             <a href={post.node.fields.slug}>{post.node.frontmatter.title}</a>
           </h1>
-          <div className="thumbnail-container">
-            <a href={post.node.fields.slug}>
-              <img src={post.node.frontmatter.image} />
-            </a>
+          <div>
+            <div className="thumbnail-container">
+              <a href={post.node.fields.slug}>
+                <img src={post.node.frontmatter.image} />
+              </a>
+            </div>
+            <p>
+              {post.node.excerpt} <a href={post.node.fields.slug}>Read more</a>
+              <span className="post-date">
+                <i className="fa fa-calendar" aria-hidden="true" />{" "}
+                {dayjs(post.node.fields.date).locale("en").format("LL")} -{" "}
+                <i className="fa fa-clock-o" aria-hidden="true" />{" "}
+                {Math.round(post.node.fields.readingTime.minutes)} minute read
+              </span>
+            </p>
           </div>
-          <p>
-            {post.node.excerpt} <a href={post.node.fields.slug}>Read more</a>
-            <span className="post-date">
-              <i className="fa fa-calendar" aria-hidden="true" />{" "}
-              {dayjs(post.node.fields.date).locale("en").format("LL")} -{" "}
-              <i className="fa fa-clock-o" aria-hidden="true" />{" "}
-              {Math.round(post.node.fields.readingTime.minutes)} minute read
-            </span>
-          </p>
         </div>
       ))}
     </div>
