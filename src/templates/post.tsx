@@ -67,6 +67,8 @@ const PostTemplate = ({ data, location }: PageProps) => {
     );
   }, []);
 
+  const draft = frontmatter.draft && process.env.NODE_ENV !== "development";
+
   return (
     <DefaultTemplate>
       <SEO
@@ -98,13 +100,18 @@ const PostTemplate = ({ data, location }: PageProps) => {
 
       <img src={frontmatter.image} />
 
-      {tableOfContents.items && (
-        <TableOfContents items={tableOfContents.items} />
-      )}
+      {draft ||
+        (tableOfContents.items && (
+          <TableOfContents items={tableOfContents.items} />
+        ))}
 
       <div className="post-content">
         {/* <MDXProvider> */}
-        <MDXRenderer>{body}</MDXRenderer>
+        {draft ? (
+          <div className="not-yet-published">Not yet published</div>
+        ) : (
+          <MDXRenderer>{body}</MDXRenderer>
+        )}
         {/* </MDXProvider> */}
       </div>
 
@@ -138,6 +145,7 @@ export const pageQuery = graphql`
         tags
         image
         comments
+        draft
       }
     }
     allMdx(
