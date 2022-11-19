@@ -151,19 +151,339 @@ e
 각 단계를 보면 알겠지만 단순 노가다를 줄인 것에 가깝다. 너무 단순하기 때문에 위 두 예제를 봤다면 Brainfuck이란 언어가 어떻게 동작하는지 이제 완벽하게 파악했을 것이다.
 
 ## 프로그래밍 언어라고 볼 수 있는가?
-그런데 이런 언어로 프로그램을 만들 수 있을까? 결론부터 말하면 **가능**하다. 물론 이런 난해한 프로그래밍 언어를 이용하여 제대로된 프로그램을 만든 사람은 없다. 그럼 제대로된 프로그램을 만든 사람이 없다면 이런 언어가 어떻게 상용 소프트웨어, 컴파일러, 운영체제, 게임과 같은 복잡한 프로그램을 만들어 낼 수 있다는 것을 증명할 수 있을까?
+그런데 이런 언어로 프로그램을 만들 수 있을까? 결론부터 말하면 **가능**하다. 물론 이런 난해한 프로그래밍 언어를 이용하여 제대로된 프로그램을 만든 사람은 없다. 제대로된 프로그램을 만든 사람이 없다면 이런 언어가 어떻게 상용 소프트웨어, 컴파일러, 운영체제, 게임과 같은 복잡한 프로그램을 만들어 낼 수 있다는 것을 증명할 수 있을까?
 
-이는 **튜링 머신**이라는 것을 통해서 가능하다. 컴퓨터 과학에서 중요한 개념으로 이 개념이 있기에 지금의 컴퓨터가 있을 수 있다고 볼 수 있다.
+우선 Brainfuck이라는 언어가 어떻게 탄생했는지 살펴보자. [위키백과](https://ko.wikipedia.org/wiki/%EB%B8%8C%EB%A0%88%EC%9D%B8%ED%8D%BD)에 따르면 Brainfuck은 우어봔 뮐러(Urban Müller)가 1993년에 가장 작은 컴파일러로 구현 가능한 **튜링 완전한 프로그래밍 언어**를 만드는 것이 목적이었다고 한다. 여기서 중요한 것은 **튜링 완전**이라는 용어다. 컴퓨터 과학을 차근차근 공부했더라도 스쳐 지나가듯 넘어가는 경우가 많기 때문에 한 번 봤더라도 까먹은 경우가 많을 것이다.
 
-이를 **튜링 완전**하다라고 말한다. 물론 현실에선 메모리의 제한이 있기 때문에 정말로 모든 것을 계산하는 것은 힘들다. 그렇기 때문에 현실에 있는 컴퓨터는 **느슨한 튜링 완전**하다라고 말한다.
+### 튜링 기계
+우리는 현대 사회 속에서 수많은 기계와 함께 살아가고 있다. 다음 이미지를 살펴보자.
+
+<Image src="/images/2022-09-18-crafting-esolang/machine.png" caption="어떤 차이가 있는가?" />
+
+위 이미지에 있는 기계 중에서 왼쪽에 해당하는 기계와 오른쪽에 해당하는 기계의 차이는 무엇일까? 정답은 간단하다. 왼쪽에 있는 기계들은 세탁하거나 음식을 데우거나 보관하는 등 정해진 일만을 수행한다. 이런 기계들은 특정 목적을 위해 존재하기 때문에 그 외의 일은 하지 않아도 된다. 반면 오른쪽에 있는 기계는 정해진 일 외에도 다른 많은 일을 할 수 있다. 문서를 작성하거나 그림을 그리거나 게임을 할 수 있다. 우리는 이런 기계를 컴퓨터라고 부른다.
+
+이렇게 정해진 일 외에도 다른 일을 수행할 수 있는 기계를 **튜링 기계**이라고 부른다. 튜링 기계는 1936년에 [앨런 튜링](https://ko.wikipedia.org/wiki/%EC%95%A8%EB%9F%B0_%ED%8A%9C%EB%A7%81)이 고안한 가상의 기계다. 튜링 기계는 다음과 같은 세 가지 조건을 만족해야 한다.
+
+1. **튜링 기계는 무한한 테이프를 가지고 있다.**
+2. **테이프의 각 칸에는 유한한 기호 중 하나가 적혀있다.**
+3. **튜링 기계는 테이프의 각 칸의 기호를 읽고 해석할 수 있다.**
+
+이 세 가지 조건을 만족하는 기계를 튜링 기계라고 부른다. 튜링 기계는 무한한 테이프를 가지고 있기 때문에 무한한 입력을 받을 수 있다. 그리고 테이프의 각 칸에는 튜링 기계가 해석할 수 있는 유한한 기호가 적혀있다. 또한 튜링 기계는 테이프의 각 칸을 읽고 해석하고 그에 따라 처리를 할 수 있기 때문에 입력받은 후 각 테이프의 영역을 다른 기호로 바꾸거나 테이프의 위치를 옮길 수 있다.
+
+<Image src="/images/2022-09-18-crafting-esolang/turing-machine.png" caption="단순한 기계지만 많은 것을 할 수 있다" />
+
+그렇지만 이런 조건을 가진 기계는 무엇을 할 수 있을까? 얼핏 보면 아무것도 아닌 기계처럼 보이지만 한번 다르게 표현해보자.
+
+1. **컴퓨터는 레지스터, RAM, HDD와 같은 저장 장치가 있다.**
+2. **저장 장치의 각 칸에는 0과 1 중 하나가 적혀있다.**
+3. **컴퓨터는 저장 장치의 각 칸의 값을 읽고 해석할 수 있다.**
+
+튜링 기계는 컴퓨터, 테이프는 저장 장치라고 표현을 바꿨다. 그리고 유한한 기호 대신 이진수로 표현한다. 어떤가? 조금 다르게 보이지 않는가? 여기서 출력 장치인 모니터나 스피커 같은 것을 달아주면 우리가 아는 컴퓨터가 된다. 즉, 튜링 기계는 현대 컴퓨터의 기원이 되는 기계라고 볼 수 있다.
+
+### 튜링 완전
+튜링 기계가 무엇인지 알았으니 이번에는 **튜링 완전**에 대해서 알아보자. 튜링 완전은 컴퓨터 과학에서 엄청나게 중요한 개념이다. 간단하게 표현하자면 튜링 완전이란 **만들어진 기계가 튜링 기계와 계산 능력이 동일하다**라는 의미를 가진다. 그런데 여기서 의문을 가질 수 있다. 프로그래밍 언어는 기계가 아닌데 왜 튜링 완전하다고 표현하는 걸까?
+
+<Image src="/images/2022-09-18-crafting-esolang/minecraft-cpu.jpeg" caption="마인크래프트에서 만들어진 CPU를 통해 구현된 스네이크 게임" />
+
+일단 그전에 튜링 기계 또 다른 튜링 기계를 만들 수 있다. 튜링 기계는 시간과 자원만 있다면 어떠한 계산이든 할 수 있기 때문에 결국 **어떠한 계산이든 할 수 있도록 지시하는 기계**가 된다면 어떠한 계산이든 할 수 있는 기계를 만든 것이라 볼 수 있다. 동일한 말이 여러 번 나와서 헷갈릴 수 있는데 우리가 잘 아는 **가상 머신**으로 생각해보자. 우리는 컴퓨터에서 가상 머신을 이용하여 윈도우에서 안드로이드 OS를 실행하거나 각종 에뮬레이터 등을 실행시킬 수 있다. 이러한 가상 머신은 우리가 사용하는 컴퓨터의 자원을 이용하여 다른 컴퓨터를 실행시키는 것이다. 이처럼 튜링 기계는 또 다른 튜링 기계를 만들 수 있다.
+
+본론으로 넘어가서 프로그래밍 언어는 기계가 아니지만 **기계가 이해할 수 있는 언어로 변환되어 실행**된다. 이러한 과정에서 프로그래밍 언어는 튜링 기계가 실행할 수 있는 기계로 변환될 수 있다. 이때, 그 기계가 튜링 완전하다면 해당 프로그래밍 언어는 튜링 완전한 프로그래밍 언어라고 부른다. 그렇기 때문에 튜링 완전한 프로그래밍 언어는 또 다른 언어를 만들 수 있다. 어셈블리어가 C언어를 만들고 파이썬이 또 파이썬(PyPy)을 만드는 것 같은 일이다.
+
+따라서 Brainfuck은 상당히 다루기 난감하지만 충분한 시간이 있다면 브라우저, 프로그래밍 언어, AAA 게임 같은 것을 만들 수 있다. 물론, 그런 행동을 하는 사람은 없을 것이다.
+
+참고로 현실에선 메모리의 제한이 있기 때문에 정말로 모든 것을 계산할 수는 없다. 그렇기 때문에 현실에 있는 컴퓨터는 **느슨한 튜링 완전**하다라고 말한다.
 
 # Brainfuck 구현해보기
+그럼 이번에는 한 번 실제로 구현해보자. 앞서 나온 여러 개념과 언어 자체가 이해하기 힘든 것을 감안하더라도 구현은 굉장히 쉬운 편이다. 구현된 소스는 [링크](https://github.com/kciter/brainfuck-impl)를 통해 볼 수 있다. Go, JavaScript 구현체가 있다. 여기서는 JavaScript(Node)로 구현해본다.
 
-## 명령어 구현
+## 기본 명령어 구현
+사실 피연산자가 없기 때문에 명령어만 구현하면 끝난다. 명령어는 `>`, `<`와 같이 포인터 이동, `+`, `-`와 같이 값 증감, `.`과 `,`와 같이 입출력이 있다. 우선 조금 더 복잡한 `[`, `]`와 같은 반복문은 제외하고 나머지 명령어부터 구현해보자.
 
-## 실행해보기
+### 초기화
+먼저 포인터가 이동할 수 있는 범위인 메모리를 만들어야 한다. 보통 Brainfuck의 메모리는 32768바이트로 초기화하는데, 이는 Brainfuck의 특성상 그 이상의 메모리를 사용할 일이 없기 때문이라고 한다. 특별히 정해진 것은 아니기 때문에 32768바이트가 아닌 다른 크기로 초기화해도 무방하다. 편의상 메모리 영역은 배열로 만든다.
 
-# 재즈랭 만들어보기
+```js
+function Brainfuck(size = 32768) {
+  this.memory = new Array(size).fill(0); // 메모리
+  this.ptr = 0; // 포인터
+  this.pc = 0; // 프로그램 카운터, 코드의 위치
+  this.code = []; // 코드를 저장할 배열
+}
+```
+
+이어서 Brainfuck 코드를 불러올 수 있도록 `load` 메소드를 만든다. 이 메소드는 Brainfuck 코드를 인자로 받아서 `this.code`에 저장한다. 이때, 편의를 위해 Brainfuck 코드를 `split`으로 나눠서 배열로 저장한다.
+
+```js
+Brainfuck.prototype.load = function (code) {
+  this.code = code.split("");
+};
+```
+
+### 포인터 이동
+이번에는 `>`, `<`와 같은 포인터 이동 명령어를 구현해보자. 포인터 이동은 `this.ptr`을 조작하도록 구현한다. `>`는 포인터를 오른쪽으로 이동시키고, `<`는 포인터를 왼쪽으로 이동시킨다. 이때, 포인터가 메모리의 범위를 벗어나면 에러를 발생시킨다.
+
+```js
+Brainfuck.prototype.increasePtr = function () {
+  if (this.ptr >= this.memory.length - 1) throw new Error("Out of memory");
+  this.ptr += 1;
+};
+
+Brainfuck.prototype.decreasePtr = function () {
+  if (this.ptr <= 0) throw new Error("Out of memory");
+  this.ptr -= 1;
+};
+```
+
+### 값 증감
+다음으로 `+`, `-`와 같은 값 증감 명령어를 구현해보자. 값 증감은 `this.ptr` 위치에 해당하는 `this.memory`의 값을 조작하도록 구현한다. `+`는 현재 포인터가 가리키는 메모리의 값을 1 증가시키고, `-`는 현재 포인터가 가리키는 메모리의 값을 1 감소시킨다.
+
+```js
+Brainfuck.prototype.increaseValue = function () {
+  this.memory[this.ptr] += 1;
+};
+
+Brainfuck.prototype.decreaseValue = function () {
+  this.memory[this.ptr] -= 1;
+};
+```
+
+### 입출력
+마지막으로 `.`, `,`와 같은 입출력 명령어를 구현해보자. `.`은 현재 포인터가 가리키는 메모리의 값을 출력하고 `,`는 현재 포인터가 가리키는 메모리의 값을 입력받는다. 이 부분은 구현하는 언어에서 제공하는 Built-in 함수를 이용한다.
+
+```js
+Brainfuck.prototype.printValue = function () {
+  process.stdout.write(String.fromCharCode(this.memory[this.ptr]));
+};
+
+Brainfuck.prototype.storingValue = function () {
+  let buffer = Buffer.alloc(1);
+  fs.readSync(0, buffer, 0, 1);
+  this.memory[this.ptr] = buffer.toString("utf8").charCodeAt(0);
+};
+```
+
+## 실행
+여기까지 구현했다면 실행하는 메서드를 구현해보자. 다음과 같이 `run`이라는 메서드를 만든다.
+
+```js
+Brainfuck.prototype.run = function () {
+  while (this.pc < this.code.length) { // 프로그램 카운터가 코드의 길이보다 작을 때까지 반복
+    const command = this.code[this.pc]; // 현재 프로그램 카운터가 가리키는 명령어
+
+    if (command === ">") this.increasePtr();
+    else if (command === "<") this.decreasePtr();
+    else if (command === "+") this.increaseValue();
+    else if (command === "-") this.decreaseValue();
+    else if (command === ".") this.printValue();
+    else if (command === ",") this.storingValue();
+
+    this.pc += 1; // 프로그램 카운터를 1 증가시킨다.
+  }
+};
+```
+
+이제 파일에서 코드를 읽고 실행시킬 수 있도록 로직을 작성해주자.
+
+```js
+fs.readFile(process.argv[2], function (err, data) {
+  if (err) throw new Error(err.message);
+  const bf = new Brainfuck();
+  bf.load(data.toString());
+  bf.run();
+  process.stdout.write("\n");
+});
+```
+
+마지막으로 `helloword.bf`라는 파일을 만들고 글 위쪽에 있는 무식하게 긴 Hello, World! 코드를 넣은 후 실행시켜보자.
+
+```bash
+$ node brainfuck.js helloworld.bf
+Hello, World!
+```
+
+## 반복문 구현
+아직 반복문은 구현하지 않았다. 최종적으로 반복문을 구현해보자. 반복문 구현은 다른 명령어보다는 조금 복잡하다.
+
+### 점프 위치 저장
+
+반복문을 구현하기 위해서 미리 반복문의 시작과 끝의 위치를 저장해두면 편하다. 이를 위해 생성자에서 `this.jumpTo`라는 객체를 만들어준다.
+
+```js
+function Brainfuck(size = 32768) {
+  this.memory = new Array(size).fill(0);
+  this.code = "";
+  this.ptr = 0;
+  this.pc = 0;
+  this.jumpTo = {}; // 점프 위치를 저장하기 위한 객체
+}
+```
+
+그리고 나름 전처리라는 의미로 `preprocess` 메서드에서 반복문의 시작과 끝의 위치를 저장해준다. 스택의 원리를 이용하면 구현하기 편하다.
+
+```js
+Brainfuck.prototype.preprocess = function () {
+  const stack = [];
+  for (let i = 0; i < this.code.length; i += 1) {
+    const command = this.code[i];
+    if (command === "[") { // 반복문 시작
+      stack.push(i);
+    } else if (command === "]") { // 반복문의 끝을 만나면
+      if (stack.length === 0) throw new Error("Syntax error"); // 스택이 비어있는데 ]가 나오면 에러
+
+      this.jumpTo[i] = stack.pop(); // 끝 위치에 반복문의 시작 위치를 스택에서 꺼내서 저장
+      this.jumpTo[this.jumpTo[i]] = i; // 시작 위치에 반복문의 끝 위치를 저장
+    }
+  }
+
+  if (stack.length > 0) throw new Error("Syntax error"); // 스택에 남아있는 [가 있으면 에러
+};
+```
+
+### 점프 구현
+이제 반복문을 구현해보자. `jump` 메서드를 통해 조건을 만족한다면 프로그램 카운터의 위치를 이동시킨다.
+
+```js
+Brainfuck.prototype.jump = function (command) {
+  if (command === "[" && this.memory[this.ptr] === 0) { // [이고 메모리 값이 0이면
+    this.pc = this.jumpTo[this.pc]; // 반복문의 끝으로 이동
+  } else if (command === "]" && this.memory[this.ptr] !== 0) { // ]이고 메모리 값이 0이 아니면
+    this.pc = this.jumpTo[this.pc]; // 반복문의 시작으로 이동
+  }
+};
+```
+
+### 반복문 실행
+
+이제 `run` 메서드에서 반복문을 실행시켜보자. `jump` 메서드를 통해 반복문의 시작과 끝을 처리해주고 나머지 명령어는 기존과 동일하게 처리한다.
+
+```js
+Brainfuck.prototype.run = function () {
+  this.preprocess(); // 전처리
+
+  while (this.pc < this.code.length) {
+    const command = this.code[this.pc];
+
+    if (command === ">") this.increasePtr();
+    else if (command === "<") this.decreasePtr();
+    else if (command === "+") this.increaseValue();
+    else if (command === "-") this.decreaseValue();
+    else if (command === ".") this.printValue();
+    else if (command === ",") this.storingValue();
+    else if (command === "[" || command === "]") this.jump(command); // 반복문 처리
+
+    this.pc += 1;
+  }
+};
+```
+
+아까 만들어둔 `helloworld.bf`에 있던 기존 코드를 지우고 다음과 같이 반복문을 사용한 코드를 넣어보자.
+
+```brainfuck
+++++++++++
+[>+++++++>++++++++++>+++>+<<<<-]
+>++.>+.+++++++..+++.>++++++++++++++.------------.<<+++++++++++++++.>.+++.------.--------.>+.
+```
+
+마지막으로 실행해보면 잘되는 것을 확인할 수 있다.
+
+```bash
+$ node brainfuck.js helloworld.bf
+Hello, World!
+```
+
+만약 다른 프로그램도 실행해보고 싶다면 [피보나치 수열](http://progopedia.com/example/fibonacci/14/)과 [팩토리얼 계산](http://progopedia.com/example/factorial/18/) 예제 코드도 있으니 실행해보자.
+
+# Jazzlang 만들어보기
+
+이제 블로그 포스팅 첫 부분에 나온 잉여 코딩의 산출물인 Jazzlang을 만들어보자. Jazzlang 코드는 [링크](https://github.com/kciter/jazzlang)에서 확인할 수 있다. 현재 Node로만 구현되어 있다.
+
+## 명령어 및 규칙
+Jazzlang은 Brainfuck 문법을 기반으로 만들어져있다. 따라서 Brainfuck 명령어와 Jazzlang 명령어는 1:1로 호환된다. 
+
+| 명령어 | 의미 |
+|------|-----|
+| 샤빱  | 포인터 위치가 1 증가한다. |
+| 사바  | 포인터 위치가 1 감소한다. |
+| 두비  | 포인터 위치에 해당하는 값이 1 증가한다. |
+| 두밥  | 포인터 위치에 해당하는 값이 1 감소한다. |
+| 두붸둡 | 포인터에 해당하는 값을 ASCII 값으로 출력한다. |
+| 샤바다 | 포인터 위치에 입력받은 값을 저장한다. |
+| 뚜비  | 포인터 위치에 해당하는 값이 0이라면 "두봐"로 이동한다. 0이 아니라면 다음 명령어로 이동한다. |
+| 두봐  | 포인터 위치에 해당하는 값이 0이 아니라면 "뚜비"로 이동한다. 0이라면 다음 명령어로 이동한다. |
+
+그리고 밈적 재미를 위해 다음과 같은 규칙도 추가했다.
+
+* `재즈가 뭐라고 생각하세요?`부터 명령어를 인식한다.
+* `이거야`가 나오면 프로그램이 종료된다.
+
+## Transpile 구현
+명령어가 호환된다는 뜻은 Brainfuck 코드로 변환하면 Brainfuck 구현체로 실행이 가능하다는 뜻이다. 따라서 Jazzlang 코드를 Brainfuck 코드로 변환하는 Transpile 기능만 구현하면 끝난다. 기존 Brainfuck 구현체에서 `load` 메서드 구현만 조금 바꿔보자.
+
+```js
+// 기존 Brainfuck 객체의 이름을 Jazzlang으로 변경했다.
+Jazzlang.prototype.load = function (code) {
+  const rawCode = code
+    .split("재즈가 뭐라고 생각하세요?")[1]
+    .split("이거야")[0]
+    .split("");
+  let read = 0;
+
+  while (read < rawCode.length) {
+    if (rawCode[read] === "샤") {
+      if (rawCode[read + 1] === "빱") {
+        this.code.push(">");
+        read += 2;
+      } else if (rawCode[read + 1] === "바" && rawCode[read + 2] === "다") {
+        this.code.push(",");
+        read += 3;
+      }
+    } else if (rawCode[read] === "사" && rawCode[read + 1] === "바") {
+      this.code.push("<");
+      read += 2;
+    } else if (rawCode[read] === "두") {
+      if (rawCode[read + 1] === "비") {
+        this.code.push("+");
+        read += 2;
+      } else if (rawCode[read + 1] === "밥") {
+        this.code.push("-");
+        read += 2;
+      } else if (rawCode[read + 1] === "붸" && rawCode[read + 2] === "둡") {
+        this.code.push(".");
+        read += 3;
+      } else if (rawCode[read + 1] === "봐") {
+        this.code.push("]");
+        read += 2;
+      }
+    } else if (rawCode[read] === "뚜" && rawCode[read + 1] === "비") {
+      this.code.push("[");
+      read += 2;
+    } else {
+      read += 1;
+    }
+  }
+};
+```
+
+굉장히 단순하게 구현했기 때문에 코드가 아주 투박하다. 하지만 이 이상 시간을 내서 고도화할 필요는 없어 보이니 관대하게 봐주시길 바란다. 다음은 Jazzlang으로 구현한 Hello, World! 코드 예제다.
+```
+재즈가 뭐라고 생각하세요?
+두비두비두비 두비두비두비 두비두비두비두비
+뚜비 샤빱 두비두비 두비두비두비 두비두비 샤빱 두비두비두비 두비두비두비 두비두비두비두비 샤빱 두비두비두비 샤빱 두비 사바사바사바사바 두밥 두봐
+샤빱 두비두비 두붸둡 샤빱 두비 두붸둡 두비두비두비 두비두비두비두비 두붸둡 두붸둡 두비두비두비 두붸둡 샤빱
+두비두비두비 두비두비두비 두비두비두비 두비두비두비 두비두비 두붸둡 두밥두밥두밥 두밥두밥두밥 두밥두밥두밥 두밥두밥두밥 두붸둡 사바사바
+두비두비두비 두비두비두비 두비두비두비 두비두비두비 두비두비두비 두붸둡 샤빱 두붸둡 두비두비두비 두붸둡 두밥두밥두밥 두밥두밥두밥 두붸둡
+두밥두밥두밥 두밥두밥두밥 두밥두밥 두붸둡 샤빱 두비 두붸둡
+이거야
+```
+
+위 코드를 `helloworld.jazz`로 저장하고 한 번 실행해보자.
+
+```bash
+$ node jazzlang.js helloworld.jazz
+Hello, World!
+```
 
 # 마치며
-글을 끝까지 읽어보면 난해한 프로그래밍 언어라는 것은 이름치고는 생각보다 구현하기 쉽다는 것을 알 수 있다. 물론 조금 더 심화 내용이 있을 거라 기대한 사람은 이 내용이 아쉽게 느껴질 수 있다. 추후에 여유가 생긴다면 이번에 구현한 Jazzlang을 LLVM을 이용하여 최적화된 언어로 만드는 과정을 포스팅해볼 예정이니 혹시 이 글을 읽고 관심이 생긴 독자가 있다면 추후 올라올 포스팅을 기대해주시길 바란다.
+글을 끝까지 읽어보면 난해한 프로그래밍 언어라는 것은 이름치고는 생각보다 구현하기 쉽다는 것을 알 수 있다. 물론 언어 구현이라길래 Lexer, Parser 등에 대한 구현이나 조금 더 심화 내용이 있을 거라 기대한 사람은 이 내용이 아쉽게 느껴질 수 있다. 그렇지만 본 포스팅의 목적은 `어려워 보이지만 쉬워요!`와 `언어 구현이 어떠한 원리로 가능한 것인지`라는 것을 보여주는 것이 목표였기 때문에 스스로는 만족스럽다.
+
+추후 조금 더 여유가 생긴다면 이번에 구현한 언어들을 고도화하는 만드는 과정을 포스팅해볼 예정이니 혹시 이 글을 읽고 관심이 생긴 독자가 있다면 추후 올라올 포스팅을 기대해주시길 바란다.
