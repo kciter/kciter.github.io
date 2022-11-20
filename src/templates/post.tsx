@@ -83,6 +83,11 @@ const PostTemplate = ({ data, location }: PageProps) => {
             name: `og:image`,
             content: `https://kciter.so${frontmatter.image}`,
           },
+          {
+            name: `image`,
+            property: `og:image`,
+            content: `https://kciter.so${frontmatter.image}`,
+          },
         ]}
       />
 
