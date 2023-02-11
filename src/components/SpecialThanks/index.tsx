@@ -23,6 +23,11 @@ const sponsors: Sponsor[] = [
     name: "18-12847",
     url: "https://github.com/18-12847",
   },
+  {
+    avatar: "https://avatars.githubusercontent.com/u/22555243?v=4",
+    name: "light8reeze",
+    url: "https://github.com/light8reeze",
+  },
 ];
 
 const SpecialThanks = () => {
