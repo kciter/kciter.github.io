@@ -20,7 +20,7 @@ import Image from '@components/Image';
 # 도메인과 모듈
 우리가 만드는 소프트웨어는 비즈니스와 밀접한 연관이 있다. 이때 도메인은 **비즈니스에서 소프트웨어로 문제를 해결하기 위한 영역**을 말한다. 개발자는 도메인과 유스케이스를 논리적인 코드로 작성하고 사용자에게 제품으로 제공한다. 도메인을 이해하고 이에 따라 코드를 작성하는 것이 중요하기 때문에 [도메인 주도 설계(Domain-Driven Design)](https://ko.wikipedia.org/wiki/%EB%8F%84%EB%A9%94%EC%9D%B8_%EC%A3%BC%EB%8F%84_%EC%84%A4%EA%B3%84) 방법론을 이용하는 팀이 많다. 필자가 재직하고 있는 회사 또한 도메인에 기반하여 제품에 대해 논의하고 개발한다.
 
-따라서 개발팀은 도메인의 역할과 제약을 기반으로 논리를 만들어내기 때문에 도메인은 아키텍처를 구성하는데 중요한 역할을 한다. 개발팀이 협업을 잘하기 위해선 도메인 영역을 나누고 도메인 모델이 서로 어떤 관계를 가지고 있는지 파악하는 것이 중요하다. 그래서 보통 도메인 영역을 별도의 모듈로 분리하여 관리하는 경우가 많다. 흔히 모듈을 평가할 때 `결합도와 응집도`를 보게되는데 결합도는 모듈 사이에서 서로 의존하는 정도를 말하고 응집도는 모듈 내에 기능이 서로 연관이 있는지를 말한다. 보통 결합도는 낮을 수록 좋고 응집도는 높을 수록 좋다.
+따라서 개발팀은 도메인의 역할과 제약을 기반으로 논리를 만들어내기 때문에 도메인은 아키텍처를 구성하는데 중요한 역할을 한다. 개발팀이 협업을 잘하기 위해선 도메인 영역을 나누고 도메인 모델이 서로 어떤 관계를 가지고 있는지 파악하는 것이 중요하다. 그래서 보통 도메인 영역을 별도의 모듈로 분리하여 관리하는 경우가 많다. 흔히 모듈을 평가할 때 **결합도와 응집도**를 보게되는데 결합도는 모듈 사이에서 서로 의존하는 정도를 말하고 응집도는 모듈 내에 기능이 서로 연관이 있는지를 말한다. 보통 결합도는 낮을 수록 좋고 응집도는 높을 수록 좋다.
 
 <Image src="/images/2023-05-03-spring-multi-module-architecture/coupling-cohesion.png" caption="소프트웨어 공학을 공부하면 자주 보는 그림" />
 
@@ -32,7 +32,7 @@ import Image from '@components/Image';
 
 이 글에서 다루는 Spring에선 개발자가 다른 모듈의 기능이 필요한 경우 해당 인터페이스를 주입하여 사용할 수 있다. 이를 **인터페이스 주입(Interface Injection)**이라고 하는데 뒤에서 설명할 **Spring의 의존성 주입(Dependency Injection)**을 통해 가능하다. 따라서 개발자는 인터페이스의 구현체를 몰라도 해당 기능을 사용할 수 있다.
 
-## 순환 종속성 문제
+## 순환 의존 문제
 이상적으로 도메인에 따라 모듈을 나누기만 하면 깔끔한 아키텍처를 설계할 수 있을 것 같지만 실제 상황에선 항상 문제가 생기기 마련이다. 예를 들어, A 모듈이 B 모듈을 의존하고 B 모듈이 A 모듈을 의존하는 경우가 있다. 이런 경우를 **순환 의존 관계(Circular Dependency)**라고 한다. 이런 경우 Message Queue 등을 사용해 비동기 통신을 하는 것이 아니라면 어쩔 수 없이 모듈을 합치거나 별도 다른 모듈로 기능을 분리하는 경우가 많다.
 
 왜 이런 일이 발생하는지 알기 위해 한 가지 예시를 들어보자. 만약 우리가 게시판 서비스를 만들어야 한다고 가정해보자.
@@ -45,7 +45,7 @@ import Image from '@components/Image';
 
 게시판 서비스를 만든다면 대략 위와 같은 기능들이 필요할 것이다. 이런 상황에서 Article 모듈과 Comment 모듈을 나누는 것은 좋은 방법이다. Article과 Comment의 책임을 분리하고 각 도메인에 따라 로직을 구현할 수 있으며 모듈 간의 의존 관계도 명확하다. 의존 관계의 예를 들면 게시물 상세 조회 기능을 구현하기 위해선 Article 모듈에서 Comment 모듈에 포함된 기능을 사용할 수 있다.
 
-그런데 만약 '내가 작성한 댓글 조회'라는 기능이 추가되고 어떤 게시물에 댓글을 남겼는지 정보가 필요하다고 가정해보자. 그러면 Article에 대한 정보가 필요하기 때문에 Comment 모듈에서 Article 모듈을 의존해야한다. 이런 경우 **순환 의존 관계**가 발생한다. 의존 관계에 순환이 발생하면 빌드가 되지 않는다.
+그런데 만약 댓글을 남기기 전에 정말 Article이 있는지 검사할 필요가 있다고 가정해보자. 그러면 Article에 대한 정보가 필요하기 때문에 Comment 모듈에서 Article 모듈을 의존해야한다. 이런 경우 **순환 의존 관계**가 발생한다. 의존 관계에 순환이 발생하면 빌드가 되지 않는다.
 
 <Image src="/images/2023-05-03-spring-multi-module-architecture/circular-dependency.png" caption="순환 의존 관계" />
 
@@ -114,7 +114,6 @@ class ArticleRepository {
   }
 }
 
-@Component
 interface ArticleProvided {
   fun getArticle(id: Long): Article
 }
@@ -146,20 +145,16 @@ class CommentService(
       .map { commentRepository.findAllByArticleId(it.id) }
 }
 ```
-위 코드에서 `CommentService`는 `ArticleProvided`를 주입받아 사용한다. 이때 `ArticleService`는 `ArticleProvided` 인터페이스를 구현체기 때문에 `ArticleService` 클래스를 주입받아 사용할 수 있다. 이렇게 하면 구현체를 몰라도 인터페이스를 통해 주입받을 수 있기 때문에 구현체 로직이 변경되어도 주입 받는 클래스에 영향을 주지 않는다. 한 가지 주목할 점으로 `ArticleProvided`는 `@Component` 어노테이션이 달려있다는 점이다. 이는 IoC 컨테이너가 해당 인터페이스를 Bean으로 관리하고 주입해준다는 것을 의미한다. 따라서 `CommentService`는 `ArticleProvided` 인터페이스를 주입받을 때 `ArticleService`의 구현체가 주입된다.
+위 코드에서 `CommentService`는 `ArticleProvided`를 주입받아 사용한다. 이때 `ArticleService`는 `ArticleProvided` 인터페이스를 구현체기 때문에 `ArticleService` 클래스를 주입받아 사용할 수 있다. 이렇게 하면 구현체를 몰라도 인터페이스를 통해 주입받을 수 있기 때문에 구현체 로직이 변경되어도 주입 받는 클래스에 영향을 주지 않는다. IoC 컨테이너가 해당 인터페이스를 Bean으로 관리하고 주입하기 때문에 `CommentService`는 `ArticleProvided` 인터페이스를 주입받을 때 `ArticleService`의 구현체가 주입된다. 구현체가 주입되더라도 인터페이스에 의해 열려있는 메서드만 사용하기 때문에 명세를 쉽게 파악할 수 있다.
 
 ## 컨셉 아키텍처
-실제 구현 코드를 다루기 전에 IoC와 DI를 이용한 아키텍처에 대한 컨셉을 알아보자. 이 아키텍처는 인터페이스가 담기는 모듈과 실제 구현체가 포함되는 모듈로 구성된다. 인터페이스가 담기는 모듈을 **컨셉 모듈**이라고 하고 실제 구현체가 포함되는 모듈을 **구현 모듈**이라고 하자. 구현 모듈은 컨셉 모듈 의존하지만 컨셉 모듈은 구현 모듈을 의존하지 않는다. 이렇게 하면 구현 모듈은 컨셉 모듈의 의존성을 알지 못하기 때문에 순환 종속성 문제가 발생하지 않는다. 또한, 컨셉 모듈은 인터페이스만을 포함하기 때문에 구현 모듈에 영향을 받지 않는다. 따라서, 컨셉 모듈은 독립적으로 관리할 수 있다.
+실제 구현 코드를 다루기 전에 IoC와 DI를 이용한 아키텍처에 대한 컨셉을 알아보자. 이 아키텍처는 인터페이스가 담기는 모듈과 실제 구현체가 포함되는 모듈로 구성된다. 인터페이스가 담기는 모듈을 **컨셉 모듈**이라고 하고 실제 구현체가 포함되는 모듈을 **구현 모듈**이라고 하자. 구현 모듈은 컨셉 모듈을 의존하지만 컨셉 모듈은 구현 모듈을 의존하지 않는다. 이렇게 하면 구현 모듈은 컨셉 모듈의 의존성을 알지 못하기 때문에 순환 의존 문제가 발생하지 않는다. 또한, 컨셉 모듈은 인터페이스만을 포함하기 때문에 구현 모듈에 영향을 받지 않는다. 따라서, 컨셉 모듈은 독립적으로 관리할 수 있다.
 
 <Image src="/images/2023-05-03-spring-multi-module-architecture/concept-architecture.png" caption="컨셉 모듈과 구현 모듈로 구성된 아키텍처" />
 
 이 아키텍처는 구현 모듈이 컨셉 모듈에 의존하기 때문에 구현 모듈이 컨셉 모듈을 사용할 수 있다. 이때 구현 모듈은 컨셉 모듈의 인터페이스를 주입받아 사용한다. 여기서 앞서 설명한 IoC와 DI가 사용된다. 구현 모듈에 필요한 의존성은 IoC 컨테이너에 의해 관리되기 때문에 인터페이스의 구현체가 알아서 주입된다. 그리고 구현 모듈은 컨셉 모듈의 인터페이스를 주입받기 때문에 컨셉 모듈의 구현체가 변경되어도 영향을 받지 않는다. 이는 모듈의 독립성을 높이는데 도움이 된다.
 
-그럼 앞서 이야기했던 순환 종속성 문제를 어떻게 해결할 수 있는지 알아보자. 다시 Article과 Comment 예시로 돌아와서 '내가 작성한 댓글 조회'라는 기능이 추가된다면 순환 종속성 문제가 생긴다고 했었다.
-
-<Image src="/images/2023-05-03-spring-multi-module-architecture/circular-dependency.png" />
-
-하지만 IoC와 DI를 이용한 아키텍처를 이용하면 Comment 서브시스템의 구현 모듈이 Article 서브시스템의 컨셉 모듈을 의존하기 때문에 이런 순환 종속성 문제에서 빠져나올 수 있다.
+그럼 앞서 이야기했던 순환 의존 문제를 어떻게 해결할 수 있는지 알아보자. 다시 Article과 Comment 예시로 돌아와서 Comment 모듈이 Article 모듈을 의존하면 순환 의존 문제가 생긴다고 했었다. 하지만 IoC와 DI를 이용한 아키텍처를 이용하면 Comment 서브시스템의 구현 모듈이 Article 서브시스템의 컨셉 모듈을 의존하기 때문에 모듈 간의 순환 의존 문제에서 빠져나올 수 있다.
 
 <Image src="/images/2023-05-03-spring-multi-module-architecture/circular-dependency-solved.png" caption="Cycle에서 빠져나올 수 있다" />
 
@@ -270,24 +265,27 @@ dependencies {
 ```kotlin
 // subsystem/article/concept/build.gradle.kts
 dependencies {
-  // Comment 서브시스템의 컨셉 모듈만 불러온다.
-  implementation(project(":subsystem:comment:comment-concept"))
+  // 아무것도 의존하지 않는다.
+  // 이 경우 build.gradle.kts에 아무 내용이 없기 때문에 파일을 제거해도 무방하다.
 }
 
 // subsystem/article/implementation/build.gradle.kts
 dependencies {
-  // Article 서브시스템의 컨셉 모듈만 불러온다.
+  // Comment, Article 서브시스템의 컨셉 모듈을 불러온다.
   implementation(project(":subsystem:article:article-concept"))
+  implementation(project(":subsystem:comment:comment-concept"))
 }
 
 // subsystem/comment/concept/build.gradle.kts
 dependencies {
   // 아무것도 의존하지 않는다.
+  // 이 경우 build.gradle.kts에 아무 내용이 없기 때문에 파일을 제거해도 무방하다.
 }
 
 // subsystem/comment/implementation/build.gradle.kts
 dependencies {
-  // Article 서브시스템의 컨셉 모듈만 불러온다.
+  // Comment, Article 서브시스템의 컨셉 모듈을 불러온다.
+  implementation(project(":subsystem:comment:comment-concept"))
   implementation(project(":subsystem:article:article-concept"))
 }
 ```
@@ -296,13 +294,226 @@ dependencies {
 
 위 작업을 마지막으로 Gradle 멀티 모듈 구성이 끝났다. 구체적인 설정 코드를 보고싶다면 따로 만들어둔 [GitHub 저장소](https://github.com/kciter/spring-ioc-di-architecture)를 통해 참고하면 된다.
 
-## 구현 아키텍처
-이제 실제 코드를 작성해보자. 먼저 각 서브시스템의 컨셉 모듈과 구현 모듈에 대한 코드를 작성할 수 있다.
+## 실제로 구현해보기
+이제 실제 코드를 작성해보자. 먼저 각 서브시스템의 컨셉 모듈과 구현 모듈에 대한 코드를 작성할 수 있다. 각 서브시스템의 컨셉 모듈은 다음과 같은 파일이 들어간다.
+* Model
+* DTO
+* Provided
 
+즉, 구현체가 아닌 외부에 제공해줘야 하는 데이터 혹은 인터페이스가 포함된다. 반면, 각 서브시스템의 구현 모듈은 다음과 같은 파일이 들어간다.
 
-## 사용 예제
+* Configuration
+* Repository
+* Service
+* Controller
+* ...
+
+다음으로 각 서브시스템의 컨셉 모듈과 구현 모듈에 대한 코드를 작성해보자. 여기선 앞서 계속 이야기한 Article과 Comment 서브시스템을 예시로 들어보자.
+
+### Article 서브시스템 구성
+먼저 Article이라는 모델을 만들어보자.
+
+```kotlin
+// subsystem/article/concept/src/main/kotlin/so/kciter/board/article/concept/model/Article.kt
+
+data class Article(
+  val id: Int,
+  val title: String,
+  val body: String
+)
+```
+
+이어서 Article 서브시스템이 제공해줘야 할 기능 명세를 인터페이스로 작성하자. 여기서는 Article 하나를 제공하는 기능이 필요하다고 가정한다.
+  
+```kotlin
+// subsystem/article/concept/src/main/kotlin/so/kciter/board/article/concept/ArticleProvided.kt
+
+interface ArticleProvided {
+  fun findById(id: Int): Mono<Article>
+}
+```
+
+이제 Article 서브시스템의 구현 모듈을 작성해보자. 먼저 `ArticleProvided` 인터페이스를 구현한 `ArticleService` 클래스를 작성하자. 여기서 Repository와 Controller 구현은 생략한다.
+
+```kotlin
+// subsystem/article/implementation/src/main/kotlin/so/kciter/board/article/ArticleService.kt
+
+@Service
+class ArticleService(
+  private val articleRepository: ArticleRepository
+) : ArticleProvided {
+  fun findAll(): Flux<Article> =
+    this.articleRepository.findAll()
+
+  override fun findById(id: Int): Mono<Article> {
+    return articleRepository.findById(id)
+  }
+}
+```
+
+그럼 이제 Comment 서브시스템에서 Article 서브시스템의 기능을 이용할 수 있다. 그럼 이어서 Comment 서브시스템의 컨셉 모듈과 구현 모듈을 작성해보자.
+
+### Comment 서브시스템 구성
+마찬가지로 먼저 Comment라는 모델을 만들어보자.
+
+```kotlin
+// subsystem/comment/concept/src/main/kotlin/so/kciter/board/comment/concept/model/Comment.kt
+
+data class Comment(
+  val id: Int,
+  val articleId: Int,
+  val body: String
+)
+```
+
+이어서 Article 서브시스템을 구성할 때 처럼 Comment 서브시스템이 제공해줘야 할 기능 명세를 인터페이스로 작성하자. 여기서는 Article 하나에 대한 Comment 목록을 제공하는 기능이 필요하다고 가정한다.
+
+```kotlin
+// subsystem/comment/concept/src/main/kotlin/so/kciter/board/comment/concept/CommentProvided.kt
+
+interface CommentProvided {
+  fun findAllByArticleId(articleId: Int): Flux<Comment>
+}
+```
+
+이제 Comment 서브시스템의 구현 모듈을 작성해보자. 먼저 `CommentProvided` 인터페이스를 구현한 `CommentService` 클래스를 작성하자. 여기서도 Repository와 Controller 구현은 생략한다.
+
+```kotlin
+// subsystem/comment/implementation/src/main/kotlin/so/kciter/board/comment/CommentService.kt
+
+@Service
+internal class CommentService(
+  private val commentRepository: CommentRepository,
+  private val articleProvided: ArticleProvided
+) {
+  fun findAll(): Flux<Comment> =
+    this.commentRepository.findAll()
+
+  override fun findAllByArticleId(articleId: Int): Flux<Comment> =
+    this.commentRepository.findAllByArticleId(articleId)
+}
+```
+
+그럼 이제 Article 서브시스템에서 Comment 서브시스템의 기능을 이용할 수 있다.
+
+### 클래스 순환 의존 문제 해결
+이어서 서로 구현한 기능을 이용하도록 코드를 수정해보자. 먼저 `ArticleService` 클래스에서 `CommentService` 클래스를 이용하도록 코드를 수정해보자.
+
+```kotlin
+// subsystem/article/implementation/src/main/kotlin/so/kciter/board/article/ArticleService.kt
+
+@Service
+internal class ArticleService(
+  private val articleRepository: ArticleRepository,
+  private val commentProvided: CommentProvided // CommentProvided 인터페이스를 주입받는다.
+): ArticleProvided {
+  fun findAll(): Flux<Article> =
+    this.articleRepository.findAll()
+
+  override fun findById(id: Int): Mono<Article> =
+    this.articleRepository
+      .findById(id)
+      .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.NOT_FOUND)))
+
+  fun findAllCommentByArticleId(articleId: Int): Flux<Comment> =
+    this.commentProvided.findAllByArticleId(articleId) // CommentProvided의 구현체인 CommentService의 메서드가 실행된다
+}
+```
+
+그럼 이제 Comment 서브시스템에서 Article 서브시스템의 기능을 이용하도록 코드를 수정해보자.
+
+```kotlin
+// subsystem/comment/implementation/src/main/kotlin/so/kciter/board/comment/CommentService.kt
+
+@Service
+internal class CommentService(
+  private val commentRepository: CommentRepository,
+  private val articleProvided: ArticleProvided
+): CommentProvided {
+  fun findAll(): Flux<Comment> =
+    this.commentRepository.findAll()
+
+  override fun findAllByArticleId(articleId: Int): Flux<Comment> =
+    this.commentRepository.findAllByArticleId(articleId)
+
+  fun findById(id: Int): Mono<Comment> =
+    this.commentRepository
+      .findById(id)
+      .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.NOT_FOUND)))
+      .flatMap { comment ->
+        this.articleProvided
+          .findById(comment.articleId)
+          .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.NOT_FOUND)))
+          .map { comment }
+      }
+}
+```
+
+이렇게 작성한 후 실행해보자. 큰 문제 없어보이지만 실행하면 에러가 발생한다.
+```
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+The dependencies of some of the beans in the application context form a cycle:
+
+   commentController defined in file [/Users/kciter/project/spring-ioc-di-architecture/subsystem/comment/implementation/build/classes/kotlin/main/so/kciter/board/comment/CommentController.class]
+┌─────┐
+|  commentService defined in file [/Users/kciter/project/spring-ioc-di-architecture/subsystem/comment/implementation/build/classes/kotlin/main/so/kciter/board/comment/CommentService.class]
+↑     ↓
+|  articleService defined in file [/Users/kciter/project/spring-ioc-di-architecture/subsystem/article/implementation/build/classes/kotlin/main/so/kciter/board/article/ArticleService.class]
+└─────┘
+```
+
+이는 클래스간 순환 참조가 발생해서 그렇다. 모듈 간의 순환 참조 문제는 해결되었지만 클래스간 순환 참조 문제를 해결하기 위해선 두 가지 방법 중 하나를 택할 수 있다.
+1. `@Lazy` 어노테이션 사용
+2. Provided를 상속받는 다른 클래스 구현
+
+`@Lazy` 어노테이션을 사용하는 것은 성능이나 메모리 문제가 있을 수 있기 때문에 Spring에서 권장하지 않는 방법이다. 따라서 두 번째 방법을 사용해보자. 그럼 `CommentService` 클래스에서 상속을 받을 수 없기 때문에 별도로 `CommentProvideService` 클래스를 만들어보자.
+
+```kotlin
+// subsystem/comment/implementation/src/main/kotlin/so/kciter/board/comment/CommentService.kt
+
+@Service
+internal class CommentService(
+  private val commentRepository: CommentRepository,
+  private val articleProvided: ArticleProvided
+) { // 상속 제거
+  fun findAll(): Flux<Comment> =
+    this.commentRepository.findAll()
+
+  fun findById(id: Int): Mono<Comment> =
+    this.commentRepository
+      .findById(id)
+      .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.NOT_FOUND)))
+      .flatMap { comment ->
+        this.articleProvided
+          .findById(comment.articleId)
+          .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.NOT_FOUND)))
+          .map { comment }
+      }
+}
+
+// subsystem/comment/implementation/src/main/kotlin/so/kciter/board/comment/CommentProvideService.kt
+
+@Service
+internal class CommentProvideService(
+  private val commentRepository: CommentRepository
+): CommentProvided {
+  override fun findAllByArticleId(articleId: Int): Flux<Comment> =
+    this.commentRepository.findAllByArticleId(articleId)
+}
+```
+
+위와 같이 수정하면 클래스 순환 참조 문제가 해결되어 문제없이 실행되는 것을 확인할 수 있다.
+
+<Image src="/images/2023-05-03-spring-multi-module-architecture/result.png" caption="소프트웨어 공학을 공부하면 자주 보는 그림" />
+
+지금까지의 예제에 대한 전체 코드는 [GitHub 저장소](https://github.com/kciter/spring-ioc-di-architecture)에 있다. 참고로 예제는 Spring Webflux 환경으로 작성되었다.
 
 # 마치며
 필자가 재직 중인 회사 [코발트](https://www.cobalt.run/)에서는 백엔드 도메인과 로직을 이 글에서 설명한 DI와 IoC를 이용하여 관리하고 있다. 모듈이 제공한 인터페이스를 통해서만 통신이 가능하고 모듈간 의존을 엄격히 관리하기 때문에 불편한 점도 있지만 **모듈의 목적성을 잃지 않고 응집도가 높은 모듈**을 만들 수 있다는 장점이 있다. 또 다른 장점으로는 **모듈 단위로 분리**가 쉽기 때문에 새로운 서버 애플리케이션을 쉽게 만들 수 있다는 점이다. 참고로 이 글에서 설명한 아키텍처는 **Spring 서버 뿐만 아닌 iOS, Android 등의 앱에서도 DI와 IoC 시스템을 구축하면 사용 가능**하다. 추후에 기회가 된다면 다른 플랫폼에서 사용하는 방법도 설명하고자 한다.
 
-그리고 현재 잘 관리하고 있지는 않지만 해당 아키텍처의 형태로 Spring 애플리케이션을 생성할 수 있는 [오픈 소스](https://github.com/cobaltinc/bloom)를 만들어두었다. 만약 이 아키텍처에 관심이 있다면 해당 프로젝트를 참고하면 좋을 것 같다.
+참고로 여기서 설명한 아키텍처는 모듈 레벨의 아키텍처 설계라 볼 수 있다. 조금 더 코드 레벨의 규칙은 따로 정해야한다. 그리고 현재 잘 관리하고 있지는 않지만 해당 아키텍처의 형태로 Spring 애플리케이션을 생성할 수 있는 [오픈 소스](https://github.com/cobaltinc/bloom)를 만들어두었다. 만약 이 아키텍처에 관심이 있다면 해당 프로젝트를 참고하면 좋을 것 같다.
