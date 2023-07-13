@@ -32,7 +32,7 @@ const TableOfContents = ({ items }: TableOfContentsProps) => {
   useEffect(() => {
     if (typeof document === undefined) return;
     new Sticky(".toc");
-  }, []);
+  }, [items]);
 
   return (
     <div className="toc" data-margin-top="50">
