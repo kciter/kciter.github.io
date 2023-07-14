@@ -88,7 +88,7 @@ const SEO = ({ title, description, meta }: SEOProps) => {
           content: metaDescription,
         },
         meta.find((item: any) => item.name === "og:image") ?? {
-          name: `og:image`,
+          property: `og:image`,
           content: "https://kciter.so/images/og.png",
         },
       ].concat(meta)}
