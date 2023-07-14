@@ -80,12 +80,12 @@ const PostTemplate = ({ data, location }: PageProps) => {
             content: dayjs(fields.date).locale("ko").format(),
           },
           {
-            name: `og:image`,
+            name: `image`,
+            property: `og:image`,
             content: `https://kciter.so${frontmatter.image}`,
           },
           {
-            name: `image`,
-            property: `og:image`,
+            property: `og:image:secure_url`,
             content: `https://kciter.so${frontmatter.image}`,
           },
         ]}
