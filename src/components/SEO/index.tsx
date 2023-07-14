@@ -91,6 +91,10 @@ const SEO = ({ title, description, meta }: SEOProps) => {
           property: `og:image`,
           content: "https://kciter.so/images/og.png",
         },
+        meta.find((item: any) => item.name === "og:image") ?? {
+          property: `og:image:secure_url`,
+          content: "https://kciter.so/images/og.png",
+        },
       ].concat(meta)}
     />
   );
