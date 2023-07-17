@@ -1,0 +1,198 @@
+---
+title: "Railway-Oriented Programming"
+categories: dev
+tags: [functional]
+image: /images/2023-07-17-railway-oriented-programming/thumbnail.png
+comments: true
+draft: true
+---
+
+import Image from '@components/Image';
+
+프로그램을 개발함에 있어 **에러와 사이드 이펙트(부수 효과)를 처리하는 것은 필연적**이다. 아무리 꼼꼼하게 코드를 작성해도 생각하지 못한 문제는 존재하며 특히나 지속해서 발전하는 프로그램은 기술 부채와 함께 **끊임없이 새로운 문제가 발생**한다.
+
+문제가 발생하는 것은 개발자 개인에게도 프로그램을 판매하는 회사에게도 끔찍한 일이다. 아무리 단순하게 해결할 수 있는 문제여도 사용자에게 피해가 간다면 금전적 손실이 발생할 수 밖에 없다. 그렇기 때문에 프로그래밍은 안전하게 프로그램을 작성할 수 있는 형태로 끊임없이 발전해왔고 개발자들은 다양한 방법을 생각해냈다. 그 중 하나가 방법론인 `Railway-Oriented Programming`(이하 ROP)이다.
+
+<Image src="/images/2023-07-17-railway-oriented-programming/trip.jpg" caption="꽤나 생소한 방법론" />
+
+# 사이드 이펙트
+
+먼저 사이드 이펙트에 대해서 자세히 알아보자. 사이드 이펙트란 **함수 내부(혹은 프로시저)에서 발생한 일이 함수 외부에 영향을 미치는 것**을 말한다. 구체적으로 다음과 같은 경우를 말한다.
+* 함수 내부에서 외부에 있는 변수를 조작하는 경우
+* 네트워크 통신 중 잘못된 데이터를 받아 프로그램에 영향을 미치는 경우
+* 함수 내부에서 에러가 발생하여 프로그램에 문제가 발생하는 경우
+
+위와 같은 사례 외에도 다양하게 존재할 수 있다. 요즘엔 함수 내부에서 외부 값을 참조하거나 변경하면 좋지 않다는 것이 널리 알려져 있기 때문에 보통 사이드 이펙트는 **I/O로 인한 문제**로 접하는 경우가 많다. 그래서 이런 문제를 해결하기 위해 많은 개발자들이 예외 처리를 하는 것에 많은 공을 들인다. 하지만 또 많은 개발자들이 간과하는 문제는 `함수 내부에서 에러가 발생하여 프로그램에 문제가 발생하는 경우`라고 할 수 있다. 아주 간단한 코드를 작성하더라도 이런 문제는 발생할 수 있다. 오히려 간단하기 때문에 실수하는 경우가 많다. 예를 들어, 다음과 같은 코드를 살펴보자.
+
+```kotlin
+// Kotlin
+fun getFirstElement(list: List<Int>): Int {
+  return list[0]
+}
+```
+
+위 코드는 리스트의 첫번째 값을 찾아 불러오는 아주 간단한 함수다. 얼핏보면 큰 문제가 없어보이나 **리스트가 비어있을 때 문제가 발생**한다. 물론 이런 간단한 문제는 쉽게 해결할 수 있지만 막상 작성할 때 실수하는 경우가 많다.
+
+사이드 이펙트는 프로그램의 흐름을 예측하기 어렵게 만들며, 특히나 다른 개발자가 작성한 코드를 수정할 때 사이드 이펙트를 고려하지 않으면 예상치 못한 문제가 발생할 수 있다. 이러한 문제를 해결하기 위해서 다양한 방법이 존재한다.
+
+# 다양한 해결 방법
+
+단순히 `if`를 이용하는 것 외에도 사이드 이펙트를 해결 할 수 있는 방법은 다양하다. ROP에 대해 알아보기 전에 다른 방법들을 먼저 살펴보자.
+
+## 순수 함수
+외부와 상호작용 해야하는 I/O를 다루는 것이 아니라면 순수 함수로 작성하여 사이드 이펙트 문제를 해결 할 수 있다. 순수 함수는 **동일한 인자**를 받았을 때 항상 **같은 값**을 반환하는 함수를 말한다. 이말은 즉, **결과를 예측할 수 있다**는 말과 동일하다. 다음과 같은 함수는 순수 함수라 할 수 있다.
+
+```kotlin
+fun sum(a: Int, b: Int): Int {
+  return a + b
+}
+```
+
+참고로 에러가 발생할 수 있는 예외는 처리해줘야 한다.
+
+프로그램은 컴퓨터 시스템 위에 올라가기 때문에 수학처럼 **완전하게 순수할 수는 없다**. 그래서 순수 함수의 범위가 애매하게 느껴질 수 있다. 예를 들면, 부동 소수점 문제가 있다.
+
+```kotlin
+var num1: Double = 0.0
+for (i in 0 until 10) {
+  num1 += 1.0 / 3
+}
+val num2: Double = 1.0 / 3 * 10
+println(num1 == num2) // false
+```
+
+위 코드를 수학적으로 생각하면 num1과 num2는 같은 값이기 때문에 `true`가 나와야 정상이다. 하지만 부동 소수점이라는 한계가 있기 때문에 `false`가 나온다. 만약 위와 같이 부동 소수점을 다루는 함수가 있다면 과연 그 함수를 순수하다고 할 수 있을까?
+
+이를 해결하기 위해서는 프로그램 목적에 따라 **구현 스펙**을 정할 필요가 있다. 다시 부동 소수점을 예로 든다면 자세한 소수점이 필요 없다면 적절한 단위에서 반올림을 통해 문제를 해결하거나 정확한 계산이 필요하다면 Double 자료형을 쓰는 것이 아닌 문자열을 통해 정확한 소수점을 계산해주는 객체를 만들어 사용할 수 있다.
+
+## try-catch 문법
+
+순수 함수는 결과를 예측하게 해주지만 **외부 I/O와 개발자가 미처 알아차리지 못한 문제**는 해결해주지 않는다. 특히 요즘 제작되는 대부분의 소프트웨어는 거의 반드시 외부 I/O를 다루기 때문에 새로운 해결 방법을 찾아야 한다. 그 중 하나가 **try-catch 문법**이다.
+
+try-catch 문법은 이미 오래전부터 많은 언어가 지원하고 있다. 그래서 많은 개발자들이 잘 알고있는 예외 처리 방법이기도 하다.
+
+```kotlin
+// Kotlin
+try {
+  // 예외가 발생할 수 있는 코드
+} catch (e: Exception) {
+  // 예외가 발생했을 때 실행할 코드
+}
+```
+```javascript
+// JavaScript
+try {
+  // 예외가 발생할 수 있는 코드
+} catch (e) {
+  // 예외가 발생했을 때 실행할 코드
+}
+```
+```python
+# Python
+try:
+  # 예외가 발생할 수 있는 코드
+except Exception as e:
+  # 예외가 발생했을 때 실행할 코드
+```
+
+언어마다 조금씩 문법은 조금씩 다르지만 형태는 거의 같다. try-catch 문법은 **예외가 발생할 수 있는 코드를 try 블록에 작성**하고 **예외가 발생했을 때 실행할 코드를 catch 블록에 작성**한다. 이렇게 작성하면 예외가 발생했을 때 catch 블록의 코드가 실행된다. try-catch는 어디에서 사용되어야 할까? 대체로 함수를 사용하는 상위 로직에서 사용한다. 그리고 사용 당하는 함수는 에러만을 던진다. 이는 개발자가 미리 알고 의도한 에러든 예상치 못한 에러든 상관없다.
+
+```kotlin
+// Kotlin
+fun authorize(user: User) {
+  if (user.role != Role.ADMIN) {
+    throw RuntimeException("권한이 없습니다.")
+  }
+}
+
+fun login() {
+  try {
+    authorize(User(name = "kciter", role = Role.USER))
+  } catch (e: Exception) {
+    println(e.message)
+  }
+}
+```
+
+try-catch 문법은 크게 문제가 없어보이지만 **가독성**에 조금 문제가 있다. try-catch는 순차적으로 흐르지 않는다. 에러가 발생하면 `catch` 절로 이동하고 `finally`와 같은 문법을 사용할 경우 `try`에서 처리된 후 온 것인지 `catch`에서 처리된 후 온 것인지 확인이 필요하다. 그렇기 때문에 프로그램을 그대로 종료할 것이 아니라면 어떤 절로 로직이 마무리 되더라도 문제없이 진행될 수 있도록 개발자가 신경써야 한다.
+
+또한, 해당 함수가 어떤 에러를 반환하는지 개발자가 미리 알아야 한다는 문제가 있다. 특히 사용자 지정 에러가 많은 경우 생산성에 문제가 될 수 있다.
+
+하지만 try-catch가 나쁘다는 의미는 아니다. 서버 프로그램과 같이 절대로 패닉이 발생해선 안되는 프로그램에서는 try-catch 문법은 매우 유용하다.
+
+```kotlin
+fun main() {
+  val server = ServerSocket(8080)
+  println("Server is running on port ${server.localPort}")
+
+  while (true) {
+    val socket = server.accept()
+    val reader = Scanner(socket.getInputStream())
+    val writer = socket.getOutputStream()
+    println("Client connected: ${socket.inetAddress.hostAddress}")
+
+    thread {
+      while (true) {
+        try {
+          val text = reader.nextLine()
+          writer.write(text.toByteArray(Charset.defaultCharset()))
+        } catch (e: Exception) {
+          println(e.message)
+          socket.close()
+          break
+        }
+      }
+    }
+  }
+}
+```
+<figcaption style="margin-top:-16px">서버는 신뢰성을 위해 최대한 살아있어야 한다</figcaption>
+
+## Guard Clause 패턴
+
+Guard Clause 패턴은 로직의 시작 지점에 방어 조건을 먼저 작성하는 패턴이다. 패턴이라하니 복잡할 수 있지만 `if`를 이용하여 간단하게 구현할 수 있다.
+
+```javascript
+// JavaScript
+function authorize(user) {
+  if (user.role !== 'admin') return false
+  if (user.isBlocked) return false
+
+  // 권한이 있는 사용자에게만 보여줄 로직
+}
+```
+
+위 코드를 보다시피 매우 간단하다. Guard Clause 패턴의 핵심은 **로직 상단에 방어 조건이 있는 것이며 중첩된 if를 피하는 것**이다. 이를 통해 함수의 **가독성**을 높일 수 있다. 참고로 Swift는 언어 자체에서 Guard 문법을 지원한다.
+
+```swift
+// Swift
+func authorize(user: User) throws -> Bool {
+  // if와 달리 조건이 맞지 않으면 실행된다.
+  guard user.role == .admin else { return false }
+  guard !user.isBlocked else { return false }
+
+  // 권한이 있는 사용자에게만 보여줄 로직
+}
+```
+
+## Functor와 Monad
+
+펑터와 모나드는 **함수형 프로그래밍**을 접하면 자주 들을 수 있는 개념이다. 일반적으로 처음 프로그래밍을 접하며 배운 내용들과 이질적이기도 하고 설명에 수학적인 내용이 들어가는 경우도 있어서 어려운 개념으로 느껴질 수 있다. 하지만 하나씩 살펴보면 그리 어려운 개념은 아니다.
+
+먼저 펑터와 모나드를 이해하기 전에 타입에 대해 살펴볼 필요가 있다. 함수형 프로그래밍에서 타입은 함수 합성을 하기 위한 중요한 개념이다.
+
+# Railway-Oriented Programming이란?
+
+간략하게 요약하면 ROP는 사이드 이펙트를 제어하기 위한 방법론이다. 기본적으로 Result라는 Monad 객체를 구현하여 사용하고 에러를 체크하는 것은 어떤 방법을 사용하더라도 문제되지 않는다.
+
+## Result
+
+에러의 타입 제한하여 미리 알 수 있다는 장점이 있다.
+
+## Pipeline
+
+## 문제점
+
+# 마치며
+
+[^1]: 로버트 C. 마틴의 저서 클린 아키텍처에서 표현된 내용
