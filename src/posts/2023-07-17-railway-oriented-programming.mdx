@@ -4,7 +4,7 @@ categories: dev
 tags: [functional, error-handling, railway-oriented-programming]
 image: /images/2023-07-17-railway-oriented-programming/thumbnail.png
 comments: true
-draft: true
+draft: false
 ---
 
 import Image from '@components/Image';
@@ -235,31 +235,356 @@ fun divide(a: Int, b: Int): Double = a.toDouble() / b.toDouble()
 
 > 확장된 치역 이미지
 
-위와 같은 개념이 **펑터**라고 할 수 있다. 펑터는 타입을 확장하여 새로운 타입을 만들어내는 것이다. 이를 통해 에러를 담아낼 수 있다. 여기선 예제로 각각 대표적 약타입 언어인 JavaScript와 강타입 언어인 Kotlin을 사용했다.
+위와 같은 개념이 **펑터**라고 할 수 있다. 지금부터 프로그래밍 세계에서 펑터를 어떻게 구현할 수 있을지 알아보자.
+
+#### Functor
+
+펑터라는 개념을 이용하면 타입을 확장하여 새로운 타입을 만들어낼 수 있다. 이를 통해 에러를 담아낼 수 있다. 코드를 살펴보기 전에 먼저 개념적인 이미지부터 살펴보자.
+
+> Functor 박스 꺼내서 함수 적용하는 이미지
+
+위 이미지를 보면 펑터는 박스와 같다는 것을 알 수 있다. 박스 안에는 값이 들어있고 이를 꺼내서 함수를 적용한다. 그리고 다시 박스에 집어넣는다. 왜 이런 번거로운 짓을 하는 걸까? 그 이유는 **값에 함수를 적용(Apply)할 때 발생하는 문제를 해결**하기 위함이다. 다시 다음 이미지를 살펴보자.
+
+> Functor에 / 0 을 적용하는 이미지
+
+이번엔 펑터에 0을 나누는 함수를 적용했다. 이 경우 당연히 에러가 발생한다. 여기서 개발자는 적절한 로직을 통해 예외 처리를 할 수 있다. 이때 **적절한 로직을 펑터 객체**에 넣어주면 된다.
+
+이를 코드로 구현하면 다음과 같다. 여기선 예제로 Kotlin을 사용하겠다.
 
 ```kotlin
-sealed class Result<out T> {
-  data class Success<T>(val value: T): Result<T>()
-  data class Failure(val error: Throwable): Result<Nothing>()
+class Functor<T>(private val value: T) {
+  fun <R> map(f: (T) -> R): Functor<R> =
+    Functor(f(this.value))
 }
 ```
 
-위 코드는 Result라는 펑터를 구현한 코드이다. Result는 Sealed Class를 이용하여 Success와 Failure라는 서브 타입을 가지고 있다. Success는 성공적인 연산의 결과를 담고 있고 Failure는 에러를 담고 있다. 이제 위에서 구현한 divide 함수를 Result를 사용하여 다시 구현해보자.
+펑터에서 **함수를 받아 값을 변형하는 함수**를 보통 `map`이라고 한다. 어디서 많이본 함수 아닌가? 그렇다. 우리는 이미 펑터라는 개념을 자주 써왔다! 그럼 이번엔 위 Functor 클래스를 이용하는 코드를 살펴보자.
+
+```kotlin
+class Functor<T>(private val value: T) {
+  fun <R> map(f: (T) -> R): Functor<R> =
+    Functor(f(this.value))
+
+  override fun toString(): String =
+    "Functor($value)"
+}
+
+fun main() {
+  val functor = Functor(1)
+  val result = functor.map { it + 1 }
+  println(result) // Functor(2)
+}
+```
+
+아주 간단한 코드다. 펑터는 1이라는 값을 가지고 있고 이를 `map` 함수를 통해 1을 더한 값을 반환한다. 이를 통해 펑터는 **값을 변형하는 함수를 적용할 수 있다**는 것을 알 수 있다. 이제 펑터를 이용하여 조금 더 복잡한 것을 만들어보자. 이번에는 값이 `null`인지 알 수 있는 펑터를 구현해볼 것이다.
+
+```kotlin
+sealed class Option<out T> {
+  data class Some<T>(val value: T): Option<T>()
+  object None: Option<Nothing>()
+
+  companion object {
+    fun <T> of(value: T?): Option<T> = when (value) {
+      null -> None
+      else -> Some(value)
+    }
+  }
+
+  override fun toString(): String =
+    when (this) {
+      is Some -> "Some($value)"
+      is None -> "None"
+    }
+}
+
+fun <T, R> Option<T>.map(f: (T) -> R): Option<R> =
+  when (this) {
+    is Option.Some -> Option.of(f(this.value))
+    is Option.None -> Option.None
+  }
+
+fun main() {
+  val option = Option.of("Hello, World!")
+  val result1 = option.map { it.toIntOrNull() }
+  val result2 = option.map { it.length }
+
+  println(result1) // None
+  println(result2) // Some
+}
+```
+
+`Option`이라는 값이 적용될 때 `null`인지 아닌지 판단하여 `null`이라면 `None`을 값이 있다면 `Some`으로 타입을 분류하는 펑터를 구현했다. 이를 이용하여 NullPointerException과 같은 문제를 예방할 수 있다. 그리고 패턴 매칭이 지원되는 언어라면 다음과 같이 더 안전하게 사용이 가능하다.
+
+```kotlin
+fun main() {
+  val option = Option.of("Hello, World!")
+  val result = when (option) {
+    is Some -> option.value
+    is None -> "None"
+  }
+
+  // result는 null이 아님을 보장한다.
+  println(result) // Hello, World!
+}
+```
+
+만약 펑터를 이용하여 `null`을 판단하는 것이 아니라 에러를 판단한다면 어떨까? 이번에는 에러를 판단하는 펑터를 구현해보자.
+
+```kotlin
+sealed class Result<out V, out E> {
+  data class Success<out V>(val value: V): Result<V, Nothing>()
+  data class Failure<out E>(val error: E): Result<Nothing, E>()
+
+  companion object {
+    fun <V> of(f: () -> V): Result<V, Throwable> = try {
+      Success(f())
+    } catch (e: Throwable) {
+      Failure(e)
+    }
+  }
+
+  override fun toString(): String =
+    when (this) {
+      is Success -> "Success($value)"
+      is Failure -> "Failure($error)"
+    }
+}
+
+fun <V, R, E> Result<V, E>.map(f: (V) -> R): Result<R, E> =
+  when (this) {
+    is Result.Success -> Result.of { f(value) }
+    is Result.Failure -> this
+  }
+```
+
+`Option`과 거의 비슷하다. 다만 `null`을 판단하는 것이 아니라 try-catch를 이용하여 `Throwable`을 판단한다는 것이 다르다. 이를 이용하여 다음과 같이 사용할 수 있다.
+
+```kotlin
+fun main() {
+  val result = Result.of { 1 + 2 }
+    .map { it / 0 }
+  println(result) // Failure(error=java.lang.ArithmeticException: / by zero)
+}
+```
+
+`of` 메서드를 통해 에러가 발생한다면 `Failure` 발생하지 않는다면 `Success` 타입으로 분류된다. 마찬가지로 `map`을 이용해 값을 변형할 때 에러가 발생한다면 `Failure`를 반환하고 발생하지 않는다면 `Success`를 반환한다. 이를 통해 에러를 안전하게 처리할 수 있다. 여기서 `Option`때와 마찬가지로 패턴 매칭을 사용한다면 다음과 같이 사용할 수 있다.
+
+```kotlin
+fun main() {
+  val result = Result.of { 1 + 2 }
+    .map { it / 0 }
+    .map { it * 2 }
+
+  when (result) {
+    is Result.Success -> println(result.value)
+    is Result.Failure -> println(result.error)
+  }
+}
+```
+
+여기까지는 아무런 문제가 없지만 다음과 같은 상황이 있을 수 있다.
+
+```kotlin
+fun sum(a: Int, b: Int): Result<Int, Throwable> = Result.of { a + b }
+fun divide(a: Int, b: Int): Result<Int, Throwable> = Result.of { a / b }
+
+fun main() {
+  val result = Result.of { 5 }
+    .map { sum(it, 10) } // Result<Result<Int, Throwable>, Throwable>
+    .map { divide(it, 0) } // 타입이 맞지 않아 컴파일 에러가 발생한다.
+
+  when (result) {
+    is Result.Success -> println(result.value)
+    is Result.Failure -> println(result.error)
+  } // java.lang.ArithmeticException: / by zero
+}
+```
+
+위 코드와 같이 함수마다 에러를 판단하기 위해 Result라는 펑터 타입을 사용한다면 `map`을 이용할 때 **박스를 다시 박스로 감싸는 문제**가 발생하게 된다. 이를 해결하기 위해서는 박스로 다시 감싸지 않고 값을 변형하는 해야한다. 프로그래밍 세계에서 이를 구현하기 위해 **모나드**라는 개념을 이용할 수 있다.
+
+#### Monad
+
+모나드는 굉장히 어렵다라는 소문이 자자한 개념이다. 그러다보니 [모나드 괴담](https://xtendo.org/ko/monad#1)이라는 자료까지 생겨나곤했다. 하지만 이론적인 내용을 배제하고 하나씩 살펴보면 그다지 어렵지 않다는 것을 알 수 있다. 
+
+<Image src="/images/2023-07-17-railway-oriented-programming/monad-problem.jpeg" caption="일단 수학 용어는 치워보자" />
+
+앞서 모나드는 펑터의 중첩을 해결 할 수 있다고 말했다. 실제로 프로그래밍 세계의 모나드는 이를 위해 탄생했다. 게다가 심지어 많은 개발자가 이미 모나드를 사용하고 있다. 다음 코드를 살펴보자.
+
+```kotlin
+val list = listOf(1, 2, 3, 4, 5)
+val result = list
+  .flatMap {
+    listOf(it, it + 1) // listOf 함수는 List<T> 타입을 반환한다.
+  }
+```
+
+`flatMap`이라는 함수에 대해 다뤄본적이 있다면 위 코드는 익숙할 것이다. 만약 리스트를 변형하던 중 다시 리스트 타입을 반환해야 한다면 `flatMap`을 사용한다. 만약 `map` 함수였다면 `List<Int>` 타입을 `List<List<Int>>` 타입으로 변형했겠지만 `flatMap`은 `List<Int>` 타입으로 변형할 수 있다. 간단하게 표현하자면 **flatMap 함수가 반환한 것을 값으로 그대로 사용하는 것**이라 볼 수 있다. 이것이 모나드다.
+
+다시 정리하면 모나드는 중첩을 해결한다. 이제 Result 펑터를 이용하여 모나드를 구현해보자.
+
+```kotlin
+sealed class Result<out V, out E> {
+  data class Success<out V>(val value: V): Result<V, Nothing>()
+  data class Failure<out E>(val error: E): Result<Nothing, E>()
+
+  companion object {
+    fun <V> of(f: () -> V): Result<V, Throwable> = try {
+      Success(f())
+    } catch (e: Throwable) {
+      Failure(e)
+    }
+  }
+
+  override fun toString(): String =
+    when (this) {
+      is Success -> "Success($value)"
+      is Failure -> "Failure($error)"
+    }
+}
+
+fun <V, R, E> Result<V, E>.map(f: (V) -> R): Result<R, E> =
+  when (this) {
+    is Result.Success -> Result.of { f(value) }
+    is Result.Failure -> this
+  }
+
+// flatMap은 결과값을 그대로 사용한다.
+fun <V, R, E> Result<V, E>.flatMap(f: (V) -> Result<R, E>): Result<R, E> =
+  when (this) {
+    is Result.Success -> f(this.value)
+    is Result.Failure -> this
+  }
+```
+
+위 코드는 Result 펑터를 구현한 코드이다. `map` 함수는 펑터의 특징을 그대로 따르고 있고 `flatMap` 함수는 모나드의 특징을 그대로 따르고 있다. `flatMap` 함수는 결과값을 그대로 사용한다는 특징을 가지고 있다. 이제 모나드를 이용하여 펑터 쪽 예제에서 불가능했던 문제를 해결해보자.
+
+```kotlin
+fun sum(a: Int, b: Int): Result<Int, Throwable> = Result.of { a + b }
+fun divide(a: Int, b: Int): Result<Int, Throwable> = Result.of { a / b }
+
+fun main() {
+  val result = Result.of { 5 }
+    .flatMap { sum(it, 10) }
+    .flatMap { divide(it, 0) } // 타입이 일치한다!
+
+  when (result) {
+    is Result.Success -> println(result.value)
+    is Result.Failure -> println(result.error)
+  } // java.lang.ArithmeticException: / by zero
+}
+```
+
+이제 문제가 해결된 것을 볼 수 있다. 모나드에 대해서는 이론적인 내용이 많이 있지만 실용적인 것만 따진다면 이렇게 간단하게 구현할 수 있다. 이제 펑터와 모나드를 이용하면 기존과는 다른 방식으로도 예외 처리를 할 수 있다는 것을 알았을 것이다. 이제 본격적으로 ROP에 대해서 알아보자.
 
 # Railway-Oriented Programming이란?
 
-간단하게 요약하자면 ROP는 사이드 이펙트를 제어하기 위한 함수형 패러다임 기반 방법론이다. 기본적으로 Result라는 Monad 객체를 구현하여 사용하고 에러를 체크하는 것은 어떤 방법을 사용하더라도 상관없다.
+ROP는 사이드 이펙트를 제어하기 위한 함수형 패러다임 기반 방법론이다. ROP는 굉장히 단순하다. 간단하게 요약하면 **로직은 성공 혹은 실패로 나뉘고 그에 따라 새로운 선로를 설치**해서 신뢰할 수 있는 소프트웨어를 구축한다는 방법론이다.
 
-## Result
+<Image src="/images/2023-07-17-railway-oriented-programming/rail.png" caption="성공 혹은 실패" />
 
-에러의 타입 제한하여 미리 알 수 있다는 장점이 있다.
+이를 위해 기본적으로 위에서 구현한 **Result라는 모나드 객체를 사용**하고 에러를 체크하는 것은 어떤 방법을 사용하더라도 상관없다. 선로는 총 세 가지로 분류된다.
+* 성공 선로
+* 실패 선로
+* 복구 선로
 
-## Pipeline
+성공 선로는 간단하다. 우리가 생각했던 베스트 케이스대로 로직이 구성되는 것이다. 반면 실패 선로는 각각의 선로를 지나가던 중(함수를 실행하는 도중) 문제가 발생하여 실패하는 경우다. 복구 선로는 실패 선로를 지나가던 중 문제가 발생했지만 복구할 수 있는 경우이다. 그러면 다시 성공 선로로 이동한다. 이미 펑터와 모나드를 설명하며 성공 선로와 실패 선로를 구축하는 것은 보았기 때문에 복구하는 방법을 살펴보자.
+
+## 복구 선로
+복구 선로를 만드는 함수는 `rescue` 혹은 `recover`라는 이름으로 구현된다. 어떤 이름을 사용하던 상관은 없다. 다음 코드를 살펴보자.
+
+```kotlin
+sealed class Result<out V, out E> {
+  data class Success<out V>(val value: V): Result<V, Nothing>()
+  data class Failure<out E>(val error: E): Result<Nothing, E>()
+}
+
+// Other functions...
+
+fun <V, E> Result<V, E>.recover(f: (E) -> V): Result.Success<V> {
+  return when (this) {
+    is Result.Success -> this
+    is Result.Failure -> Result.Success(f(error))
+  }
+}
+
+fun main() {
+  val result = Result.of { 5 }
+    .flatMap { sum(it, 10) }
+    .flatMap { divide(it, 0) }
+    .recover { 0 } // 복구 선로 후에는 무조건 Success다.
+
+  println(result.value) // 0
+}
+```
+
+필자는 `recover`라는 함수를 구현하여 실패에 대한 처리를 할 수 있도록 구현했다. 위 코드를 보다시피 매우 간단하다.
+
+## 에러 타입 제한
+
+try-catch의 경우 어떤 에러가 발생할지 알기 어렵다는 점이 있다. 그래서 사용할 함수 내부를 파악하고 사용하는 쪽 `throw`에서 분기 혹은 타입 패턴 매칭을 사용하는 경우가 많다. 하지만 Result를 사용하면 에러를 구분하여 처리할 수 있다. 다음 코드를 살펴보자.
+
+```kotlin
+sealed class NumberException: RuntimeException() {
+  data class DivideByZero(override val message: String): NumberException()
+  data class TooBig(override val message: String): NumberException()
+  data class TooSmall(override val message: String): NumberException()
+}
+
+fun sum(a: Int, b: Int): Result<Int, NumberException> {
+  val result = a + b
+  if (result > 100) return Result.Failure(NumberException.TooBig("Too Big"))
+  if (result < 0) return Result.Failure(NumberException.TooSmall("Too Small"))
+
+  return Result.Success(result)
+}
+fun divide(a: Int, b: Int): Result<Int, NumberException> {
+  if (b == 0) return Result.Failure(NumberException.DivideByZero("Divide By Zero"))
+  return Result.Success(a / b)
+}
+
+fun main() {
+  val result = sum(5, 10)
+    .flatMap { divide(it, 0) }
+    .recover {
+      when (it) {
+        is NumberException.DivideByZero -> -1
+        is NumberException.TooBig -> 100
+        is NumberException.TooSmall -> 0
+      }
+    }
+
+  println(result.value) // -1
+}
+```
+
+위 코드에서 `recover`와 `when` 부분을 보자. `sealed clas`를 통해 제한된 타입을 패턴 매칭을 통해 안전하게 처리하는 것을 볼 수 있다. 이를 통해 더욱 더 안전하게 예외를 관리할 수 있다.
 
 ## 문제점
 
-아쉽게도 몇 언어를 제외하면 Higher Kinded Type을 제공하는 언어는 드물기 때문에 Monad Comprehension을 사용할 수 없다는 문제가 있다.
+만약 Result를 다른 모나드와 함께 사용하고 싶다면 어떻게 해야할까? 예를 들면, 위에서 구현한 Option을 함께 사용하고 싶을 수도 있다. 다음 코드를 살펴보자.
+
+```kotlin
+sealed class Option<out T> { ... }
+sealed class Result<out T, out E> { ... }
+
+fun main() {
+  val result = Mono.just(5)
+    .flatMap { sum(it, 10) }
+    .flatMap { divide(it, 0) }
+    .recover { 0 }
+
+  println(result.value) // 0
+}
+```
+
+안타깝게도 몇 언어를 제외하면 **Higher Kinded Type**을 제공하는 언어는 드물기 때문에 **Monad Comprehension**을 사용할 수 없다는 문제가 있다. 이를 지원하는 언어 중 하나인 Scala에서는 다음과 같이 사용할 수 있다.
+
+```scala
+
+```
+
+위 문법은 for-notation이라 부르는 문법으로 Monad Comprehension을 쉽게 사용할 수 있게 해주는 Syntactic Sugar 문법이다. 아쉽게도 이를 지원하지 않는 언어는 편법을 이용하거나 사용이 불가능하다. 따라서 이를 도입하고 싶은 개발자는 자신의 환경을 고려할 필요가 있다.
 
 # 마치며
 
-[^1]: 로버트 C. 마틴의 저서 클린 아키텍처에서 표현된 내용
+ROP를 사용한다면 조금 더 안전한 코딩을 할 수 있다. 다만, 환경에 따라 사용하기 힘들 수 있으니 이를 고려하여 사용하도록 하자. 또한, ROP를 사용하더라도 모든 함수에 대해 Result를 사용하는 것은 권장하지 않는다. 이는 코드의 가독성을 떨어뜨릴 수 있기 때문이다. 따라서, 필요한 함수에 대해서만 사용하는 것이 좋다.
