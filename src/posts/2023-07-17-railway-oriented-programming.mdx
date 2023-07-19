@@ -500,16 +500,23 @@ fn main() {
 
 <Image src="/images/2023-07-17-railway-oriented-programming/rail.png" caption="성공 혹은 실패" />
 
-이를 위해 기본적으로 위에서 구현한 **Result라는 모나드 객체를 사용**하고 에러를 체크하는 것은 어떤 방법을 사용하더라도 상관없다. 이미 Result를 구현한 시점에서 ROP의 설명은 거의 끝났다고 볼 수 있다.
+이를 위해 기본적으로 위에서 구현한 **Result라는 모나드 객체를 사용**하고 에러를 체크하는 것은 어떤 방법을 사용하더라도 상관없다. 중요한 것은 **ROP라는 방법론의 철학을 이해**하는 것이다. ROP는 다음과 같은 철학을 따른다.
+* 모든 기능은 순차적으로 실행된다.
+* 모든 기능은 성공 혹은 실패로 나뉜다.
+* 프로그램은 패닉이 발생하면 안된다.
 
-ROP는 세 가지 선로로 분류된다.
+이렇게 간단한 철학을 따르면서도 ROP는 사고적으로 굉장히 강력한 방법론이다. 우리는 프로그래밍을 할 때 항상 기능에 대한 추상화를 한다. ROP에선 **기능을 선로에 빗대어 추상화**하며 선로를 구성하는 기능들은 모두 성공 혹은 실패로 나뉜다. 이렇게 추상화를 하면 **기능의 단위를 적절한 성공과 실패로 나누게 되므로** 구현과 리팩토링 하는 것이 굉장히 쉬워진다.
+
+또한, 모든 기능을 **순차적으로 실행하기 때문에 프로그램의 흐름을 이해하기 쉬워지고 가독성이 좋아진다**. 이러한 장점들을 통해 ROP는 신뢰할 수 있는 소프트웨어를 구축하는데 도움을 준다. 이제 Result에 대한 추가적인 내용에 대해 알아보자.
+
+## 복구 선로
+이미 Result를 구현한 시점에서 ROP의 설명은 거의 끝났다고 볼 수 있다. 하지만 앞서 설명하지 않은 내용 중 **복구**라는 개념이 있다. ROP는 세 가지 선로로 분류된다.
 * 성공 선로
 * 실패 선로
 * 복구 선로
 
 성공 선로는 간단하다. 우리가 생각했던 베스트 케이스대로 로직이 구성되는 것이다. 반면 실패 선로는 각각의 선로를 지나가던 중(함수를 실행하는 도중) 문제가 발생하여 실패하는 경우다. 복구 선로는 실패 선로를 지나가던 중 문제가 발생했지만 복구할 수 있는 경우이다. 그러면 다시 성공 선로로 이동한다. 이미 펑터와 모나드를 설명하며 성공 선로와 실패 선로를 구축하는 것은 Result를 구현하며 보았기 때문에 복구하는 방법을 살펴보자.
 
-## 복구 선로
 복구 선로를 만드는 함수는 `rescue` 혹은 `recover`라는 이름으로 구현된다. 어떤 이름을 사용하던 상관은 없다. 다음 코드를 살펴보자.
 
 ```kotlin
@@ -643,6 +650,71 @@ fun main() {
 
 여기서 Context Receiver를 이용한 구현은 이 글의 범위를 벗어나기 때문에 생략한다. 만약 이에 대해 궁금하다면 [ArrowKt 공식 홈페이지](https://arrow-kt.io/learn/design/receivers-flatmap/)를 참고하길 바란다.
 
+## 중첩 컨테이너 문제
+
+만약 Result를 다른 모나드와 함께 사용하고 싶다면 어떻게 해야할까? 예를 들면, 위에서 만든 Option 모나드를 함께 사용하고 싶을 수도 있다. 다음 코드를 살펴보자.
+
+```kotlin
+fun getUserById(id: Int): Result<Option<User>, Throwable> {
+  // ...
+}
+
+fun getPostByUserId(userId: Int): Result<Post, Throwable> {
+  // ...
+}
+
+fun main() {
+  val result = getUserById(1)
+    .flatMap { user ->
+      when (user) { // user는 Option<User> 타입이다.
+        is Option.Some -> {
+          getPostsByUserId(user.value.id)
+            .map { posts -> 
+              posts.map { it.title } 
+            }
+        }
+        is Option.None -> Result.Failure(Throwable("User not found"))
+      }
+    }
+
+  when (result) {
+    is Result.Success -> println(result.value)
+    is Result.Failure -> println(result.error)
+  }
+}
+```
+
+위 코드를 보면 `getUserById` 함수가 `Result<Option<User>, Throwable>` 타입이기 때문에 중간에 패턴 매칭을 통해 박스를 벗겨내는 것을 볼 수 있다. 여기서는 `Option`을 Nullable로 대체하면 해결할 수 있지만 실제로 여러 모나드를 사용할 경우 점점 코드가 복잡해질 수 있다. 이처럼 이미 다른 모나드를 주력으로 사용하고 있는 상황이라면 문제가 될 수 있다. 예를 들어, Spring 환경에서 Reactive Programming을 위해 Mono, Flux 등을 사용하는 경우 혹은 Rx 계열 라이브러리를 사용하는 경우를 예시로 들 수 있다.
+
+이를 해결하기 위해서는 **Higher-Kinded Type**(이하 HKT)이라는 개념이 필요하다. 다만, 안타깝게도 몇 언어를 제외하면 HKT를 제공하는 언어는 드물기 때문에 이 문제를 해결하기는 쉽지 않다. 이 글 전반적으로 사용되는 Kotlin에선 해당 기능을 제공하지 않는다.
+
+Scala에선 HKT를 지원한다. 이를 통해 **Monad Transfomer**이라는 것을 구현할 수 있는데, 이를 통해 문제를 해결할 수 있다.
+
+```scala
+def getUserById(id: Int): Either[Exception, Option[User]] = {
+  Right(Option(User(1, 30)))
+}
+
+def getPostsByUserId(userId: Int): Either[Exception, List[Post]] = {
+  Right(List(Post("A"), Post("B")))
+}
+
+def main(args: Array[String]): Unit = {
+  val result = for {
+    // OptionT 타입은 cats 라이브러리를 통해 사용했다.
+    user <- OptionT(getUserById(1))
+    posts <- OptionT.liftF(getPostsByUserId(user.id))
+  } yield posts.map(_.title)
+
+  result.value match {
+    case Right(posts) => println(posts)
+    case Left(e) => println(e)
+  }
+}
+```
+
+위 코드를 보다시피 Nested한 코드가 제거되어 조금 더 깔끔한 모습을 볼 수 있다. 아쉽게도 이를 지원하지 않는 언어는 사용이 불가능하다. 따라서 ROP를 도입하고 싶은 개발자는 자신의 환경을 고려할 필요가 있다.
+
 # 마치며
 
-ROP를 사용한다면 조금 더 안전한 코딩을 할 수 있다. 다만, 환경에 따라 사용하기 힘들 수 있으니 이를 고려하여 사용하도록 하자. 또한, ROP를 사용하더라도 모든 함수에 대해 Result를 사용하는 것은 권장하지 않는다. 이는 코드의 가독성을 떨어뜨릴 수 있기 때문이다. 따라서, 필요한 함수에 대해서만 사용하는 것이 좋다.
+ROP를 사용한다면 조금 더 안전하고 직관적인 코딩을 할 수 있다. 다만, 환경에 따라 사용하기 힘들 수 있으니 이를 고려하여 사용하도록 하자. 또한, ROP를 사용하더라도 모든 함수에 대해 Result를 사용하는 것은 권장하지 않는다. 이는 코드의 가독성을 떨어뜨릴 수 있기 때문이다. 따라서, 필요한 함수에 대해서만 사용하는 것이 좋다.
