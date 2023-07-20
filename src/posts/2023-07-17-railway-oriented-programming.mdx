@@ -214,11 +214,11 @@ fun main() {
 
 먼저 펑터와 모나드를 이해하기 전에 **타입**에 대해 살펴볼 필요가 있다. 함수형 프로그래밍에서 타입은 **함수 합성**을 하기 위한 중요한 개념이다. 수학적 정의와 마찬가지로 프로그래밍 세계의 함수도 **정의역과 치역**으로 이루어져 있다.
 
-> 정의역과 치역 이미지
+<Image src="/images/2023-07-17-railway-oriented-programming/domain-range.png" caption="정의역과 치역 그리고 공역" width="80%" />
 
 함수의 정의역과 치역은 집합이다. 그리고 프로그래밍 언어에선 이를 타입으로 표현한다. 
 
-```
+```js
 Boolean = {true, false}
 Short = {-32768, ..., 0, ..., 32767}
 Int = {-2147383647, ..., 0, ..., 2147483647}
@@ -231,23 +231,23 @@ Int = {-2147383647, ..., 0, ..., 2147483647}
 fun divide(a: Int, b: Int): Double = a.toDouble() / b.toDouble()
 ```
 
-하지만 위 함수는 b가 0일 경우 DivideByZero 에러가 발생하기 때문에 순수 함수가 아니다. 이 경우 치역을 온전한 Double이라고 말할 수는 없다. 분기를 이용한 예외 처리로 이를 해결할 수 있지만 만약 에러마저도 치역에 포함시키고 싶다면 다른 방법을 사용해야 한다. 이 문제를 해결하는 것이 어렵게 느껴질 수 있지만 사실 상당히 간단한 일이다. Double이라는 집합으로는 에러를 담아낼 수 없기 때문에 새로운 집합이 필요하다. 즉, 새로운 타입을 만들어내면 되는 것이다.
+하지만 위 함수는 b가 0일 경우 DivideByZero 에러가 발생하기 때문에 순수 함수가 아니다. 이 경우 **치역을 온전한 Double**이라고 말할 수는 없다. 분기를 이용한 예외 처리로 이를 해결할 수 있지만 만약 에러마저도 치역에 포함시키고 싶다면 다른 방법을 사용해야 한다. 이 문제를 해결하는 것이 어렵게 느껴질 수 있지만 사실 상당히 간단한 일이다. Double이라는 집합으로는 에러를 담아낼 수 없기 때문에 새로운 집합이 필요하다. 즉, **새로운 타입**을 만들어내면 되는 것이다.
 
-> 확장된 치역 이미지
+<Image src="/images/2023-07-17-railway-oriented-programming/new-range.png" caption="묶어서 하나의 타입" />
 
 위와 같은 개념이 **펑터**라고 할 수 있다. 지금부터 프로그래밍 세계에서 펑터를 어떻게 구현할 수 있을지 알아보자.
 
 #### Functor
 
-펑터라는 개념을 이용하면 타입을 확장하여 새로운 타입을 만들어낼 수 있다. 이를 통해 에러를 담아낼 수 있다. 코드를 살펴보기 전에 먼저 개념적인 이미지부터 살펴보자.
+펑터라는 개념을 이용하면 타입을 확장하여 새로운 타입을 만들어낼 수 있다. 이를 통해 에러를 담아낼 수 있다. 코드를 살펴보기 전에 먼저 **개념적인 이미지**부터 살펴보자.
 
-> Functor 박스 꺼내서 함수 적용하는 이미지
+<Image src="/images/2023-07-17-railway-oriented-programming/functor.png" />
 
-위 이미지를 보면 펑터는 박스와 같다는 것을 알 수 있다. 박스 안에는 값이 들어있고 이를 꺼내서 함수를 적용한다. 그리고 다시 박스에 집어넣는다. 왜 이런 번거로운 짓을 하는 걸까? 그 이유는 **값에 함수를 적용(Apply)할 때 발생하는 문제를 해결**하기 위함이다. 다시 다음 이미지를 살펴보자.
+위 이미지를 보면 펑터는 박스와 같다는 것을 알 수 있다. 박스 안에는 값이 들어있고 이를 **꺼내서(unwrap value)** 함수를 **적용(apply function)**한다. 그리고 다시 박스에 **집어넣는다(rewrap value)**. 왜 이런 번거로운 짓을 하는 걸까? 그 이유는 **값에 함수를 적용할 때 발생하는 문제를 해결**하기 위함이다. 다시 다음 이미지를 살펴보자.
 
-> Functor에 / 0 을 적용하는 이미지
+<Image src="/images/2023-07-17-railway-oriented-programming/functor-error.png" />
 
-이번엔 펑터에 0을 나누는 함수를 적용했다. 이 경우 당연히 에러가 발생한다. 여기서 개발자는 적절한 로직을 통해 예외 처리를 할 수 있다. 이때 **적절한 로직을 펑터 객체**에 넣어주면 된다.
+이번엔 펑터에 0을 나누는 함수를 적용했다. 이 경우 당연히 에러가 발생한다. 여기서 개발자는 적절한 로직을 통해 예외 처리를 할 수 있다. 이때 **예외 처리를 통해 얻은 에러 객체를 펑터**에 넣어주면 된다.
 
 이를 코드로 구현하면 다음과 같다. 여기선 예제로 Kotlin을 사용하겠다.
 
@@ -478,18 +478,45 @@ fun main() {
 
 # Railway-Oriented Programming
 
-ROP는 사이드 이펙트를 제어하기 위한 함수형 패러다임 기반 방법론이다. ROP는 굉장히 단순하다. 간단하게 요약하면 **로직은 성공 혹은 실패로 나뉘고 그에 따라 새로운 선로를 설치**해서 신뢰할 수 있는 소프트웨어를 구축한다는 방법론이다.
+ROP는 사이드 이펙트를 제어하기 위한 함수형 패러다임 기반 방법론이다. ROP라는 방법론은 널리 알려지진 않았지만 Rust는 try-catch 문법을 지원하지 않는대신 ROP 철학을 따르고 있다. 즉, 배워둬서 나쁠건 없다고 생각한다.
+
+```rust
+// Rust 예제
+use std::fs::File;
+
+fn main() {
+  let f = File::open("hello.txt"); // Result 객체를 반환한다.
+
+  let f = match f {
+    Ok(file) => file, // 파일이 정상적으로 열렸다면 파일 객체를 반환한다.
+    Err(error) => {
+      panic!("There was a problem opening the file: {:?}", error) // 에러를 처리한다.
+    },
+  };
+}
+```
+
+이어서 설명하면 ROP는 굉장히 단순하다. 간단하게 요약하면 **로직은 성공 혹은 실패로 나뉘고 그에 따라 새로운 선로를 설치**해서 신뢰할 수 있는 소프트웨어를 구축한다는 방법론이다.
 
 <Image src="/images/2023-07-17-railway-oriented-programming/rail.png" caption="성공 혹은 실패" />
 
-이를 위해 기본적으로 위에서 구현한 **Result라는 모나드 객체를 사용**하고 에러를 체크하는 것은 어떤 방법을 사용하더라도 상관없다. 선로는 총 세 가지로 분류된다.
+이를 위해 기본적으로 위에서 구현한 **Result라는 모나드 객체를 사용**하고 에러를 체크하는 것은 어떤 방법을 사용하더라도 상관없다. 중요한 것은 **ROP라는 방법론의 철학을 이해**하는 것이다. ROP는 다음과 같은 철학을 따른다.
+* 모든 기능은 순차적으로 실행된다.
+* 모든 기능은 성공 혹은 실패로 나뉜다.
+* 프로그램은 패닉이 발생하면 안된다.
+
+이렇게 간단한 철학을 따르면서도 ROP는 사고적으로 굉장히 강력한 방법론이다. 우리는 프로그래밍을 할 때 항상 기능에 대한 추상화를 한다. ROP에선 **기능을 선로에 빗대어 추상화**하며 선로를 구성하는 기능들은 모두 성공 혹은 실패로 나뉜다. 이렇게 추상화를 하면 **기능의 단위를 적절한 성공과 실패로 나누게 되므로** 구현과 리팩토링 하는 것이 굉장히 쉬워진다.
+
+또한, 모든 기능을 **순차적으로 실행하기 때문에 프로그램의 흐름을 이해하기 쉬워지고 가독성이 좋아진다**. 이러한 장점들을 통해 ROP는 신뢰할 수 있는 소프트웨어를 구축하는데 도움을 준다. 이제 Result에 대한 추가적인 내용에 대해 알아보자.
+
+## 복구 선로
+이미 Result를 구현한 시점에서 ROP의 설명은 거의 끝났다고 볼 수 있다. 하지만 앞서 설명하지 않은 내용 중 **복구**라는 개념이 있다. ROP는 세 가지 선로로 분류된다.
 * 성공 선로
 * 실패 선로
 * 복구 선로
 
-성공 선로는 간단하다. 우리가 생각했던 베스트 케이스대로 로직이 구성되는 것이다. 반면 실패 선로는 각각의 선로를 지나가던 중(함수를 실행하는 도중) 문제가 발생하여 실패하는 경우다. 복구 선로는 실패 선로를 지나가던 중 문제가 발생했지만 복구할 수 있는 경우이다. 그러면 다시 성공 선로로 이동한다. 이미 펑터와 모나드를 설명하며 성공 선로와 실패 선로를 구축하는 것은 보았기 때문에 복구하는 방법을 살펴보자.
+성공 선로는 간단하다. 우리가 생각했던 베스트 케이스대로 로직이 구성되는 것이다. 반면 실패 선로는 각각의 선로를 지나가던 중(함수를 실행하는 도중) 문제가 발생하여 실패하는 경우다. 복구 선로는 실패 선로를 지나가던 중 문제가 발생했지만 복구할 수 있는 경우이다. 그러면 다시 성공 선로로 이동한다. 이미 펑터와 모나드를 설명하며 성공 선로와 실패 선로를 구축하는 것은 Result를 구현하며 보았기 때문에 복구하는 방법을 살펴보자.
 
-## 복구 선로
 복구 선로를 만드는 함수는 `rescue` 혹은 `recover`라는 이름으로 구현된다. 어떤 이름을 사용하던 상관은 없다. 다음 코드를 살펴보자.
 
 ```kotlin
@@ -508,8 +535,7 @@ fun <V, E> Result<V, E>.recover(f: (E) -> V): Result.Success<V> {
 }
 
 fun main() {
-  val result = Result.of { 5 }
-    .flatMap { sum(it, 10) }
+  val result = sum(it, 10)
     .flatMap { divide(it, 0) }
     .recover { 0 } // 복구 선로 후에는 무조건 Success다.
 
@@ -560,32 +586,135 @@ fun main() {
 
 위 코드에서 `recover`와 `when` 부분을 보자. `sealed clas`를 통해 제한된 타입을 패턴 매칭을 통해 안전하게 처리하는 것을 볼 수 있다. 이를 통해 더욱 더 안전하게 예외를 관리할 수 있다.
 
-## 문제점
+## Monad Comprehension
 
-만약 Result를 다른 모나드와 함께 사용하고 싶다면 어떻게 해야할까? 예를 들면, 위에서 구현한 Option을 함께 사용하고 싶을 수도 있다. 다음 코드를 살펴보자.
+`flatMap`을 사용하여 박스를 중첩하지 않아도 된다는 것을 앞서 배웠다. 웬만하면 `flatMap`만으로 깔끔하게 코드를 작성하는 것이 가능하지만 다음과 같은 경우가 있을 수 있다.
 
 ```kotlin
-sealed class Option<out T> { ... }
-sealed class Result<out T, out E> { ... }
-
 fun main() {
-  val result = Mono.just(5)
-    .flatMap { sum(it, 10) }
-    .flatMap { divide(it, 0) }
-    .recover { 0 }
+  val result = getUserById(1)
+    .flatMap { user ->
+      getAllPosts()
+        .map { posts ->
+          posts.filter { it.userId == user.id } // user가 필요하다.
+        }
+    }
 
-  println(result.value) // 0
+  when (result) {
+    is Result.Success -> println(result.value)
+    is Result.Failure -> println(result.error)
+  }
 }
 ```
 
-안타깝게도 몇 언어를 제외하면 **Higher Kinded Type**을 제공하는 언어는 드물기 때문에 **Monad Comprehension**을 사용할 수 없다는 문제가 있다. 이를 지원하는 언어 중 하나인 Scala에서는 다음과 같이 사용할 수 있다.
+위 코드를 보면 `flatMap`을 사용하여도 점점 Nested 되기 때문에 코드가 복잡하다. 위 코드처럼 선행된 값을 알아야하기 때문에 Nested한 코드를 어쩔 수 없이 작성하는 경우가 많다. 이를 해결하기 위해 `Monad Comprehension`이라는 것을 사용할 수 있다. 다만, 이 글에서 예제 코드를 위해 전반적으로 사용하는 Kotlin에선 Monad Comprehension을 지원하지 않는다. 이 기능을 제공하는 언어는 대표적으로 Scala와 Haskell이 있다. 여기서는 Scala 예제를 통해 Monad Comprehension을 살펴보자.
 
 ```scala
+def getUserById(id: Int): Either[Exception, User] = {
+  // ...
+}
 
+def getAllPosts(): Either[Exception, List[Post]] = {
+  // ...
+}
+
+def main(args: Array[String]) = {
+  val result = for {
+    user <- getUserById(1)
+    posts <- getAllPosts().map(_.filter(_.userId == user.id))
+  } yield posts.map(_.title)
+
+  result match {
+    case Right(posts) => println(posts)
+    case Left(e) => println(e)
+  }
+}
 ```
 
-위 문법은 for-notation이라 부르는 문법으로 Monad Comprehension을 쉽게 사용할 수 있게 해주는 Syntactic Sugar 문법이다. 아쉽게도 이를 지원하지 않는 언어는 편법을 이용하거나 사용이 불가능하다. 따라서 이를 도입하고 싶은 개발자는 자신의 환경을 고려할 필요가 있다.
+위 코드에서 `for ~ yield` 부분이 For Comprehension이라 부르는 문법으로 Monad Comprehension을 쉽게 사용할 수 있게 해주는 Syntactic Sugar 문법이다. 이런식으로 Nested를 제거할 수 있다. 참고로 Kotlin에서 이 문법 흉내내기 위해서 Context Receiver라는 것을 사용할 수 있다.
+
+```kotlin
+fun main() {
+  val result: Result<List<String>, Throwable> = binding {
+    val user = getUserById(1).bind()
+    val posts = getAllPosts().bind()
+    posts.filter { it.userId == user.id }.map { it.title }
+  }
+
+  when (result) {
+    is Result.Success -> println(result.value)
+    is Result.Failure -> println(result.error)
+  }
+}
+```
+
+여기서 Context Receiver를 이용한 구현은 이 글의 범위를 벗어나기 때문에 생략한다. 만약 이에 대해 궁금하다면 [ArrowKt 공식 홈페이지](https://arrow-kt.io/learn/design/receivers-flatmap/)를 참고하길 바란다.
+
+## 중첩 컨테이너 문제
+
+만약 Result를 다른 모나드와 함께 사용하고 싶다면 어떻게 해야할까? 예를 들면, 위에서 만든 Option 모나드를 함께 사용하고 싶을 수도 있다. 다음 코드를 살펴보자.
+
+```kotlin
+fun getUserById(id: Int): Result<Option<User>, Throwable> {
+  // ...
+}
+
+fun getPostByUserId(userId: Int): Result<Post, Throwable> {
+  // ...
+}
+
+fun main() {
+  val result = getUserById(1)
+    .flatMap { user ->
+      when (user) { // user는 Option<User> 타입이다.
+        is Option.Some -> {
+          getPostsByUserId(user.value.id)
+            .map { posts -> 
+              posts.map { it.title } 
+            }
+        }
+        is Option.None -> Result.Failure(Throwable("User not found"))
+      }
+    }
+
+  when (result) {
+    is Result.Success -> println(result.value)
+    is Result.Failure -> println(result.error)
+  }
+}
+```
+
+위 코드를 보면 `getUserById` 함수가 `Result<Option<User>, Throwable>` 타입이기 때문에 중간에 패턴 매칭을 통해 박스를 벗겨내는 것을 볼 수 있다. 여기서는 `Option`을 Nullable로 대체하면 해결할 수 있지만 실제로 여러 모나드를 사용할 경우 점점 코드가 복잡해질 수 있다. 이처럼 이미 다른 모나드를 주력으로 사용하고 있는 상황이라면 문제가 될 수 있다. 예를 들어, Spring 환경에서 Reactive Programming을 위해 Mono, Flux 등을 사용하는 경우 혹은 Rx 계열 라이브러리를 사용하는 경우를 예시로 들 수 있다.
+
+이를 해결하기 위해서는 **Higher-Kinded Type**(이하 HKT)이라는 개념이 필요하다. 다만, 안타깝게도 몇 언어를 제외하면 HKT를 제공하는 언어는 드물기 때문에 이 문제를 해결하기는 쉽지 않다. 이 글 전반적으로 사용되는 Kotlin에선 해당 기능을 제공하지 않는다.
+
+Scala에선 HKT를 지원한다. 이를 통해 **Monad Transfomer**이라는 것을 구현할 수 있는데, 이를 통해 문제를 해결할 수 있다.
+
+```scala
+def getUserById(id: Int): Either[Exception, Option[User]] = {
+  Right(Option(User(1, 30)))
+}
+
+def getPostsByUserId(userId: Int): Either[Exception, List[Post]] = {
+  Right(List(Post("A"), Post("B")))
+}
+
+def main(args: Array[String]): Unit = {
+  val result = for {
+    // OptionT 타입은 cats 라이브러리를 통해 사용했다.
+    user <- OptionT(getUserById(1))
+    posts <- OptionT.liftF(getPostsByUserId(user.id))
+  } yield posts.map(_.title)
+
+  result.value match {
+    case Right(posts) => println(posts)
+    case Left(e) => println(e)
+  }
+}
+```
+
+위 코드를 보다시피 Nested한 코드가 제거되어 조금 더 깔끔한 모습을 볼 수 있다. 아쉽게도 이를 지원하지 않는 언어는 사용이 불가능하다. 따라서 ROP를 도입하고 싶은 개발자는 자신의 환경을 고려할 필요가 있다.
 
 # 마치며
 
-ROP를 사용한다면 조금 더 안전한 코딩을 할 수 있다. 다만, 환경에 따라 사용하기 힘들 수 있으니 이를 고려하여 사용하도록 하자. 또한, ROP를 사용하더라도 모든 함수에 대해 Result를 사용하는 것은 권장하지 않는다. 이는 코드의 가독성을 떨어뜨릴 수 있기 때문이다. 따라서, 필요한 함수에 대해서만 사용하는 것이 좋다.
+ROP를 사용한다면 조금 더 안전하고 직관적인 코딩을 할 수 있다. 다만, 환경에 따라 사용하기 힘들 수 있으니 이를 고려하여 사용하도록 하자. 또한, ROP를 사용하더라도 모든 함수에 대해 Result를 사용하는 것은 권장하지 않는다. 이는 코드의 가독성을 떨어뜨릴 수 있기 때문이다. 따라서, 필요한 함수에 대해서만 사용하는 것이 좋다.
