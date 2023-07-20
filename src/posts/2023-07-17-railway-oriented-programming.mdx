@@ -367,7 +367,7 @@ fun main() {
 }
 ```
 
-`of` 메서드를 통해 에러가 발생한다면 `Failure` 발생하지 않는다면 `Success` 타입으로 분류된다. 마찬가지로 `map`을 이용해 값을 변형할 때 에러가 발생한다면 `Failure`를 반환하고 발생하지 않는다면 `Success`를 반환한다. 이를 통해 에러를 안전하게 처리할 수 있다. 여기서 `Option`때와 마찬가지로 패턴 매칭을 사용한다면 다음과 같이 사용할 수 있다.
+`of` 메서드를 통해 에러가 발생한다면 `Failure` 타입이 반환되고 발생하지 않는다면 `Success` 타입이 반환된다. 마찬가지로 `map`을 이용해 값을 변형할 때 에러가 발생한다면 `Failure`를 반환하고 발생하지 않는다면 `Success`를 반환한다. 이를 통해 에러를 안전하게 처리할 수 있다. 여기서 `Option`때와 마찬가지로 패턴 매칭을 사용한다면 다음과 같이 사용할 수 있다.
 
 ```kotlin
 fun main() {
@@ -476,7 +476,7 @@ fun main() {
 
 이제 문제가 해결된 것을 볼 수 있다. 모나드에 대해서는 이론적인 내용이 많이 있지만 실용적인 것만 따진다면 이렇게 간단하게 구현할 수 있다. 이제 펑터와 모나드를 이용하면 기존과는 다른 방식으로도 예외 처리를 할 수 있다는 것을 알았을 것이다. 이제 본격적으로 ROP에 대해서 알아보자.
 
-# Railway-Oriented Programming이란?
+# Railway-Oriented Programming
 
 ROP는 사이드 이펙트를 제어하기 위한 함수형 패러다임 기반 방법론이다. ROP는 굉장히 단순하다. 간단하게 요약하면 **로직은 성공 혹은 실패로 나뉘고 그에 따라 새로운 선로를 설치**해서 신뢰할 수 있는 소프트웨어를 구축한다는 방법론이다.
 
@@ -537,6 +537,7 @@ fun sum(a: Int, b: Int): Result<Int, NumberException> {
 
   return Result.Success(result)
 }
+
 fun divide(a: Int, b: Int): Result<Int, NumberException> {
   if (b == 0) return Result.Failure(NumberException.DivideByZero("Divide By Zero"))
   return Result.Success(a / b)
