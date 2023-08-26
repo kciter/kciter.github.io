@@ -12,10 +12,11 @@ import { Helmet } from "react-helmet";
 import $ from "jquery";
 import { useEffect } from "react";
 import { useState } from "react";
+import Series from "@components/Series";
 
 dayjs.extend(require("dayjs/plugin/localizedFormat"));
 
-const PostTemplate = ({ data, location }: PageProps) => {
+const PostTemplate = ({ data, location, pageContext }: PageProps) => {
   const {
     body,
     tableOfContents,
@@ -23,6 +24,8 @@ const PostTemplate = ({ data, location }: PageProps) => {
     frontmatter,
     excerpt,
   } = (data as any).mdx;
+
+  const { series } = pageContext as any;
 
   const author = "Lee Sun-Hyoup";
   const date = dayjs(fields.date).locale("ko").format();
@@ -41,6 +44,8 @@ const PostTemplate = ({ data, location }: PageProps) => {
     "@type": "BlogPosting",
     "@context": "https://schema.org",
   };
+
+  console.log(series, frontmatter.series);
 
   useEffect(() => {
     if (typeof document === undefined) return;
@@ -111,6 +116,15 @@ const PostTemplate = ({ data, location }: PageProps) => {
       {draft ||
         (tableOfContents.items && (
           <TableOfContents items={tableOfContents.items} />
+        ))}
+
+      {draft ||
+        (series?.items && (
+          <Series
+            title={series.title}
+            items={series.items}
+            currentItem={frontmatter.title}
+          />
         ))}
 
       <div className="post-content">

@@ -37,6 +37,7 @@ exports.createPages = ({ graphql, actions }) => {
               title
               categories
               draft
+              series
             }
           }
         }
@@ -49,6 +50,23 @@ exports.createPages = ({ graphql, actions }) => {
         component: path.resolve(`src/templates/post.tsx`),
         context: {
           slug: node.fields.slug,
+          series: node.frontmatter.series
+            ? {
+                title: node.frontmatter.series,
+                items: result.data.allMdx.edges
+                  .filter(edge => {
+                    return (
+                      edge.node.frontmatter.series === node.frontmatter.series
+                    );
+                  })
+                  .map(edge => {
+                    return {
+                      title: edge.node.frontmatter.title,
+                      url: edge.node.fields.slug,
+                    };
+                  }),
+              }
+            : undefined,
         },
       });
     });
