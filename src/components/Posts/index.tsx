@@ -15,7 +15,7 @@ const RelatedPost = ({ page = 1 }: PostsProps) => {
         sort: { fields: [fields___date], order: DESC }
         filter: {
           fields: { type: { eq: "post" } }
-          frontmatter: { draft: { ne: true } }
+          frontmatter: { draft: { ne: true }, hide: { ne: true } }
         }
       ) {
         edges {

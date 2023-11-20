@@ -8,7 +8,7 @@ module.exports = {
   plugins: [
     `gatsby-plugin-tsconfig-paths`,
     `gatsby-plugin-react-helmet`,
-    `gatsby-plugin-image`,
+    // `gatsby-plugin-image`,
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
     {
