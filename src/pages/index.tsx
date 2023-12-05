@@ -30,7 +30,7 @@ export const relatedPostQuery = graphql`
     allMdx(
       filter: {
         fields: { type: { eq: "post" } }
-        frontmatter: { draft: { ne: true } }
+        frontmatter: { draft: { ne: true }, hide: { ne: true } }
       }
     ) {
       edges {
