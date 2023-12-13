@@ -45,8 +45,6 @@ const PostTemplate = ({ data, location, pageContext }: PageProps) => {
     "@context": "https://schema.org",
   };
 
-  console.log(series, frontmatter.series);
-
   useEffect(() => {
     if (typeof document === undefined) return;
 
