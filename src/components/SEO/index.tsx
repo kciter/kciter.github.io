@@ -87,9 +87,11 @@ const SEO = ({ title, description, meta }: SEOProps) => {
           name: `twitter:description`,
           content: metaDescription,
         },
-        meta.find((item: any) => item.property === "og:image") ?? {
+        {
           property: `og:image`,
-          content: "https://kciter.so/images/og.png",
+          content:
+            meta.find((item: any) => item.property === "og:image")?.content ??
+            "https://kciter.so/images/og.png",
         },
       ].concat(meta)}
     />
