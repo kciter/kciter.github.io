@@ -1,5 +1,5 @@
+import Giscus from "@components/Giscus";
 import SpecialThanks from "@components/SpecialThanks";
-import Utterances from "@components/Utterances";
 import React from "react";
 
 interface PostFooterProps {
@@ -33,7 +33,7 @@ const PostFooter = ({ tags, comment }: PostFooterProps) => {
       {comment && (
         <>
           <div id="comments">
-            <Utterances repo="kciter/kciter.github.io" theme="github-light" />
+            <Giscus repo="kciter/kciter.github.io" theme="light" />
           </div>
 
           {/* <script
