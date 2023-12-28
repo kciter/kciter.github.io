@@ -9,7 +9,12 @@ const Index = ({ data }: PageProps) => {
   const [posts, setPosts] = useState();
   useEffect(() => {
     setPosts(
-      (data as any).allMdx.edges.sort(() => Math.random() - 0.5).splice(0, 6)
+      (data as any).allMdx.edges
+        .sort(
+          (a: any, b: any) =>
+            +new Date(b.node.fields.date) - +new Date(a.node.fields.date)
+        )
+        .splice(0, 9)
     );
   }, []);
 
@@ -19,7 +24,7 @@ const Index = ({ data }: PageProps) => {
 
       <Bio />
 
-      <h2>Posts</h2>
+      <h2>Recent Posts</h2>
       {posts && <RelatedPost posts={posts} style={{ padding: 0 }} />}
     </DefaultTemplate>
   );
