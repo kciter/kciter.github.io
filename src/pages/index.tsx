@@ -39,8 +39,6 @@ const Index = () => {
     )
     .splice(0, 9);
 
-  console.log(result);
-
   return (
     <DefaultTemplate>
       <SEO title="" />
