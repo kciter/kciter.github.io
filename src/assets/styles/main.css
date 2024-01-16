@@ -971,7 +971,7 @@ th, td {
 .post-bio-container .summary .name {
   font-weight: bold;
   background: linear-gradient(to right, #191335, #191335 33.33333%, #00AB6C 66.66666%, #00CB8C);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   transition: all 0.3s ease;
   background-size: 300% 100%;
