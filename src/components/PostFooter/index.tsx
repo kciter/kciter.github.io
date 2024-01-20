@@ -1,3 +1,4 @@
+import PostBio from "@components/PostBio";
 import Giscus from "@components/Giscus";
 import SpecialThanks from "@components/SpecialThanks";
 import React from "react";
@@ -20,13 +21,9 @@ const PostFooter = ({ tags, comment }: PostFooterProps) => {
             ))}
           </div>
         )}
-
-        {/* {comment && (
-          <div id="comment-button-wrapper">
-            <div id="comment-button">댓글 닫기</div>
-          </div>
-        )} */}
       </div>
+
+      <PostBio />
 
       <SpecialThanks />
 
