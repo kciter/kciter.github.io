@@ -76,6 +76,8 @@ export const SpinningCube = () => {
   React.useEffect(() => {
     let fpsInterval = 24;
     let then = Date.now();
+    let handleId: number;
+
     function animate() {
       const now = Date.now();
       const elapsed = now - then;
@@ -108,10 +110,14 @@ export const SpinningCube = () => {
         C += 0.01;
       }
 
-      requestAnimationFrame(animate);
+      handleId = requestAnimationFrame(animate);
     }
 
     animate();
+
+    return () => {
+      cancelAnimationFrame(handleId);
+    };
   }, []);
 
   return (
