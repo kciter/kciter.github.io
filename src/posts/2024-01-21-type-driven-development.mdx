@@ -15,7 +15,7 @@ import Image from '@components/Image';
 
 # 타입에 대한 재인식
 
-타입에 대해 깊게 생각해본 적이 없다면 단순히 언어에서 제공되는 원시 타입이나 클래스만을 생각할 수 있다. 하지만 타입은 그 이상으로 활용할 수 있는 개념이다. 타입은 함수와 데이터가 준수해야하는 **강력한 계약**이며 정적 타입 시스템은 이를 어길 수 없게 만든다. 개발자는 이 타입 시스템을 조금 더 풍부하게 사용하여 더 안정적인 프로그램을 만들거나 코드의 가독성을 좋게 만들 수 있다.
+타입에 대해 깊게 생각해본 적이 없다면 단순히 언어에서 제공되는 원시 타입이나 클래스만을 생각할 수 있다. 하지만 타입은 그 이상으로 활용할 수 있는 개념이다. 타입은 함수와 데이터가 준수해야하는 **강력한 계약**이며 정적 타입 시스템은 이를 어길 수 없게 만든다. 개발자는 이 타입 시스템 잘 활용하여 더 안정적인 프로그램을 만들거나 코드의 가독성을 좋게 만들 수 있다. 반대로 개발자가 타입을 풍부하게 사용하지 않는다면 타입 시스템을 통해 얻을 수 있는 이점을 제대로 누릴 수 없다.
 
 ## 타입은 집합이다
 
@@ -29,7 +29,7 @@ String = { "", "a", "b", "c", ... }
 
 중요한 것은 타입은 무한하지 않고 제한적이라는 것이다. 예를 들어 `Int` 타입은 `-2147483648`부터 `2147483647`까지의 정수만 포함한다. 이는 `Int` 타입이라는 집합에 속하는 값은 이 범위를 벗어날 수 없다는 것을 의미한다. 따라서 이제 인식을 바꿔 **타입은 범위를 제한한 집합**이라고 생각해보자. 이는 개발자에게 있어 타입이라는 개념을 더욱 풍부하게 만들어준다.
 
-## 타입과 타입의 변환
+## 타입의 변환
 
 타입에 속한 값은 변형을 통해 다른 타입으로 변환될 수 있다. 예를 들어 `Int` 타입의 값은 대부분의 언어에서 제공하는 변환 함수를 통해 `String` 타입으로 변환될 수 있다. 혹은 같은 계열인 타입으로 변환하는 것도 가능하다. 예를 들어 `Int` 타입의 값은 더 큰 범위인 `Long` 타입으로 변환될 수 있다.
 
@@ -101,9 +101,139 @@ identity(1) // 1
 identity(126) // 126
 ```
 
-## 타입으로 안정성 검증하기
+위 같은 함수가 불필요하게 보일 수 있지만 항등 함수는 0과 1이 필요한 것처럼 고차 함수를 사용할 때 유용하게 사용할 수 있다. 예를 들어, 변환 함수를 인자로 받는 고차 함수를 작성한다고 가정해보자. 이때 만약 변환이 필요없다면 항등 함수를 사용할 수 있다.
 
-앞서 설명했듯 타입은 함수와 데이터가 준수해야하는 일종의 계약이다. 이 계약을 준수하지 않으면 컴파일 타임에 오류가 발생한다. 이를 통해 런타임에 발생할 수 있는 문제를 미연에 방지할 수 있다. 하지만 개발자가 타입을 풍부하게 사용하지 않는다면 타입 시스템을 통해 얻을 수 있는 이점을 제대로 누릴 수 없다. 예를 들어 다음 코드를 살펴보자.
+```kotlin
+fun <T> identity(x: T): T = x
+
+fun <T, R> map(list: List<T>, f: (T) -> R): List<R> =
+  list.map { f(it) }
+
+map(listOf(1, 2, 3), ::identity) // [1, 2, 3]
+map(listOf(1, 2, 3), { it * 2 }) // [2, 4, 6]
+```
+
+위 코드를 봤을 때 단순히 변환 함수를 사용하지 않으면 된다고 생각할 수 있다. 일반적으론 그렇지만 함수 파이프라인을 사용하기 때문에 분기하기 애매하거나 가독성 등을 위해 항등 함수를 사용하는 경우가 있을 수 있다.
+
+## 타입을 통한 추상적 사고
+
+앞서 단사 함수와 전사 함수 이야기를 한 것은 **타입을 통해 집합이 바뀌고 범위가 바뀔 수 있다는 것**을 말하고 싶었기 때문이다. 따라서 타입을 통해 로직을 추상화 하는 것이 가능하다. 프로그래머스의 [문자열 계산하기](https://school.programmers.co.kr/learn/courses/30/lessons/120902) 문제를 풀어본다고 가정해보자. 문제의 요구사항을 요약하면 다음과 같다.
+
+* 문자열로 이루어진 수식을 입력으로 제공한다.
+* 연산자는 `+`와 `-`만 존재한다.
+* 피연산자는 자연수만 존재한다.
+* 잘못된 수식은 주어지지 않는다.
+* 숫자와 연산자는 공백으로 구분한다.
+
+먼저 `String` 타입을 받아 `Int`로 반환하는 함수가 필요하다는 것을 떠올릴 수 있다. 이는 `(String) -> Int`와 같이 표현이 가능하다. 요구사항을 기반으로 로직을 더 구체화 해보면 다음과 같은 로직이 필요하다는 것을 알 수 있다.
+
+* 문자열을 숫자와 연산자로 분리한다.
+  * 문자를 숫자로 변환한다.
+  * 문자를 연산자로 변환한다.
+* 문자가 숫자인지 연산자인지 판단한다.
+* 문자열을 계산한다.
+
+먼저 각 키워드를 타입으로 추상화하면 다음과 같다.
+
+* 문자열 → `String`
+* 문자 → `Token`
+  * 숫자 → `Number`
+  * 연산자 → `Operator`
+  * 부호 → `Sign`
+
+코드로 나타내면 다음과 같다.
+
+```kotlin
+// 부호
+enum class Sign {
+  PLUS, MINUS
+}
+
+// 토큰
+sealed interface Token<T> {
+  val value: T
+
+  // 숫자 토큰
+  data class Number(override val value: Int): Token<Int>
+  // 연산자 토큰
+  data class Operator(override val value: Sign): Token<Sign>
+}
+```
+
+이번에는 각 로직을 타입으로 추상화해보자.
+
+* 문자열을 숫자와 연산자로 분리한다. → `(String) -> List<Token>`
+  * 문자를 숫자로 변환한다. → `(String) -> Number`
+  * 문자를 연산자로 변환한다. → `(String) -> Operator`
+* 문자가 숫자인지 연산자인지 판단한다. → `(String) -> Boolean`
+* 문자열을 계산한다 → `(String) -> Int`
+
+분해한 로직을 합쳐 로직 파이프라인을 만들면 다음과 같다.
+
+```kotlin
+// 문자가 숫자인지 연산자인지 판단한다.
+fun isNumber(token: String): Boolean =
+  token.toIntOrNull() != null
+
+// 문자를 숫자로 변환한다.
+fun toNumber(token: String): Int =
+  token.toInt()
+
+// 문자를 연산자로 변환한다.
+fun toSign(token: String): Sign =
+  when (token) {
+    "+" -> Sign.PLUS
+    "-" -> Sign.MINUS
+    else -> throw IllegalArgumentException("Unknown operator: ${token}")
+  }
+
+// 문자열을 숫자와 연산자 문자로 분리한다.
+fun tokenize(input: String): List<Token<*>> =
+  input.split(" ").map { token ->
+    when {
+      isNumber(token) -> Token.Number(toNumber(token))
+      else -> Token.Operator(toSign(token))
+    }
+  }
+
+// 문자열을 계산한다.
+fun calculate(input: String): Int {
+  val tokens = tokenize(input)
+  var result = 0
+  var sign = Sign.PLUS
+
+  tokens.forEach { token ->
+    when (token) {
+      is Token.Number -> {
+        when (sign) {
+          Sign.PLUS -> {
+            result += token.value
+          }
+          Sign.MINUS -> {
+            result -= token.value
+          }
+        }
+      }
+      is Token.Operator -> {
+        sign = token.value
+      }
+    }
+  }
+
+  return result
+}
+
+fun main() {
+  val input = "9 - 4 - 1 + 2 + 6"
+  val result = calculate(input)
+
+  println(result) // 12
+}
+```
+
+## 가독성과 런타임 안정성 챙기기
+
+타입을 이용하면 가독성을 챙기는 것도 가능하다. 예를 들어 다음 코드를 살펴보자.
 
 ```kotlin
 class User {
@@ -211,7 +341,7 @@ case class Name(value: String) {
   require(value.nonEmpty, "이름은 공백일 수 없습니다.")
 }
 ```
-
+<!-- 
 TypeScript에선 위와 같이 타입을 정의할 수 없지만 Union Type을 사용하여 값 혹은 다른 타입을 조합할 수 있다.
 
 ```typescript
@@ -221,15 +351,40 @@ type Result =
 
 const result = { status: "failure", error: "something went wrong" };
 console.log(result.data); // compile error
-```
+``` -->
 
-정리하면 타입 시스템을 풍부하게 사용하면 다음과 같은 이점을 얻을 수 있다.
+마지막으로 정리하면 타입 시스템을 풍부하게 사용하는 것으로 다음과 같은 이점을 얻을 수 있다.
 
 * 컴파일 타임에 오류를 발견할 수 있다.
+* 타입을 통해 로직을 설계 할 수 있다.
 * 코드의 가독성을 높일 수 있다.
 * 코드의 안정성을 높일 수 있다.
 
-<!-- # 우아한 타입 활용 -->
+<!--
+
+# 우아한 타입 활용
+
+타입 시스템을 잘 이용하려면 개발자가 먼저 타입을 잘 이해해야 한다. 타입 시스템의 동작은 프로그래밍 언어마다 다르며 자신이 사용하는 언어에서는 지원하지 않더라도 다른 언어에선 지원할 수 있다. 따라서 타입 시스템을 잘 이해하고싶다면 다른 언어를 공부하는 것도 좋은 방법이다. 따라서 이 글에서는 다양한 타입 사용 사례를 소개하며 적절한 언어로 예제를 작성할 것이다.
+
+## First-class type
+
+## Generic
+
+## Algebraic Data Type
+
+## Type Class
+
+## Dependent Type
+
+## Higher-kinded Type
+
+## Union Type
+
+## Intersection Type
+
+## Phantom Type 
+
+-->
 
 # 타입 주도 개발
 
