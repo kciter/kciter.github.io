@@ -39,13 +39,13 @@ module.exports = {
         path: `${__dirname}/src/posts`,
       },
     },
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        name: `posts`,
-        path: `${__dirname}/src/snippets`,
-      },
-    },
+    // {
+    //   resolve: `gatsby-source-filesystem`,
+    //   options: {
+    //     name: `posts`,
+    //     path: `${__dirname}/src/snippets`,
+    //   },
+    // },
     {
       resolve: `gatsby-transformer-remark`,
       options: {
