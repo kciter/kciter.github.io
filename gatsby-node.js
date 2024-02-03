@@ -72,31 +72,31 @@ exports.createPages = ({ graphql, actions }) => {
     });
   });
 
-  graphql(`
-    {
-      allMdx(filter: { fileAbsolutePath: { glob: "**/snippets/*.(md|mdx)" } }) {
-        edges {
-          node {
-            fields {
-              slug
-            }
-            frontmatter {
-              title
-              categories
-            }
-          }
-        }
-      }
-    }
-  `).then(result => {
-    result.data.allMdx.edges.forEach(({ node }) => {
-      createPage({
-        path: node.fields.slug,
-        component: path.resolve(`src/templates/snippet.tsx`),
-        context: {
-          slug: node.fields.slug,
-        },
-      });
-    });
-  });
+  // graphql(`
+  //   {
+  //     allMdx(filter: { fileAbsolutePath: { glob: "**/snippets/*.(md|mdx)" } }) {
+  //       edges {
+  //         node {
+  //           fields {
+  //             slug
+  //           }
+  //           frontmatter {
+  //             title
+  //             categories
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // `).then(result => {
+  //   result.data.allMdx.edges.forEach(({ node }) => {
+  //     createPage({
+  //       path: node.fields.slug,
+  //       component: path.resolve(`src/templates/snippet.tsx`),
+  //       context: {
+  //         slug: node.fields.slug,
+  //       },
+  //     });
+  //   });
+  // });
 };
