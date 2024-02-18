@@ -116,14 +116,14 @@ const PostTemplate = ({ data, location, pageContext }: PageProps) => {
           <TableOfContents items={tableOfContents.items} />
         ))}
 
-      {draft ||
+      {/* {draft ||
         (series?.items && (
           <Series
             title={series.title}
             items={series.items}
             currentItem={frontmatter.title}
           />
-        ))}
+        ))} */}
 
       <div className="post-content">
         {/* <MDXProvider> */}
