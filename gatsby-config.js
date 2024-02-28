@@ -56,7 +56,7 @@ module.exports = {
               className: `anchor-header`,
               maintainCase: false,
               removeAccents: true,
-              elements: [`h2`, `h3`, `h4`],
+              elements: [`h1`, `h2`, `h3`, `h4`],
             },
           },
           {

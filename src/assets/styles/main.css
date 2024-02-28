@@ -30,6 +30,8 @@ body {
 
 h1 {
   font-size: 2rem;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
 }
 
 h1 a {

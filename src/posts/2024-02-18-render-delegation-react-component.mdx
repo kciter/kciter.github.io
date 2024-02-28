@@ -10,11 +10,11 @@ draft: false
 
 import Image from '@components/Image';
 
-이전에 [Polymorphic한 React 컴포넌트 만들기](/posts/polymorphic-react-component)라는 글을 작성했다. 해당 글에서는 `as` 속성을 이용하여 컴포넌트를 변형시키는 것을 소개하는데 이를 이용하면 하나의 컴포넌트로 여러 요소(Element)나 그에 따른 속성(Attribute)을 이용할 수 있고 이를 넘어 다른 컴포넌트를 합성하는 것도 가능하다. 따라서 이를 이용하여 **무엇이든지 될 수 있는 가장 추상화된 형태의 컴포넌트**를 만들 수 있다.
+이전에 [Polymorphic한 React 컴포넌트 만들기](/posts/polymorphic-react-component)라는 글을 작성했다. 해당 글에서는 `as` 속성을 이용하여 컴포넌트를 변형시키는 것을 소개하는 데 이를 이용하면 하나의 컴포넌트로 여러 요소(Element)나 그에 따른 속성(Attribute)을 이용할 수 있고 이를 넘어 다른 컴포넌트를 합성하는 것도 가능하다. 따라서 이를 이용하여 **무엇이든지 될 수 있는 가장 추상화된 형태의 컴포넌트**를 만들 수 있다.
 
-다만 이 방법은 여러 비판을 받기도 하는데 가장 큰 이유는 **모호성** 때문이다. `as` 속성을 이용하여 컴포넌트를 결합하는 경우 전달할 수 있는 `prop`이 어떤 컴포넌트의 것인지 알기 힘들다는 점과 코드만 봐서는 어떻게 렌더링되는지 알기 힘들다는 점이다. 그 외의 비판점으로는 자동 완성이 느려진다거나 TypeScript에서 타입을 추론하기 어렵다는 점 등이 있다.
+다만 이 방법은 여러 비판을 받기도 하는데 가장 큰 이유는 **모호성** 때문이다. `as` 속성을 이용하여 컴포넌트를 결합하는 경우 전달할 수 있는 `prop`이 어떤 컴포넌트의 것인지 알기 힘들다는 점과 코드만 봐서는 어떻게 렌더링 되는지 알기 힘들다는 점이다. 그 외의 비판점으로는 자동 완성이 느려진다거나 TypeScript에서 타입을 추론하기 어렵다는 점 등이 있다.
 
-따라서 이에 대한 대안으로 자신의 속성과 행동을 자식 컴포넌트에게 넘긴 후 자식이 직접 부모 컴포넌트를 대신하여 렌더링하는 방법인 `Render Delegation`[^1]이 등장했다. 이는 [Radix](https://www.radix-ui.com)라는 오픈소스 리액트 컴포넌트 라이브러리를 통해 유명해진 방법으로 Render Delegation 기능을 제공하는 라이브러리는 보통 `asChild`라는 속성을 통해 해당 기능을 이용할 수 있게 제공한다.
+따라서 이에 대한 대안으로 자신의 속성과 행동을 자식 컴포넌트에 넘긴 후 자식이 직접 부모 컴포넌트를 대신하여 렌더링하는 방법인 `Render Delegation`[^1]이 등장했다. 이는 [Radix](https://www.radix-ui.com)라는 오픈소스 리액트 컴포넌트 라이브러리를 통해 유명해진 방법으로 Render Delegation 기능을 제공하는 라이브러리는 보통 `asChild`라는 속성을 통해 해당 기능을 이용할 수 있게 제공한다.
 
 <Image src="/images/2024-02-18-render-delegation-react-component/render-delegation-component.png" width="70%" caption="Render Delegation 컴포넌트의 구성" />
 
@@ -24,7 +24,7 @@ Render Delegation 컴포넌트는 보통 `Slot`과 `Slottable`이라는 두 컴�
 
 # 문제 인식하기
 
-만약 앞서 언급한 Polymorphic 컴포넌트와 이번 글에서 다룰 Render Delegation 컴포넌트가 왜 필요한지 잘 모를 수 있다. 이전에 작성한 글에서도 설명했지만 다시 한 번 간단히 설명해보겠다.
+만약 앞서 언급한 Polymorphic 컴포넌트와 이번 글에서 다룰 Render Delegation 컴포넌트가 왜 필요한지 잘 모를 수 있다. 이전에 작성한 글에서도 설명했지만 다시 한번 간단히 설명해 보겠다.
 
 ```jsx
 /**
@@ -69,7 +69,7 @@ const App = () => {
 }
 ```
 
-위 처럼 작성할 수도 있겠지만 재사용성 측면에선 그다지 좋은 방법은 아니다. 추후 재사용을 고려하여 새로운 컴포넌트를 만들 수도 있다.
+위 코드처럼 작성할 수도 있겠지만 재사용성 측면에선 그다지 좋은 방법은 아니다. 추후 재사용을 고려하여 새로운 컴포넌트를 만들 수도 있다.
 
 ```jsx
 /**
@@ -111,7 +111,7 @@ const App = () => {
 }
 ```
 
-위와 같이 작성할 수도 있지만 이 경우 a 태그가 확장되지 않는다는 문제점이 있고 컴포넌트의 의존 관계가 새롭게 추가된다는 문제점이 있다. 그리고 만약 react-router나 Next.js를 사용하여 SPA를 위한 Link 컴포넌트를 사용한다면 또 새로운 컴포넌트를 만들어줄 수 밖에 없다. 이 문제의 해결법으로 Polymorphic 컴포넌트나 Render Delegation 컴포넌트를 사용할 수 있다.
+혹은 위와 같이 작성할 수도 있지만 이 경우 a 태그가 확장되지 않는다는 문제점이 있고 컴포넌트의 의존 관계가 새롭게 추가된다는 문제점이 있다. 그리고 만약 react-router나 Next.js를 사용하여 SPA를 위한 Link 컴포넌트를 사용한다면 또 새로운 컴포넌트를 만들어줄 수밖에 없다. 이 문제의 해결법으로 Polymorphic 컴포넌트나 Render Delegation 컴포넌트를 사용할 수 있다.
 
 # 살펴보기
 
@@ -155,7 +155,7 @@ const App = () => {
 
 <Image src="/images/2024-02-18-render-delegation-react-component/aschild-basic-example.png" caption="요소가 변경되었다" />
 
-위와 같이 작성하면 렌더링되는 요소가 `a`로 변경된다.
+위와 같이 작성하면 렌더링 되는 요소가 `a`로 변경된다.
 
 ## Slot 사용하기
 
@@ -246,11 +246,11 @@ const App = () => {
 };
 ```
 
-Slottable 컴포넌트는 Slot 컴포넌트로 렌더링될 컴포넌트의 `children`이 들어갈 곳을 정할 수 있다. 즉, 위 코드에선 `Button`의 `children`이 아닌 `a` 요소의 `children`이 Slottable 컴포넌트 내부로 들어가게 된다.
+Slottable 컴포넌트는 Slot 컴포넌트로 렌더링 될 컴포넌트의 `children`이 들어갈 곳을 정할 수 있다. 즉, 위 코드에선 `Button`의 `children`이 아닌 `a` 요소의 `children`이 Slottable 컴포넌트 내부로 들어가게 된다.
 
 <Image src="/images/2024-02-18-render-delegation-react-component/slottable-example.png" width="50%" caption="렌더링 결과" />
 
-실제로 렌더링된 코드를 보면 다음과 같다.
+실제로 렌더링 된 코드를 보면 다음과 같다.
 
 ```html
 <div>
@@ -266,11 +266,11 @@ Slottable 컴포넌트는 Slot 컴포넌트로 렌더링될 컴포넌트의 `chi
 </div>
 ```
 
-결과적으로 `icon` 속성은 `Button` 컴포넌트에서 설정한대로 따르지만 그 외 속성은 `asChild` 속성에 따라 위임된다. 즉, 위임하고 싶은 부분만 따로 지정해서 구현하는 것이 가능하다. 이렇게 Slottable을 사용하면 조금 더 풍부한 표현이 가능해진다. 참고로 Slot만 사용하는 것은 Slot 내부에 Slottable을 최상위로 둬서 사용하는 것과 같다.
+결과적으로 `icon` 속성은 `Button` 컴포넌트에서 설정한 대로 따르지만, 그 외 속성은 `asChild` 속성에 따라 위임된다. 즉, 위임하고 싶은 부분만 따로 지정해서 구현하는 것이 가능하다. 이렇게 Slottable을 사용하면 조금 더 풍부한 표현이 가능해진다. 참고로 Slot만 사용하는 것은 Slot 내부에 Slottable을 최상위로 둬서 사용하는 것과 같다.
 
 # JavaScript에서 구현하기
 
-이제 Slot과 Slottable 컴포넌트가 무엇인지 알았으니 이 두 컴포넌트를 직접 만들어보자. 먼저 JavaScript로 구현해보자.
+이제 Slot과 Slottable 컴포넌트가 무엇인지 알았으니 이 두 컴포넌트를 직접 만들어보자. 먼저 JavaScript로 구현해 보자.
 
 ## Slot 구현하기
 
@@ -338,7 +338,7 @@ export const Slottable = ({ children }) => {
 }
 ```
 
-`Slottable` 컴포넌트는 따로 하는게 없다. 그저 스스로 `Slottable`라는 것을 알려줄 수만 있으면 되기에 위와 같이 구현하면 된다. 대신 기존에 구현했던 Slot 컴포넌트의 로직을 변경할 필요가 있다. 이 부분이 조금 어려울 수 있다.
+`Slottable` 컴포넌트는 따로 하는 게 없다. 그저 스스로 `Slottable`라는 것을 알려줄 수만 있으면 되기에 위와 같이 구현하면 된다. 대신 기존에 구현했던 Slot 컴포넌트의 로직을 변경할 필요가 있다. 이 부분이 조금 어려울 수 있다.
 
 ```jsx
 import React from "react";
@@ -388,17 +388,17 @@ export const Slot = ({ children, ...props }) => {
 };
 ```
 
-기존 코드에서 달라진 점은 Slottable이 있는지 확인하고 있다면 이에 대해 처리해주는 부분이다. 이 부분을 제외하면 기존 코드와 동일하다. 이렇게 만들어진 Slot과 Slottable을 이용하여 이전에 사용했던 예제로 실행해보면 잘되는 것을 확인할 수 있다.
+기존 코드에서 달라진 점은 Slottable이 있는지 확인하고 있다면 이에 대해 처리해 주는 부분이다. 이 부분을 제외하면 기존 코드와 동일하다. 이렇게 만들어진 Slot과 Slottable을 이용하여 이전에 사용했던 예제로 실행해 보면 잘되는 것을 확인할 수 있다.
 
 <Image src="/images/2024-02-18-render-delegation-react-component/handmade-slottable.png" width="70%" caption="아주 잘 동작한다" />
 
 # TypeScript에서 구현
 
-이제 TypeScript에서 구현해보자. 타입을 신경써야 해서 구현이 복잡하지 않을까 싶지만 Render Delegation 컴포넌트는 Polymorphic 컴포넌트와 다르게 컴포넌트가 코드에서 분리되기 때문에 타입 추론이 쉽다. 따라서 TypeScript에서 구현하는 것이 어렵지 않다.
+이제 TypeScript에서 구현해 보자. 타입을 신경써야 해서 구현이 복잡하지 않을까 싶지만 Render Delegation 컴포넌트는 Polymorphic 컴포넌트와 다르게 컴포넌트가 코드에서 분리되기 때문에 타입 추론이 쉽다. 따라서 TypeScript에서 구현하는 것이 어렵지 않다.
 
 ## 타입 붙이기
 
-먼저 Slot 컴포넌트에 타입을 붙이면서 다시 구현해보자.
+먼저 Slot 컴포넌트에 타입을 붙이면서 다시 구현해 보자.
 
 ```tsx
 // Slot.tsx
@@ -429,7 +429,7 @@ export const Slot = ({ children, ...props }: SlotProps) => {
 
 타입을 아주 상식적인 수준 정도로 붙였는데 벌써 완성됐다. 코드 중 `RenderDelegationProps`는 Render Delegation을 사용할 컴포넌트에 붙일 수 있는 타입이다. 이 타입을 이용하면 `asChild` 속성을 사용할 수 있게 된다.
 
-이어서 Slottable 개념과 관련된 로직에 타입을 붙이면서 다시 구현해보자.
+이어서 Slottable 개념과 관련된 로직에 타입을 붙이면서 다시 구현해 보자.
 
 ```tsx
 // Slottable.tsx
@@ -505,7 +505,7 @@ export const Slot = ({ children, ...props }: SlotProps) => {
 };
 ```
 
-마찬가지로 기존 코드와 크게 다른점이 없다. 딱 한 라인이 추가되었는데 이는 `Slottable` 컴포넌트를 찾은 후 어떤 타입인지 명시해주는 것 뿐이다. 만약 TypeScript의 [사용자 정의 타입 가드 문법](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)을 사용하면 다음과 같이 작성하는 것도 가능하다.
+마찬가지로 기존 코드와 크게 다른 점이 없다. 딱 한 라인이 추가되었는데 이는 `Slottable` 컴포넌트를 찾은 후 어떤 타입인지 명시해 주는 것뿐이다. 만약 TypeScript의 [사용자 정의 타입 가드 문법](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)을 사용하면 다음과 같이 작성하는 것도 가능하다.
 
 ```tsx
 // Slot.tsx
@@ -522,8 +522,6 @@ export const Slot = ({ children, ...props }: SlotProps) => {
 }
 ```
 
-<!--
-
 ## ref 받아오기
 
 ## prop 병합 문제
@@ -536,8 +534,8 @@ export const Slot = ({ children, ...props }: SlotProps) => {
 
 https://sandroroth.com/blog/react-polymorphic-components/
 https://github.com/ariakit/ariakit/issues/1245
+https://www.bekk.christmas/post/2023/01/polymorphism-in-react
 
--->
 
 # 마치며
 
