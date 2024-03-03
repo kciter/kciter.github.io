@@ -220,6 +220,7 @@ sup {
 .post-title {
   margin: 0;
   padding: 0;
+  border: none;
 }
 
 .post-date {

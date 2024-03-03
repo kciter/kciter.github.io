@@ -1,0 +1,443 @@
+---
+title: "ASCII 3D 렌더러 만들기"
+categories: dev
+tags: [crafting, renderer, 3d, ascii]
+image: /images/2024-03-03-ascii-3d-renderer/thumbnail.png
+comments: true
+draft: false
+hide: false
+---
+
+import Image from '@components/Image';
+import { SpinningCube } from '@materials/ascii-3d-renderer';
+
+필자는 쓸데없지만 재밌는 프로그램을 만들면서 공부하는 것을 좋아한다. 최근에 정신적으로 에너지가 바닥나고 있다는 것을 느껴 작년에 재미로 만들었던 [Jazzlang](https://kciter.so/posts/crafting-esolang/)과 같이 정신적 에너지를 채워줄만한 재미를 느끼고 싶었다. 그래서 무언가 할만한 것을 찾던 중 작년 이맘때 쯤 재밌는 [유튜브 영상](https://www.youtube.com/watch?v=p09i_hoFdd0)을 봤던 것이 생각났다. 영상에서는 **CLI 환경에서 큐브를 회전시키는 프로그램**을 처음부터 끝까지 조용히 코딩하는 것을 보여준다.
+
+<figure>
+  <Image src="/images/2024-03-03-ascii-3d-renderer/youtube.gif" width="80%" />
+  <figcaption>영상 중 일부 캡쳐</figcaption>
+</figure>
+
+필자는 이 아이디어가 굉장히 참신하다 생각했다. 마침 무언가를 만들고 싶었던 차에 `큐브가 됐다면 CLI 환경에서 다른 물체도 3D 렌더링 할 수 있지 않을까?`라는 생각을 하게되었고 실제로 구현했다. 이 글의 결과물은 [이곳](https://github.com/kciter/ascii-3d-renderer.js)에서 볼 수 있다.
+
+# 어떻게 ASCII를 3D처럼 보이게 할까?
+
+일반적인 게임에서 3D 렌더링은 빛과 그림자, 최적화, 쉐이더, 충돌 처리, 물리 계산 등 굉장히 난이도가 높은 기술이 포함된다. 하지만 우리는 단순히 3D 물체를 화면에 그리기만 할 것이기 때문에 몇 가지 기본적인 기술만 있으면 된다. 우선 화면에 나오는 물체를 왜 3D처럼 인식을 할까? 답은 간단하다. 스크린을 통해 **원근감**을 표현했기 때문이다. 사람이 원근감을 느끼도록 만드는 방법은 다양하지만 일반적인 CLI 환경에서 쓸 수 있는 것은 **선[^1]과 명암** 뿐이다.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/perspective.png" caption="겨우 선 몇 개로 공간을 느낄 수 있다" />
+
+선을 이용하여 원근감을 표현하는 방법은 간단하다. **멀리있는 것은 결국 한 점으로 모인다**는 사실을 이용할 수 있다. 이를 미술 용어로 [소실점](https://ko.wikipedia.org/wiki/%EC%86%8C%EC%8B%A4%EC%A0%90)이라 부른다. 소실점은 여러 개가 있을 수 있다.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/shade.jpeg" caption="빛과 그림자를 통해 입체감을 표현할 수 있다" width="70%" />
+
+명암을 포함한 원근감을 표현하는 방법은 더욱 간단하다. **빛이 있는 곳은 밝게, 빛이 없는 곳은 어둡게** 표현하면 된다. 이를 통해 물체의 입체감을 표현할 수 있다.
+
+그럼 이제 ASCII 만으로 원근감, 입체감을 표현할 방법을 찾아야한다. 우선 선을 이용한 방법은 3D 공간 좌표를 2D 좌표로 변환하면 자연스럽게 처리될 것이다. 그럼 가장 고민이 되는 지점은 명암을 표현하는 방법인데 **빛이 보고있는 방향에서 나온다 가정했을 때 가까이 있을 수록 짙은 텍스트 멀리 있을 수록 옅은 텍스트로 표현**하면 될 것이다. 이를 ASCII로 표현한다면 다음과 같을 것이다.
+
+```
+@ : 가장 짙은 명암
+% : 짙은 명암
+# : 조금 짙은 명암
+x : 중간 명암
+o : 조금 옅은 명암
+; : 옅은 명암
+. : 가장 옅은 명암
+```
+
+참고로 간격이 일정해야 하므로 반드시 고정폭 글꼴을 사용해야 한다.
+
+# 3D 좌표를 2D 좌표로
+
+우리가 표현하고자 하는 물체는 3D 공간에 존재하지만 모니터 스크린은 2D 공간이다. 따라서 이를 표현하기 위해서는 **값으로 정의된 3D 공간을 모니터 스크린인 2D 공간에 보이도록 변환**시킬 필요가 있다. 이런 변환하는 과정을 **렌더링 파이프라인**이라고 한다.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/rendering-pipeline.png" caption="렌더링 파이프라인" />
+
+이 글에서는 오로지 ASCII를 이용하여 3D 물체를 표현하는 것이 목표이므로 렌더링 파이프라인의 일부만 구현할 것이다. 그렇기 때문에 전체를 자세히 설명하지는 않고 필요한 부분만 설명할 것이다. 렌더링 파이프라인은 크게 보면 세 과정으로 이루어진다.
+
+* 버텍스 처리 (Vertex processing)
+* 래스터화 (Rasterization)
+* 프래그먼트 처리 (Fragment processing)
+
+각 과정을 하나씩 살펴보자.
+
+## 버텍스 처리
+
+3D 공간을 표현하기 위해서는 **3D 공간 좌표**가 필요하다. 3D 공간 좌표는 **데카르트 좌표계**를 사용하여 좌표를 3개의 축 `(x, y, z)`와 같이 표현한다. 어려운 용어처럼 느껴지지만 그냥 3개의 값으로 좌표를 표현한다고 생각하면 된다.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/cartesian-coordinate-system.png" caption="데카르트 좌표계" width="50%" />
+
+이렇게 표현된 좌표를 **버텍스**<sup>Vertex</sup>라고 부르며 3D 공간에 위치한 '정점'을 의미한다. 버텍스 하나로는 물체를 표현할 수 없으므로 버텍스를 모아 물체를 표현한다. 이때 물체를 표현하는 최소 단위를 **폴리곤**<sup>Polygon</sup>이라고 부른다. 보통 폴리곤은 특수한 경우[^2]를 제외하면 3개의 버텍스로 이루어진 삼각형으로 표현한다. 하필 삼각형인 이유는 면을 구성하기 위해 필요한 최소 단위가 삼각형이며 효율적이기 때문이다.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/low-polygon.jpeg" caption="적은 수의 폴리곤을 사용했기에 각져 보인다 / 버추어 파이터" />
+
+이렇게 버텍스와 폴리곤으로 구성된 하나의 물체를 **폴리곤 메시**<sup>Polygon mesh</sup>라고 부른다. 보통 개발자는 디자이너가 만들어준 3D 모델 파일을 불러와서 폴리곤 메시를 만든다. 3D 모델 파일에는 버텍스와 폴리곤을 포함한 다양한 정보가 담겨있다. 이 정보를 통해 물체를 표현할 수 있다. 이러한 과정을 **버텍스 처리**<sup>Vertex processing</sup>라고 부른다.
+
+버텍스 처리 단계에서 버텍스에 대한 여러 처리를 할 수 있지만 보통 변환을 처리하는 것이 가장 기본이다. 여기서 말하는 **변환이 3D 공간을 2D 스크린으로 옮기는 핵심 로직**이다. 버텍스 처리 과정에서 변환은 보통 세 단계를 거친다.
+
+* 월드 변환 (World transform)
+* 뷰 변환 (View transform)
+* 투영 변환 (Projection transform)
+
+각 변환은 **행렬**<sup>Matrix</sup>을 이용하여 처리한다. 이제 각 변환에 대해 알아보자.
+
+### 월드 변환
+
+월드 변환은 **3D 모델 파일에 담겨있는 버텍스를 월드라고 부르는 3D 공간에 배치하는 것**이다. 3D 모델 파일은 자신만의 공간에서 고정된 값을 가지지만 월드에 배치할 위치나 크기, 회전 각도에 따라 새로운 값을 부여해줄 필요가 있다. 모델 좌표를 변경하여 월드에 배치하는 것이기 때문에 모델 변환이라 부르기도 한다.
+<!-- 
+앞서 설명한 것처럼 좌표 변환은 행렬을 이용하여 처리한다. 여기서부터 조금 머리 아픈 부분이 시작된다. 각 이동, 크기, 회전에 대한 행렬이 존재하며 이를 이용하여 변환을 처리하기 위해서는 행렬의 곱셈을 알아야 한다. 보통 교과 과정에서 배우는 내용이지만 잊었던 기억을 끄집어내기 위해 다시 살펴보자. 행렬의 곱셈은 다음과 같이 정의된다.
+
+```
+A = [a, b]  B = [e, f]
+    [c, d]      [g, h]
+```
+
+위와 같이 A와 B라는 2x2 행렬이 있다고 가정했을 때 A와 B의 곱셈은 다음과 같이 정의된다.
+
+```
+A * B = [a * e + b * g, a * f + b * h]
+        [c * e + d * g, c * f + d * h]
+``` -->
+
+앞서 설명한 것처럼 좌표 변환은 행렬을 이용하여 처리한다. 이때 변환을 처리하기 위한 행렬은 3차원 좌표를 처리함에도 불구하고 4x4 행렬을 사용한다. 각각 하나씩만 처리한다면 3x3 행렬을 사용해도 문제 없지만 이동, 크기, 회전을 한 번에 처리하기 위해서는 4x4 행렬을 사용해야 한다.[^3]
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/transform-matrix.png" caption="좌표 열벡터에 4×4 변환 행렬을 곱하면 변환된 좌표를 얻을 수 있다" width="70%" />
+
+이동, 크기, 회전에 대한 행렬이 존재하지만 지금은 우선 그런 것들이 있다는 것만 이해하고 넘어가자. 요약하자면 **버텍스 위치에 대한 열벡터(1×4 행렬)와 각 행렬을 모두 곱하는 것이 월드 변환**이다. 월드 변환을 마치고나면 불러온 모델을 월드에 절대적인 좌표로 배치했다고 볼 수 있다.
+
+### 뷰 변환
+
+월드 변환을 통해 절대적인 좌표로 모델을 월드에 배치했지만 아직 스크린에 표현할 수는 없다. 스크린에 표현하기 위해서는 어느 좌표에서 어느 시점으로 물체를 바라보는지 알아야 한다. 그 좌표와 시점을 포함한 것을 카메라라고 부르며 카메라의 위치에 따라 물체가 보이는 모습이 달라질 수 있다. 따라서 카메라의 위치와 방향을 월드에 배치하고 모델의 좌표를 카메라의 위치를 기준으로 변환해야 한다. 이를 관점이라는 의미를 담아 뷰 변환이라 부른다. 카메라 값에 따라 달라지기 때문에 카메라 변환이라고 부르기도 한다.
+
+카메라를 표현하는 값은 세 가지가 있다.
+
+* 카메라 위치 (Eye)
+* 카메라 방향 (Look)
+* 카메라 업 벡터 (Up)
+
+카메라 위치는 카메라가 월드에서 어디에 위치하는지를 나타내는 값이다. 카메라 방향은 카메라가 어느 방향을 바라보는지를 나타내는 값이다. 카메라 업 벡터는 카메라가 어느 방향을 위로 할지를 나타내는 값이다. 카메라 업 벡터는 카메라 방향과 수직이어야 한다. 이 세 가지 값은 카메라를 표현하는 좌표계를 구성한다. 이를 카메라 좌표계라고 부른다.
+
+이후에 뷰 변환을 할 때는 카메라 좌표계를 이용하여 **카메라를 기준으로 다른 물체의 좌표를 변환**하게 된다. 따라서 모든 물체에 카메라에 대한 역행렬을 적용하면 된다. 참고로 뷰 변환을 할 때는 아직 원근감을 표현하지 않는다. 원근감을 표현하기 위해서는 투영 변환이 필요하다.
+
+### 투영 변환
+
+앞서 설명한 것처럼 원근감을 표현하기 위해서 투영 변환을 해야한다. 투영 변환은 크게 직교 투영과 원근 투영 두 가지로 나뉘지만 직교 투영은 원근감을 표현하지 않는 방법[^4]이기 때문에 원근 투영을 사용한다.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/perspective-projection.jpeg" caption="원근 투영" width="60%" />
+
+투영 변환 과정을 거치면 3D 공간 좌표를 2D 공간 좌표로 변환했다고 볼 수 있다. 이제 래스터화를 통해 2D 공간 좌표를 픽셀 좌표로 변환해야 한다.
+
+## 래스터화
+
+버텍스 처리를 통해 3D 공간 좌표를 2D 공간 좌표로 변환했다. 이후에 **2D 공간 좌표를 픽셀 좌표로 변환하는 것을 래스터화**라고 부른다. 래스터화는 2D 공간 좌표를 픽셀 좌표로 변환하는 것이다. 이때 픽셀 좌표는 **정수**로 표현한다. 이는 픽셀이 정수로 표현되기 때문이다. 래스터화는 보통 세 단계를 거친다.
+
+* 뷰포트 변환 (Viewport transform)
+* 클리핑 (Clipping)
+* 삼각형 래스터화 (Triangle rasterization)
+
+각 과정을 하나씩 살펴보자.
+
+### 뷰포트 변환
+
+뷰포트 변환은 2D 공간 좌표를 픽셀 좌표로 변환하는 것이다. 이때 픽셀 좌표는 정수로 표현되기 때문에 2D 공간 좌표를 정수로 변환해야 한다. 이를 위해 2D 공간 좌표를 픽셀 좌표로 변환하는 과정을 뷰포트 변환이라고 부른다. 뷰포트 변환은 보통 뷰포트라는 사각형 영역을 정의하고 그 영역 안에 있는 2D 공간 좌표를 픽셀 좌표로 변환한다.
+
+### 클리핑
+
+클리핑은 뷰포트 변환을 통해 픽셀 좌표로 변환된 좌표가 뷰포트 영역을 벗어나는지 확인하는 과정이다. 만약 벗어난다면 뷰포트 영역 안에 있는 좌표로 변환한다. 이를 통해 뷰포트 영역을 벗어나는 좌표를 제거할 수 있다.
+
+### 삼각형 래스터화
+
+삼각형 래스터화는 폴리곤을 픽셀 좌표로 변환하는 것이다. 폴리곤은 보통 삼각형으로 표현되기 때문에 삼각형 래스터화를 통해 폴리곤을 픽셀 좌표로 변환할 수 있다. 삼각형 래스터화는 보통 세 단계를 거친다.
+
+* 삼각형 분할 (Triangle subdivision)
+* 삼각형 스캔 (Triangle scan)
+* 삼각형 채움 (Triangle fill)
+
+## 프래그먼트 처리
+
+프래그먼트 처리는 래스터화를 통해 픽셀 좌표로 변환된 좌표를 이용하여 명암을 계산하는 것이다. 명암을 계산하는 방법은 다양하지만 보통 빛과 그림자를 이용하여 명암을 계산한다. 이를 쉐이딩이라고 부른다. 쉐이딩은 보통 세 단계를 거친다.
+
+* 조명 계산 (Lighting calculation)
+* 텍스처 매핑 (Texture mapping)
+* 알파 블렌딩 (Alpha blending)
+
+여기서는 ASCII를 렌더링할 것이기 때문에 실제로 질감을 표현하기 위한 텍스처 매핑이나 투명도를 조절하는 알파 블렌딩은 처리하지 않을 것이다. 따라서 명암을 계산하기 위한 조명 계산만 필요하다.
+
+조명 계산은 빛과 그림자를 이용하여 명암을 계산하는 것이다. 이때 빛과 그림자를 계산하기 위해서는 빛의 위치와 방향이 필요하다. 빛의 위치와 방향은 빛을 표현하는 좌표계를 구성한다. 이를 라이트 좌표계라고 부른다. 라이트 좌표계는 카메라 좌표계와 마찬가지로 빛의 위치와 방향을 표현하는 좌표계이다.
+
+# 구현하기
+
+## 사전 준비
+이제 렌더링 파이프라인에 대해 알았으니 ASCII로 3D 물체를 표현하기 위한 렌더링 파이프라인 구현을 해보자. 먼저 CLI 상에서 ASCII로 표현하는 것이기 때문에 몇 가지 제약이 있다.
+
+1. 정확한 픽셀 좌표를 이용할 수 없다.
+2. 텍스처를 입힐 수 없다.
+
+정확한 픽셀 좌표를 알더라도 CLI에서 표현할 수 없기 때문에 문자열 공간에 표현할 수 있는 좌표로 변환해야 한다. 따라서 뷰포트 변환을 할 때 이를 고려해야 한다. 또한 텍스처를 입힐 수 없기 때문에 명암을 표현할 때 사용할 문자열을 미리 정의할 필요가 있다. 이를 고려하여 구현해야 한다.
+
+우선 크게 로직의 순서는 다음과 같을 것이다.
+
+* 광원과 카메라 위치를 정한다.
+* 3D 모델을 불러온다.
+* 모델의 버텍스에 월드 변환, 뷰 변환, 투영 변환을 한다.
+* 래스터화를 통해 CLI에서 표현할 수 있는 좌표로 변환한다.
+* 광원 위치를 기준으로 명암을 계산한다.
+* 명암에 따른 ASCII 문자를 출력한다.
+
+수학 계산이 필요하므로 이에 대한 객체를 먼저 만들어 보자.
+
+```ts
+class Matrix44 { /* ... */ }
+class Vector2 { /* ... */ }
+class Vector3 { /* ... */ }
+class Vector4 { /* ... */ }
+```
+
+여기서 자세한 코드는 적지 않지만 각 클래스는 기본적인 더하기 빼기 곱하기 나누기 연산을 포함하여 앞서 설명한 회전 변환, 크기 변환, 이동 변환 등을 처리할 수 있도록 구현한다. 이제 렌더러를 만들어보자. 다음으로 필요한 객체는 다음과 같다.
+
+```ts
+class World { /* ... */ }
+class Camera { /* ... */ }
+```
+
+각각 월드 객체와 카메라 객체는 월드 변환과 뷰 변환을 처리할 수 있도록 구현한다.
+
+## 모델 로더 구현
+
+모델 로더는 3D 모델 파일을 불러와서 버텍스와 폴리곤을 추출하는 역할을 한다. 여기서는 [obj](https://en.wikipedia.org/wiki/Wavefront_.obj_file) 확장자를 기준으로 구현할 것이다.
+
+```
+o Cube
+v -1.000000 1.000000 1.000000
+v -1.000000 -1.000000 1.000000
+v -1.000000 1.000000 -1.000000
+v -1.000000 -1.000000 -1.000000
+v 1.000000 1.000000 1.000000
+v 1.000000 -1.000000 1.000000
+v 1.000000 1.000000 -1.000000
+v 1.000000 -1.000000 -1.000000
+f 5 3 1
+f 3 8 4
+f 7 6 8
+f 2 8 6
+f 1 4 2
+f 5 2 6
+f 5 7 3
+f 3 7 8
+f 7 5 6
+f 2 4 8
+f 1 3 4
+f 5 1 2
+```
+
+`obj` 확장자는 위와 같이 작성되어 있다 `v`는 버텍스를 나타내고 `f`는 Face element로 버텍스 연결을 통해 나타나는 도형을 뜻한다. 이를 이용하여 모델 로더를 구현해보자.
+
+```ts
+class Loader {
+  static loadFromFile(file: File): Promise<Polygon[]> {
+    /* ... */
+  }
+
+  static loadFromString(string: string): Polygon[] {
+    return this.parseOBJ(string);
+  }
+
+  private static parseOBJ(data: string): Polygon[] {
+    const lines = data.split("\n");
+
+    const vertices: Vector3[] = [];
+    const polygons: Polygon[] = [];
+
+    for (const line of lines) {
+      const parts = line.trim().split(" ");
+      if (parts[0] === "v") {
+        vertices.push(
+          new Vector3(
+            parseFloat(parts[1]),
+            parseFloat(parts[2]),
+            parseFloat(parts[3])
+          )
+        );
+      } else if (parts[0] === "f") {
+        polygons.push(
+          new Polygon([
+            vertices[parseInt(parts[1]) - 1],
+            vertices[parseInt(parts[2]) - 1],
+            vertices[parseInt(parts[3]) - 1],
+          ])
+        );
+      }
+    }
+
+    return polygons;
+  }
+}
+```
+
+위 코드는 `obj` 내용을 파싱하여 버텍스와 폴리곤을 추출하는 역할을 한다. 코드 내용은 어렵지 않다. 단순히 whitespace를 기준으로 문자열을 나누고 값을 넣어줬을 뿐이다. 그리고 폴리곤 구성은 이미 정리한 버텍스 정보를 이용하여 만들었다.
+
+## 렌더러 구현
+
+이제 렌더러를 구현해보자. 렌더러는 앞서 설명한 것처럼 다음과 같은 로직으로 구성된다.
+
+* 광원과 카메라 위치를 정한다.
+* 3D 모델을 불러온다.
+* 모델의 버텍스에 월드 변환, 뷰 변환, 투영 변환을 한다.
+* 래스터화를 통해 CLI에서 표현할 수 있는 좌표로 변환한다.
+* 광원 위치를 기준으로 명암을 계산한다.
+* 명암에 따른 ASCII 문자를 출력한다.
+
+```ts
+class Renderer {
+  private el: HTMLElement;
+  private width: number;
+  private height: number;
+  private world: World;
+  private camera: Camera;
+  private frameBuffer: string[][];
+  private mesh: Polygon[];
+
+  constructor(el: HTMLElement, width: number, height: number, objString: string) {
+    this.el = el;
+    this.width = width;
+    this.height = height;
+    this.mesh = Loader.loadFromString(objString);
+    this.world = new World();
+    this.camera = new Camera();
+  }
+
+  run() {
+    const fps = 60;
+    const interval = 1000 / fps;
+    let then = Date.now();
+    let now;
+    let delta;
+
+    const renderFrame = () => {
+      now = Date.now();
+      delta = now - then;
+
+      if (delta > interval) {
+        then = now - (delta % interval);
+        this.render();
+        this.angle += 0.01;
+        if (this.angle >= 2 * 3.14) this.angle -= 2 * 3.14;
+      }
+
+      requestAnimationFrame(renderFrame);
+    };
+
+    requestAnimationFrame(renderFrame);
+  }
+
+  render() {
+    this.clearFrameBuffer();
+    this.process();
+    this.drawFrameBuffer();
+  }
+
+  private clearFrameBuffer() {
+    this.frameBuffer = Array.from({ length: height }, () =>
+      Array.from({ length: width }, () => " ")
+    );
+  }
+
+  private process() {
+    for (const polygon of polygons) {
+      const vertices = polygon.vertices.map((vertex) => {
+        let v = vertex;
+        v = this.world.transform(v);
+        v = this.camera.transform(v);
+        v = this.camera.project(v);
+        return v;
+      });
+      this.rasterize(vertices);
+    }
+  }
+
+  private rasterize(vertices: Vector2[]) {
+    /* ... */
+  }
+
+  private drawFrameBuffer() {
+    const ascii = this.frameBuffer
+      .map((row) => row.join(""))
+      .join("<br />");
+    this.el.innerHTML = ascii;
+  }
+}
+```
+
+위와 같이 구현 후 `run` 메서드를 호출하면 렌더링이 된다. `run` 메서드에선 60 프레임을 유지하도록 시간을 계산하여 렌더링한다. 이제 `rasterize` 메서드를 구현해보자.
+
+```ts
+private rasterize(V1: Vector3, V2: Vector3, V3: Vector3) {
+  const halfWidth = this.width / 2;
+  const halfHeight = this.height / 2;
+
+  const v1 = new Vector2(V1.x * halfWidth + halfWidth, -V1.y * halfHeight + halfHeight);
+  const v2 = new Vector2(V2.x * halfWidth + halfWidth, -V2.y * halfHeight + halfHeight);
+  const v3 = new Vector2(V3.x * halfWidth + halfWidth, -V3.y * halfHeight + halfHeight);
+
+  const minX = Math.floor(Math.max(0, Math.min(v1.x, Math.min(v2.x, v3.x))));
+  const minY = Math.floor(Math.max(0, Math.min(v1.y, Math.min(v2.y, v3.y))));
+
+  const maxX = Math.floor(Math.min(this.width, Math.max(v1.x, Math.max(v2.x, v3.x)) + 1));
+  const maxY = Math.floor(Math.min(this.height, Math.max(v1.y, Math.max(v2.y, v3.y)) + 1));
+
+  for (let i = minY; i < maxY; i++) {
+    for (let j = minX; j < maxX; j++) {
+      if (this.isPointInTriangle(j, i, v1, v2, v3)) {
+        this.frameBuffer[i][j] = '#';
+      }
+    }
+  }
+}
+```
+
+위 코드를 통해 폴리곤 속 좌표를 래스터화하여 ASCII 문자열을 출력할 수 있다. 다음으로 월드 행렬을 회전시켜 3D라는 것을 인지할 수 있도록 만들어보자.
+
+```ts
+class Renderer {
+  private angle: number;
+
+  constructor() {
+    // ...
+    this.angle = 0;
+  }
+
+  // ...
+
+  render() {
+    this.angle += 0.01;
+    if (this.angle >= 2 * 3.14) this.angle -= 2 * 3.14; // 다 돌면 다시 0으로
+    // ...
+  }
+
+  private process() {
+    // 월드를 회전시킨다.
+    this.world.rotateX(this.angle);
+    this.world.rotateY(this.angle);
+    this.world.rotateZ(this.angle);
+
+    // ...
+  }
+}
+```
+
+위와 같이 월드를 회전시키면 3D 물체가 회전하는 것처럼 보인다. 마치 물체가 회전하는 것처럼 보인다.
+
+JavaScript(TypeScript를 빌드)로 구현했기 때문에 웹에서 실행이 가능하다. 결과적으로 다음과 같은 결과물을 웹에서 볼 수 있다.
+
+<div style="box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.1); border-radius: 4px; padding: 16px; width: 80%; margin: 0 auto 8px auto">
+  <SpinningCube />
+</div>
+<figcaption>마치 상자가 회전하는 것처럼 보인다</figcaption>
+
+# 마치며
+
+반쯤 재미로 시작한 프로젝트지만 생각보다 구현이 쉽지는 않았다. 게임 개발이 하고 싶어 개발자의 길을 걸었지만 마지막으로 게임 개발과 관련된 공부를 한지도 벌써 10년이 지났다. 그럼에도 불구하고 오랜만에 작업을 하니 재미있었고 다시 머리가 깨어나는 느낌이었다. 역시 학습에서 중요한 것은 평소에 잘 하지 않는 것을 해보는 것, 그리고 그것을 익숙해질 때까지 반복하는 것이라는 것을 다시 한 번 깨달았다. 다음에 기회가 된다면 또 다시 이런 재미있는 프로젝트를 해보고 싶다.
+
+[^1]: 엄밀히 따지면 선은 아니다. 픽셀이라는 작은 사각형이 모여 선처럼 보이는 것처럼 ASCII 문자열이 모여 선처럼 보이는 것이다.
+[^2]: 3D 모델링 툴은 작업의 편의성을 위해 사각 폴리곤을 제공한다. 이는 후처리 과정에서 삼각 폴리곤으로 변환된다.
+[^3]: 이는 [동차좌표](https://ko.wikipedia.org/wiki/%EB%8F%99%EC%B0%A8%EC%A2%8C%ED%91%9C)를 사용했기 때문이다. 이를 이용한 동차좌표계는 3차원 좌표에서 방향성을 추가하여 4차원 좌표로 확장함으로서 3차원 좌표의 회전, 이동, 크기 조절을 한 번에 처리할 수 있다.
+[^4]: 따라서 보통 화면에 딱 붙어야하는 UI를 구현할 때 많이 사용한다.
