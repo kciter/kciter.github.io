@@ -13,8 +13,6 @@ import { SpinningCube, ASCII3DRenderer } from '@materials/ascii-3d-renderer';
 
 필자는 쓸데없지만 재밌는 프로그램을 만들면서 공부하는 것을 좋아한다. 최근에 정신적으로 에너지가 바닥나고 있다는 것을 느껴 작년에 재미로 만들었던 [Jazzlang](https://kciter.so/posts/crafting-esolang/)과 같이 정신적 에너지를 채워줄만한 재미를 느끼고 싶었다. 그래서 무언가 할만한 것을 찾던 중 작년 이맘때 쯤 재밌는 [유튜브 영상](https://www.youtube.com/watch?v=p09i_hoFdd0)을 봤던 것이 생각났다. 영상에서는 **CLI 환경에서 큐브를 회전시키는 프로그램**을 처음부터 끝까지 조용히 코딩하는 것을 보여준다.
 
-<!-- <ASCII3DRenderer /> -->
-
 <figure>
   <Image src="/images/2024-03-03-ascii-3d-renderer/youtube.gif" width="80%" />
   <figcaption>영상 중 일부 캡쳐</figcaption>
@@ -23,6 +21,12 @@ import { SpinningCube, ASCII3DRenderer } from '@materials/ascii-3d-renderer';
 필자는 이 아이디어가 굉장히 참신하다 생각했다. 마침 무언가를 만들고 싶었던 차에 `큐브가 됐다면 CLI 환경에서 다른 물체도 3D 렌더링 할 수 있지 않을까?`라는 생각을 하게되었고 실제로 구현했다. 이 글의 결과물은 [이곳](https://github.com/kciter/ascii-3d-renderer.js)에서 볼 수 있다.
 
 # 어떻게 ASCII를 3D처럼 보이게 할까?
+
+결론부터 이야기하자면 **사실 조금 큰 픽셀**이라 생각하면 된다. 다음 이미지를 보자.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/pixelate.png" caption="픽셀" width="50%" />
+
+좌측은 원본 이미지 우측은 Pixelate 이펙트를 입힌 이미지다. ASCII를 사용한다는 것은 단지 글자를 이용하여 우측 이미지 처럼 만드는 것과 크게 다르지 않다. 다만, 실제 픽셀과 달리 글자는 여러가지 제약이 있다.
 
 일반적인 게임에서 3D 렌더링은 빛과 그림자, 최적화, 쉐이더, 충돌 처리, 물리 계산 등 굉장히 난이도가 높은 기술이 포함된다. 하지만 우리는 단순히 3D 물체를 화면에 그리기만 할 것이기 때문에 몇 가지 기본적인 기술만 있으면 된다. 우선 화면에 나오는 물체를 왜 3D처럼 인식을 할까? 답은 간단하다. 스크린을 통해 **원근감**을 표현했기 때문이다. 사람이 원근감을 느끼도록 만드는 방법은 다양하지만 일반적인 CLI 환경에서 쓸 수 있는 것은 **선[^1]과 명암** 뿐이다.
 
@@ -46,7 +50,14 @@ o : 조금 옅은 명암
 . : 가장 옅은 명암
 ```
 
-참고로 간격이 일정해야 하므로 반드시 고정폭 글꼴을 사용해야 한다.
+참고로 간격이 일정해야 하므로 반드시 고정폭 글꼴을 사용해야 한다. 앞서 소개했던 유튜브 영상에서 나오는 큐브처럼 명암을 표현하면 다음과 같다.
+
+<div style="box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.1); border-radius: 4px; padding: 16px; width: 80%; margin: 0 auto 8px auto">
+  <SpinningCube />
+</div>
+<figcaption>마치 상자가 회전하는 것처럼 보인다</figcaption>
+
+위 예제는 필자가 유튜브 영상에 나온 프로그램을 직접 웹에서 실행 가능하도록 구현한 것이다. 빛에 기반한 명암 처리는 아니지만 **입체감**을 느낄 수 있다. 이제 이를 구현하기 위해 필요한 지식을 알아보자.
 
 # 3D 좌표를 2D 좌표로
 
@@ -430,10 +441,7 @@ class Renderer {
 
 JavaScript(TypeScript를 빌드)로 구현했기 때문에 웹에서 실행이 가능하다. 결과적으로 다음과 같은 결과물을 웹에서 볼 수 있다.
 
-<div style="box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.1); border-radius: 4px; padding: 16px; width: 80%; margin: 0 auto 8px auto">
-  <SpinningCube />
-</div>
-<figcaption>마치 상자가 회전하는 것처럼 보인다</figcaption>
+
 
 # 마치며
 

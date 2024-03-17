@@ -1,3 +1,4 @@
+// @ts-nocheck
 var S = Object.defineProperty;
 var Z = (d, t, i) =>
   t in d
@@ -512,7 +513,7 @@ class J {
         h > i &&
           ((s = m - (h % i)),
           this.render(),
-          (this.angle += 0.01),
+          (this.angle += 7e-3),
           this.angle >= 2 * 3.14 && (this.angle -= 2 * 3.14)),
         requestAnimationFrame(n);
     };
@@ -530,7 +531,7 @@ class J {
       1e3
     );
     this.world.matrix.setIdentity(),
-      this.world.translate(new o(0, 0, -3)),
+      this.world.translate(new o(0, 0, -7)),
       this.world.rotateX(this.angle),
       this.world.rotateY(this.angle),
       this.world.rotateZ(this.angle),
