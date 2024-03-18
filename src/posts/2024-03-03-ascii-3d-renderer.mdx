@@ -190,11 +190,11 @@ class Vector4 { /* ... */ }
 여기서 자세한 코드는 적지 않지만 각 클래스는 기본적인 더하기 빼기 곱하기 나누기 연산을 포함하여 앞서 설명한 회전 변환, 크기 변환, 이동 변환 등을 처리할 수 있도록 구현한다. 이제 렌더러를 만들어보자. 다음으로 필요한 객체는 다음과 같다.
 
 ```ts
-class World { /* ... */ }
+class Mesh { /* ... */ }
 class Camera { /* ... */ }
 ```
 
-각각 월드 객체와 카메라 객체는 월드 변환과 뷰 변환을 처리할 수 있도록 구현한다.
+각각 월드에 배치할 객체와 카메라 객체는 월드 변환과 뷰 변환을 처리할 수 있도록 구현한다.
 
 ## 모델 로더 구현
 
@@ -286,17 +286,15 @@ class Renderer {
   private el: HTMLElement;
   private width: number;
   private height: number;
-  private world: World;
   private camera: Camera;
   private frameBuffer: string[][];
-  private mesh: Polygon[];
+  private mesh: Mesh;
 
   constructor(el: HTMLElement, width: number, height: number, objString: string) {
     this.el = el;
     this.width = width;
     this.height = height;
     this.mesh = Loader.loadFromString(objString);
-    this.world = new World();
     this.camera = new Camera();
   }
 
@@ -337,10 +335,11 @@ class Renderer {
   }
 
   private process() {
+    const polygons = this.mesh.polygons;
     for (const polygon of polygons) {
       const vertices = polygon.vertices.map((vertex) => {
         let v = vertex;
-        v = this.world.transform(v);
+        v = this.mesh.transform(v);
         v = this.camera.transform(v);
         v = this.camera.project(v);
         return v;
@@ -409,17 +408,17 @@ class Renderer {
   }
 
   private process() {
-    // 월드를 회전시킨다.
-    this.world.rotateX(this.angle);
-    this.world.rotateY(this.angle);
-    this.world.rotateZ(this.angle);
+    // 메쉬를 회전시킨다.
+    this.mesh.rotateX(this.angle);
+    this.mesh.rotateY(this.angle);
+    this.mesh.rotateZ(this.angle);
 
     // ...
   }
 }
 ```
 
-위와 같이 월드를 회전시키면 3D 물체가 회전하는 것처럼 보인다. 마치 물체가 회전하는 것처럼 보인다.
+위와 같이 메쉬 객체를 회전시키면 3D 물체가 회전하는 것처럼 보인다. 마치 물체가 회전하는 것처럼 보인다.
 
 JavaScript(TypeScript를 빌드)로 구현했기 때문에 웹에서 실행이 가능하다. 결과적으로 다음과 같은 결과물을 웹에서 볼 수 있다.
 
