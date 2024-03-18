@@ -5,7 +5,7 @@ export const ASCII3DRenderer = () => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const renderer = new Renderer(ref.current, 100, 40);
+    const renderer = new Renderer(ref.current, 80, 40);
     renderer.loadFromString(mesh);
     renderer.run();
   }, []);
@@ -14,10 +14,10 @@ export const ASCII3DRenderer = () => {
     <div
       ref={ref}
       style={{
-        fontSize: 12,
+        fontSize: ((ref.current?.clientWidth || 0) / 700) * 14,
+        lineHeight: 1,
         width: "100%",
         fontFamily: "monospace",
-        lineHeight: 1,
       }}
     />
   );
