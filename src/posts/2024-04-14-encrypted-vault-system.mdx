@@ -2,7 +2,7 @@
 title: "비밀 관리를 위한 금고 시스템 만들기"
 categories: dev
 tags: [vault, cipher, security, password]
-image: /images/2024-04-14-encrypted-vault-system/thumbnail.jpeg
+image: /images/2024-04-14-encrypted-vault-system/thumbnail.png
 comments: true
 draft: false
 hide: false
@@ -192,6 +192,8 @@ pip install pycryptodome
 설치를 마쳤다면 다음 코드를 작성해보자.
 
 ```python
+# aes.py
+
 import base64
 import hashlib
 from Crypto.Cipher import AES
@@ -220,11 +222,12 @@ class AESCipher(object):
         return unpad(dec, AES.block_size).decode('utf-8')
 
 
-aes = AESCipher("key")
-encrypted, iv = aes.encrypt("password")
-print(encrypted) # 6F9aHBhcbWhExUkVjBWFvw== or something like this
-decrypted = aes.decrypt(encrypted, iv)
-print(decrypted) # password
+if __name__ == "__main__":
+    aes = AESCipher("key")
+    encrypted, iv = aes.encrypt("password")
+    print(encrypted) # 6F9aHBhcbWhExUkVjBWFvw== or something like this
+    decrypted = aes.decrypt(encrypted, iv)
+    print(decrypted) # password
 ```
 
 `AESCipher` 클래스는 평문의 암호화와 복호화를 담당한다. 참고로 코드 중 `iv`는 **Initialization Vector**의 약자로 암호화할 때 사용하는 초기화 벡터를 의미한다. 이는 암호화할 때 사용한 `iv`를 복호화할 때도 사용해야 한다. 이를 통해 암호화된 메세지가 같은 메세지라도 매번 다른 암호문을 생성할 수 있다.
@@ -234,6 +237,8 @@ print(decrypted) # password
 다음으로 해싱 모듈을 만들어보자.
 
 ```python
+# hash.py
+
 import base64
 import hashlib
 from Crypto.Protocol.KDF import PBKDF2
@@ -246,8 +251,9 @@ def hash_sha256(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
 
-print(hash_password("password", "salt")) # ... 48 length hash
-print(hash_sha256("password")) # ... 48 length hash
+if __name__ == "__main__":
+    print(hash_password("password", "salt")) # ... 48 length hash
+    print(hash_sha256("password")) # ... 48 length hash
 ```
 
 `hash_password` 함수는 PBKDF2를 이용하여 해싱한 후 base64로 인코딩하여 반환한다. 이때 `dkLen`은 해싱된 길이를 의미하며 `count`는 해싱 반복 횟수를 의미한다. 이 값이 클수록 보안이 높아지지만 속도가 느려진다. `hash_sha256` 함수는 SHA-256 해싱을 수행한다.
@@ -255,6 +261,8 @@ print(hash_sha256("password")) # ... 48 length hash
 이제 기본적인 암호화 모듈을 만들었으니 랜덤 비밀 키를 생성해 비밀번호 관리 서비스에 등록하는 모듈을 만들어보자. 여기서는 macOS를 기준으로 작성한다.
 
 ```python
+# random_key.py
+
 import base64
 import subprocess
 import os
@@ -276,13 +284,14 @@ def keychain_store_password(service, account, password):
     p.close()
 
 
-# If password exists, print it
-if not keychain_get_password("local-vault", "manager"):
-    print("Password does not exist")
-    keychain_store_password("local-vault", "manager", generate_random_key())
-    print("Password stored")
+if __name__ == "__main__":
+    # If password exists, print it
+    if not keychain_get_password("local-vault", "manager"):
+        print("Password does not exist")
+        keychain_store_password("local-vault", "manager", generate_random_key())
+        print("Password stored")
 
-print(keychain_get_password("local-vault", "manager")) # print random key
+    print(keychain_get_password("local-vault", "manager")) # print random key
 ```
 
 위 코드를 실행하면 macOS 키체인에 정상적으로 값이 들어간 것을 확인할 수 있다.
@@ -292,43 +301,366 @@ print(keychain_get_password("local-vault", "manager")) # print random key
 이제 기반 모듈은 모두 만들었다. 이제 이를 이용하여 애플리케이션을 만들어 볼 것이다. 먼저 가장 중요한 마스터 언록 키를 생성하는 모듈을 만들어보자.
 
 ```python
+# muk.py
+
 import base64
 from hash import hash_password, hash_sha256
 from random_key import generate_random_key, keychain_get_password, keychain_store_password
 
 
-# Hash master password with salt
-def hash_master_password(master_password: str, salt: str) -> bytes:
-    return hash_password(master_password, salt)
-
-# XOR two strings
 def xor_two_str(a: str, b: str) -> str:
     a = base64.b64decode(a)
     b = base64.b64decode(b)
     return base64.b64encode(bytes([x ^ y for x, y in zip(a, b)])).decode('utf-8')
 
-# Generate master unlock key
 def generate_master_unlock_key(master_password: str) -> str:
-    hashed_master_password = hash_master_password(master_password, "salt")
+    hashed_master_password = hash_password(master_password, "salt")
 
     if not keychain_get_password("local-vault", "manager"):
         keychain_store_password("local-vault", "manager", generate_random_key())
+
     random_secret_key = keychain_get_password("local-vault", "manager")
     hashed_random_secret_key = hash_sha256(random_secret_key)
 
-    # XOR two hashed strings
     return xor_two_str(hashed_master_password, hashed_random_secret_key)
 
 
-print(generate_master_unlock_key("master_password")) # ... 42 length string
+if __name__ == "__main__":
+    print(generate_master_unlock_key("master_password")) # ... 42 length string
 ```
 
 마스터 패스워드를 PBKDF2로 해싱한 값과 랜덤 비밀 키를 SHA-256으로 해싱한 값을 XOR 연산하여 마스터 언록 키를 생성한다. 이렇게 생성된 마스터 언록 키는 사용자의 디바이스에 종속된 키가 되어 모든 비밀번호를 관리할 수 있게 된다.
 
-이제 이를 이용하여 새로운 비밀번호를 추가하고 저장된 비밀번호를 확인하고 삭제하는 모듈을 만들어보자.
+이제 이를 이용하여 비밀번호 관리자의 기본 기능을 구현해보자. 먼저 CLI 애플리케이션이기 때문에 `argparse`를 사용하여 명령어를 파싱할 것이다.
+
+```python
+# main.py
+# import ...
+
+class App:
+    def setup(self):
+        master_password = getpass.getpass("Enter master password: ")
+        self.muk = generate_master_unlock_key(master_password)
+        self.aes = AESCipher(self.muk)
+
+    def run(self):
+        parser = argparse.ArgumentParser(description="Vault: Add, Update, Delete and Query Passwords", usage="[options]")
+
+        parser.add_argument("-a", "--add", action="store_true", help="Add new password along with name")
+        parser.add_argument("-u", "--update", type=str, nargs=1, help="Update a password by name", metavar=("[name]"))
+        parser.add_argument("-d", "--delete", type=str, nargs=1, help="Delete entry by name", metavar=("[name]"))
+        parser.add_argument("-q", "--query", type=str, nargs=1, help="Look up password by name", metavar=("[name]"))
+        parser.add_argument("-l", "--list", action="store_true", help="List all entries in vault")
+
+        args = parser.parse_args()
+
+        if args.add:
+            print('add')
+        elif args.update:
+            print('update')
+        elif args.delete:
+            print('delete')
+        elif args.query:
+            print('query')
+        elif args.list:
+            print('list')
+        else:
+            parser.print_help()
+```
+
+위와 같이 추가, 수정, 삭제, 조회 등의 명령어를 파싱할 수 있도록 구현했다. 이제 이를 이용하여 비밀번호를 추가, 수정, 삭제, 조회하는 기능을 구현해보자. 먼저 추가부터 구현할 것이다.
+
+```python
+# main.js
+
+class App:
+    # ...
+
+    def add(self):
+        name = input("Enter item name: ")
+        password = getpass.getpass("Enter password: ")
+        cipher, iv = self.aes.encrypt(password)
+
+        ## Read from file as JSON
+        if os.path.isfile("vault.json") == False:
+            data = {}
+        else:
+            file = open("vault.json", "r")
+            data = json.load(file)
+            file.close()
+
+        ## Update JSON
+        data[name] = {"cipher": cipher, "iv": iv}
+
+        ## Save to file as JSON
+        file = open("vault.json", "w")
+        json.dump(data, file)
+        file.close()
+
+        print(f"Entry {name} added")
+```
+
+추가 명령이 들어오는 경우 사용자로부터 이름과 비밀번호를 입력받아 암호화한 후 파일에 저장한다. 이때 파일은 JSON 형식으로 저장하며 이름과 암호화된 비밀번호, IV를 저장한다. 다음으로 조회 기능을 구현해보자.
+
+```python
+# main.js
+
+class App:
+    # ...
+
+    def list(self):
+        if os.path.isfile("vault.json") == False:
+            print("No entries found")
+            return
+
+        file = open("vault.json", "r")
+        data = json.load(file)
+        file.close()
+
+        for entry in data:
+            print(f"* {entry}")
+
+    def query(self, name):
+        if os.path.isfile("vault.json") == False:
+            print("No entries found")
+            return
+
+        file = open("vault.json", "r")
+        data = json.load(file)
+        file.close()
+
+        if name in data:
+            cipher = data[name]["cipher"]
+            iv = data[name]["iv"]
+            password = self.aes.decrypt(cipher, iv)
+            print(f"Password for {name}: {password}")
+        else:
+            print("Entry not found")
+```
+
+목록 조회와 조회 기능을 구현했다. 목록 조회는 파일에 저장된 모든 이름을 출력하고 조회 기능은 입력받은 이름에 해당하는 비밀번호를 복호화하여 출력한다. 마지막으로 수정과 삭제 기능을 구현해보자.
+
+```python
+# main.js
+
+class App:
+    # ...
+
+    def delete(self, name):
+        if os.path.isfile("vault.json") == False:
+            print("No entries found")
+            return
+
+        file = open("vault.json", "r")
+        data = json.load(file)
+        file.close()
+
+        if name in data:
+            del data[name]
+
+            file = open("vault.json", "w")
+            json.dump(data, file)
+            file.close()
+
+            print(f"Entry {name} deleted")
+        else:
+            print("Entry not found")
+
+    def update(self, name):
+        if os.path.isfile("vault.json") == False:
+            print("No entries found")
+            return
+
+        file = open("vault.json", "r")
+        data = json.load(file)
+        file.close()
+
+        if name in data:
+            password = getpass.getpass("Enter new password: ")
+            cipher, iv = self.aes.encrypt(password)
+            data[name] = {"cipher": cipher, "iv": iv}
+
+            file = open("vault.json", "w")
+            json.dump(data, file)
+            file.close()
+
+            print(f"Entry {name} updated")
+        else:
+            print("Entry not found")
+```
+
+이제 모든 기능을 구현했다. 실행 가능하게 변경한 최종 코드는 다음과 같다.
+
+```python
+# main.py
+
+import os
+import getpass
+import argparse
+import json
+from muk import generate_master_unlock_key
+from aes import AESCipher
 
 
+class App:
+    def setup(self):
+        master_password = getpass.getpass("Enter master password: ")
+        self.muk = generate_master_unlock_key(master_password)
+        self.aes = AESCipher(self.muk)
 
+    def add(self):
+        name = input("Enter item name: ")
+        password = getpass.getpass("Enter password: ")
+        cipher, iv = self.aes.encrypt(password)
+
+        ## Read from file as JSON
+        if os.path.isfile("vault.json") == False:
+            data = {}
+        else:
+            file = open("vault.json", "r")
+            data = json.load(file)
+            file.close()
+
+        ## Update JSON
+        data[name] = {"cipher": cipher, "iv": iv}
+
+        ## Save to file as JSON
+        file = open("vault.json", "w")
+        json.dump(data, file)
+        file.close()
+
+        print(f"Entry {name} added")
+
+    def list(self):
+        if os.path.isfile("vault.json") == False:
+            print("No entries found")
+            return
+
+        file = open("vault.json", "r")
+        data = json.load(file)
+        file.close()
+
+        for entry in data:
+            print(f"* {entry}")
+
+    def query(self, name):
+        if os.path.isfile("vault.json") == False:
+            print("No entries found")
+            return
+
+        file = open("vault.json", "r")
+        data = json.load(file)
+        file.close()
+
+        if name in data:
+            cipher = data[name]["cipher"]
+            iv = data[name]["iv"]
+            password = self.aes.decrypt(cipher, iv)
+            print(f"Password for {name}: {password}")
+        else:
+            print("Entry not found")
+
+    def delete(self, name):
+        if os.path.isfile("vault.json") == False:
+            print("No entries found")
+            return
+
+        file = open("vault.json", "r")
+        data = json.load(file)
+        file.close()
+
+        if name in data:
+            del data[name]
+
+            file = open("vault.json", "w")
+            json.dump(data, file)
+            file.close()
+
+            print(f"Entry {name} deleted")
+        else:
+            print("Entry not found")
+
+    def update(self, name):
+        if os.path.isfile("vault.json") == False:
+            print("No entries found")
+            return
+
+        file = open("vault.json", "r")
+        data = json.load(file)
+        file.close()
+
+        if name in data:
+            password = getpass.getpass("Enter new password: ")
+            cipher, iv = self.aes.encrypt(password)
+            data[name] = {"cipher": cipher, "iv": iv}
+
+            file = open("vault.json", "w")
+            json.dump(data, file)
+            file.close()
+
+            print(f"Entry {name} updated")
+        else:
+            print("Entry not found")
+
+    def run(self):
+        parser = argparse.ArgumentParser(description="Vault: Add, Update, Delete and Query Passwords", usage="[options]")
+
+        parser.add_argument("-a", "--add", action="store_true", help="Add new password along with name")
+        parser.add_argument("-u", "--update", type=str, nargs=1, help="Update a password by name", metavar=("[name]"))
+        parser.add_argument("-d", "--delete", type=str, nargs=1, help="Delete entry by name", metavar=("[name]"))
+        parser.add_argument("-q", "--query", type=str, nargs=1, help="Look up password by name", metavar=("[name]"))
+        parser.add_argument("-l", "--list", action="store_true", help="List all entries in vault")
+
+        args = parser.parse_args()
+
+        if args.add:
+            self.setup()
+            self.add()
+        elif args.update:
+            self.setup()
+            self.update(args.update[0])
+        elif args.delete:
+            self.delete(args.delete[0])
+        elif args.query:
+            self.setup()
+            self.query(args.query[0])
+        elif args.list:
+            self.list()
+        else:
+            parser.print_help()
+
+
+if __name__ == "__main__":
+    app = App()
+    app.run()
+```
+
+다음과 같이 사용할 수 있다.
+
+```bash
+$ python main.py -a
+Enter master password: 
+Enter item name: Google
+Enter password: 
+Entry Google added
+
+$ python main.py -l
+* Google
+
+$ python main.py -q Google
+Enter master password:
+Password for Google: password # Your password
+
+$ python main.py -u Google
+Enter master password:
+Enter new password:
+Entry Google updated
+
+$ python main.py -d Google
+Entry Google deleted
+```
+
+마스터 언록 키를 캐싱하는 등의 편의 기능은 여기서 구현하진 않았다. 만약 이 글의 내용이 재미있었다면 이를 추가로 구현해보는 것도 좋을 것이다. 이렇게 구현한 비밀번호 관리자는 로컬에서만 사용할 수 있으며 네트워크 환경에서 사용하는 경우에는 더 많은 보안을 고려해야 한다. 작성된 코드는 [GitHub 저장소](https://github.com/kciter/python-vault-example)에도 올려두었다.
 
 <!--
 
@@ -346,7 +678,7 @@ print(generate_master_unlock_key("master_password")) # ... 42 length string
 
 암호라는 것은 모든 것이 공개되는 인터넷 세계에선 필수라고 할 수 있다. 그럼에도 불구하고 필자를 포함한 많은 개발자들이 암호에 대해 잘 알지 못한다. 이 도메인을 전문적으로 다루거나 종사하는 것이 아니라면 모든 것을 다 알아야할 필요는 없겠지만 단순히 패스워드를 해싱하는 수준에서 벗어나 더 넓은 세계를 탐구해보는 것은 좋을 것이다.
 
-참고로 이 글에서 쓰여진 코드는 정말 안전한지 검증된 것은 아니다. 그리고 만약 로컬이 아닌 네트워크 환경을 고려한다면 더 많은 것을 고려해야 한다. 따라서 이 글을 참고하여 실제 제품에 반영하고자 한다면 충분히 검증 후 도입하기를 권장한다. 여기서 사용된 알고리즘은 보편적으로 사용하는 것을 택했으며 더 안전한 방법이 있을 수 있다.
+참고로 이 글에서 쓰여진 코드는 정말 안전한지 검증된 것은 아니다. 따라서 이 글을 참고하여 실제 제품에 반영하고자 한다면 충분히 검증 후 도입하기를 권장한다. 여기서 사용된 알고리즘은 보편적으로 사용하는 것을 택했으며 더 안전한 방법이 있을 수 있다.
 
 [^1]: 비즈네르는 다른 암호를 만든 블레즈 드 비즈네르라는 프랑스 인이지만 역사상의 인용 오류 때문에 그냥 비즈네르라는 이름이 굳어버렸다 / 처음 배우는 암호화 1장 32쪽
 [^2]: 키가 될 수 있는 조합 수
