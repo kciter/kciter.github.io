@@ -82,60 +82,263 @@ import Image from '@components/Image';
 
 고전 암호는 전수 키 탐색, 빈도 수 공격 등에 매우 취약하다. 특히 카이사르 암호와 같이 키 공간[^2]이 부족하고 언어적 특성이 바로 반영되는 경우엔 암호로서 큰 의미가 없다고 볼 수 있다. 그럼 현대 암호는 뭐가 다를까?
 
-현대 암호는 **혼돈과 확산**이라는 개념을 극대화한 알고리즘을 사용한다. 혼돈과 확산은 정보 이론의 창시자라 할 수 있는 클로드 섀넌이 제시했으며 혼돈은 **암호문에서 키를 알아내기 어렵게 하는 성질**을 말하며 확산은 **암호문에서 원본 메세지를 알아내기 어렵게 하는 성질**을 말한다. 현대 암호는 이를 잘 달성했는지 여부가 암호화의 안전성을 판단하는 기준이 된다.
+예를 들어 현대에 사용되는 대칭 암호화는 **혼돈과 확산**이라는 개념을 극대화한 알고리즘을 사용한다. 혼돈과 확산은 정보 이론의 창시자라 할 수 있는 클로드 섀넌이 제시했으며 혼돈은 **암호문에서 키를 알아내기 어렵게 하는 성질**을 말하며 확산은 **암호문에서 원본 메세지를 알아내기 어렵게 하는 성질**을 말한다. 현대 암호는 이를 잘 달성했는지 여부가 암호화의 안전성을 판단하는 기준이 된다.
 
 <Image src="/images/2024-04-14-encrypted-vault-system/confusion-and-diffusion.jpg" caption="인크립션: 실용주의 암호화 / 길벗" width="80%" />
 
 그러면 혼돈과 확산은 어떻게 달성하는가? 혼돈은 원래 대상과 다른 대상을 섞어 원래 대상이 무엇인지 알아볼 수 없만들고 확산은 원래 대상이 암호문에서 최대한 넓은 부분으로 퍼지도록 만든다. 이때 혼돈을 달성하기 위해 **Substitution**<sup>대체</sup>을 사용하고 확산을 달성하기 위해 **Permutation**<sup>순열</sup>을 사용한다. 말 그대로 Substitution은 'ABCA'와 같은 문자열이 있다면 '1231'과 같이 대체하는 것을 말하고 Permutation은 'ABCA'와 같은 문자열이 있다면 'BCAA'와 같이 순서를 바꾸는 것을 말한다.
 
-Substitution과 Permutation을 한 번 수행하는 것을 SPN(Substitution-Permutation Network)이라고 하며 현대 암호는 SPN을 여러번 반복하는 것으로 충분한 안정성을 달성한다.
+Substitution과 Permutation을 한 번 수행하는 것을 SPN(Substitution-Permutation Network)이라고 하며 현대 암호는 SPN을 여러번 반복하는 것으로 어마어마한 경우의 수를 만들어낸다. 즉, 원본 키에 대한 혼돈과 확산을 적용하여 원본을 알아낼 수 없을 정도로 어마어마한 경우의 수를 만들어 컴퓨터의 엄청난 연산량으로도 복호화를 해내지 못하게 만든다면 충분한 안정성을 달성했다고 볼 수 있다.
+
+<Image src="/images/2024-04-14-encrypted-vault-system/rubber-hose-cryptanalysis.webp" caption="이런 경우를 제외하면 복호화는 불가능하다 / 고무호스 암호분석" />
 
 # 세 가지 암호화 방식
 
-보통 현대적인 암호화 알고리즘은 세 가지 방식으로 나뉜다. 각각 대칭 암호화, 비대칭 암호화, 해싱으로 이 세 가지 방식은 각각 다른 목적으로 사용되며 서로 다른 특징을 가지고 있다. 이 글에선 간단한 개념과 대표적인 알고리즘을 소개하고 구체적인 동작이나 구현에 대해 알아보지는 않을 것이다.
+보통 현대적인 암호화 알고리즘은 세 가지 방식으로 나뉜다. 각각 **대칭 암호화, 비대칭 암호화, 해싱**으로 이 세 가지 방식은 각각 다른 목적으로 사용되며 서로 다른 특징을 가지고 있다.
 
 ## 대칭 암호화
 
-대칭 암호화는 하나의 비밀 키를 이용하여 암호화하고 복호화하는 알고리즘을 의미한다. 
+대칭 암호화(Symmetric Encryption)는 **하나의 비밀 키(혹은 대칭 키)를 이용하여 암호화하고 복호화하는 알고리즘**을 의미한다. 앞서 소개한 모든 암호 알고리즘은 대칭 암호화에 속한다.
 
 <Image src="/images/2024-04-14-encrypted-vault-system/symmetric-key-algorithm.png" />
 
-대표적으로 AES 알고리즘이 있으며 이를 이용하여 사용자가 추가할 비밀번호를 암호화하여 저장할 수 있다. 또한, 사용자가 비밀번호를 요청할 때 이 비밀 키를 이용하여 복호화하여 반환할 수 있다.
+보통 블록 암호화 알고리즘인 **AES 알고리즘**[^3]을 사용하는 경우가 많다. 여기서 해당 알고리즘의 자세한 동작을 설명하지는 않을 것이다. 만약 AES 알고리즘 동작을 알고 싶다면 시각화가 잘 되어있는 [유튜브 영상](https://www.youtube.com/watch?v=mlzxpkdXP58)을 살펴보자.
+
+참고로 대칭 암호화로 AES를 사용한다면 비밀 키를 탈취당하는 것을 제외하고 사실상 복호화가 불가능하다. 앞서 설명한 SPN을 여러번 실행하기 때문에 원본 키를 알아내는 것은 거의 불가능하므로 무차별 대입으로 전수 키 조사를 하는 것이 그나마 실질적인 공격이라 할 수 있다. 충분히 복잡하고 긴 키를 사용하는 경우 슈퍼 컴퓨터가 오더라도 의미있는 시간[^4] 내에 복호화할 수 없다.
 
 ## 비대칭 암호화
 
-## 해싱
+비대칭 암호화(Asymmetric Encryption)는 **두 개의 키를 이용하여 암호화하고 복호화하는 알고리즘**을 의미한다. 이 두 개의 키는 서로 다르며 하나는 공개 키(Public Key)이고 다른 하나는 개인 키(Private Key)라고 부른다.
 
-# 개인 비밀번호 관리자
+<Image src="/images/2024-04-14-encrypted-vault-system/asymmetric-key-algorithm.png" />
 
-보통 브라우저나 OS에서 제공하는 비밀번호 관리자 시스템은 사용자 개인을 위해 만들어졌다. 이를 이용하면 어렵게 만든 비밀번호를 외우지 않더라도 쉽게 로그인하는 것이 가능하기에 매우 편리하다. 하지만 쓰면서도 정말 안전하게 맞는지 의심이 들 수 있다. 개인 비밀번호 관리자가 어떻게 돌아가는 지 이해하기 위해선 두 가지 개념을 알아야 한다. 바로 **마스터 패스워드**와 **대칭키 암호화**다. 실제 제품에는 보안을 위해 더 많은 기술이 필요하겠지만 가장 핵심적인 기술은 이 두 가지라고 할 수 있다.
+공개 키는 누구나 알 수 있지만 개인 키는 오직 소유자만 알 수 있다. 이 두 키를 이용하여 암호화하면 공개 키로 암호화한 것은 개인 키로만 복호화할 수 있고 개인 키로 암호화한 것은 공개 키로만 복호화할 수 있다. 이를 이용하여 안전하게 통신 할 수 있다. 이미 대칭 암호화가 있는데 왜 비대칭 암호화를 사용할까?
 
-## 마스터 패스워드
+대칭 암호화는 서로 암호를 주고 받기 위해서 최소한 한 번은 비밀 키를 공유할 필요가 있다. 이는 많은 사례에 적합하지만 참여자가 많은 경우엔 문제가 생긴다. 참여자 중 한명이 비밀 키를 유출하지 않으리라는 보장을 할 수 있을까? 현실적으로는 불가능하다. 따라서 만약 많은 사용자가 접속하는 웹사이트에 암호문을 전달해야 한다면 대칭 암호화는 사실상 의미가 없다. 그래서 비대칭 암호화가 필요해졌다. 참고로 이러한 문제를 **Key Distribution**<sup>키 배포</sup>라고 한다. 이 문제는 오랫동안 난제였지만 디피-헬먼 키 교환 알고리즘을 거쳐 **RSA 알고리즘**[^5]을 통해 해결되었다.
 
-마스터 패스워드는 암호화되어 저장한 모든 비밀번호를 복호화할 수 있는 키를 의미한다. 이말은 즉, 마스터 패스워드이 유출되면 모든 비밀번호가 유출된다는 것을 의미한다. 또한, 유실할 경우 저장된 모든 비밀번호를 알 수 없게 되버린다. 따라서 이 마스터 패스워드는 안전하게 보관해야 한다. 다만, 유실의 경우 다른 특수한 기술을 사용하여 복구하는 방법이 있을 수 있다.
+다시 설명으로 돌아와 비대칭 암호화는 받을 대상의 공개 키로 암호화 할 수 있으므로 누구나 암호화할 수 있지만 복호화는 오직 받을 대상의 개인 키로만 가능하다. 따라서 참여자가 많더라도 안전하게 통신할 수 있다.
 
-보통 마스터 패스워드는 그대로 사용하지 않고 사용자가 입력한 값을 해싱(Hashing) 알고리즘을 통해 만들어 낸다. 해싱 알고리즘은 단방향 암호화라고도 부르는데 그 이유는 받은 쪽에서 복호화가 불가능하기 때문이다. 오로지 받은 평문을 해싱하여 저장된 해싱값과 일치하는지 확인하는 것만 가능하다.
+## 단방향 암호화
+
+단방향 암호화는 **임의의 길이의 데이터를 고정된 길이의 데이터로 변환하는 것**을 의미한다. 이 변환된 데이터를 해시 값이라고 부르며 해시 함수를 이용하여 변환한다. 해싱은 앞서 소개한 암호화와는 다르게 **복호화가 불가능**하다. 즉, 해시 값으로 원본 데이터를 알아낼 수 없다. 그럼 단방향 암호화를 사용하는 의미가 있을까?
 
 <Image src="/images/2024-04-14-encrypted-vault-system/hashing-algorithm.png" />
 
-이를 이용하여 사용자가 입력한 마스터 패스워드를 해싱하여 비밀 키를 만들어낸다. 이렇게 만들어진 비밀 키를 저장하여 이후 사용자가 보낸 마스터 패스워드가 진짜인지 확인하는 용도로 사용할 수 있다.
+단방향 암호화는 **무결성 검증**에 사용된다. 무결성 검증이란 데이터가 변조되지 않았는지 확인하는 것을 의미한다. 예를 들어 파일을 다운로드 받을 때 파일의 해시 값을 함께 제공하면 다운로드 받은 파일이 변조되지 않았는지 확인할 수 있다. 또한, 비밀번호를 저장할 때도 해싱을 사용한다. 비밀번호를 해싱하여 저장하면 원본 비밀번호를 알 수 없으며 해시 값만 알 수 있다. 따라서 해시 값이 유출되더라도 원본 비밀번호를 알 수 없다.
+
+해싱 함수 중에는 대표적으로 SHA[^6]가 있다. SHA-1, SHA-256, SHA-512 등이 있으며 각각 160비트, 256비트, 512비트의 해시 값을 생성한다. 이 중 SHA-256은 안정성과 성능을 고려하여 현재 많이 사용되는 해싱 함수다. 다만, **레인보우 테이블**이나 **해시 충돌** 등의 공격을 당할 수 있기에 복호화가 불가능하다해서 해싱이 안전하다고 볼 수는 없다. 따라서 **솔트<sup>Salt</sup>와 키 스트레칭<sup>Key Stretching</sup>**을 사용하여 보완해야 한다.
+
+솔트는 재료에 소금을 곁을여 먹는 것에 비유한 것으로 평문에 임의의 문자열을 추가하여 암호화하는 방법을 말한다. 그리고 키 스트레칭은 해시를 여러번 반복하여 원문을 알기 힘들게 만드는 방법이다. 이런 방법을 사용하면 공격자가 해싱 알고리즘을 실행하는 데에 시간이 오래걸리므로 암호화 해독이 어려워진다. 해싱 함수와 솔트, 키 스트레칭을 묶은 Bcrypt, PBKDF2 등의 알고리즘이 있다.
+
+# 개인 비밀 금고
+
+이제 본격적으로 비밀번호 관리자와 연관된 개인 비밀 금고에 대해 알아보자. 비밀번호 관리자는 기본적으로 두 가지 개념만 알아도 된다. 바로 **마스터 패스워드**와 **대칭 암호화**다. 실제 제품에는 보안을 위해 더 많은 기술이 필요하겠지만 가장 핵심적인 기술은 이 두 가지라고 할 수 있다.
+
+## 마스터 패스워드
+
+**마스터 패스워드는 비밀번화 관리자의 주인임을 인증할 수 있는 비밀 키**를 의미한다. 사용자는 마스터 패스워드를 통해 비밀번호 관리자 인증을 통과하고 비밀번호를 보관하거나 확인할 수 있다. 이말은 **마스터 패스워드이 유출되면 모든 비밀번호가 유출**된다는 것을 의미한다. 또한, 유실할 경우 저장된 모든 비밀번호를 알 수 없게 되버린다. 따라서 이 마스터 패스워드는 안전하게 보관해야 한다. 다만, 유실의 경우 다른 특수한 기술을 사용하여 복구하는 방법이 있을 수 있다.
+
+보통 사용자가 입력한 마스터 패스워드는 단방향 암호화로 해시를 만든 후 진짜 사용자인지 인증하는 데에 사용한다. 즉, 웹사이트에 사용하는 비밀번호와 크게 다르지 않다. 다만, 아무래도 이 비밀번호는 모든 비밀번호를 관리하는 열쇠이기에 더욱 안전하게 만들어지고 보관해야 한다.
+
+마스터 패스워드를 비롯하여 안전한 비밀번호는 다음과 같은 특징을 가지고 있다. 만약 비밀번호 관리자를 사용하다면 가급적 다음 수칙을 지키는 것이 좋다.
+
+1. 최소 16자 이상 - 길이가 길수록 안전하다
+2. 재사용된 비밀번호가 아닐 것 - 다른 웹사이트에서 사용한 비밀번호를 사용하지 않을 것
+3. 복잡성을 가질 것 - 대소문자, 숫자, 특수문자를 조합하여 사용
+4. 개인 정보가 포함되지 않을 것 - 이름, 생일, 주소 등 개인 정보가 포함되지 않을 것
+5. 사전에 등록된 단어가 아닐 것 - Dictionary Attack을 방지하기 위해 사전에 등록된 단어가 아닐 것
+
+## 비밀번호 저장하기
+
+보관할 비밀번호는 마스터 패스워드의 해싱 값을 이용하여 대칭 암호화한 후 저장하면 된다. 이때 주의할 점으로 **마스터 패스워드의 해싱 값은 절대로 저장해서는 안된다.** 마스터 패스워드의 해싱 값을 대칭 키로 이용하면 굳이 마스터 패스워드를 몰라도 저장된 해싱 값을 알아내면 복호화하는 것이 가능하다. 이를 [Pass-the-Hash 공격](https://www.beyondtrust.com/resources/glossary/pass-the-hash-pth-attack)이라고 한다. 이는 보통 웹 서비스에서 비밀번호를 해싱하여 저장하는 습관에서 비롯된 것으로 많은 사람들이 실수하기 쉬운 부분이므로 주의할 필요가 있다.
+
+<Image src="/images/2024-04-14-encrypted-vault-system/local-vault-usecase.png" caption="아주 간단한 도식" />
+
+마스터 패스워드의 해싱 값은 어딘가에 저장되지 않고 클라이언트에 잠깐 거쳐가거나 클라이언트 메모리에 짧은 기간 동안 보관되어야 한다. 편의를 위해 영구 보관할 수도 있겠지만 보안에 취약하다. 클라이언트가 마스터 패스워드 해싱 값을 알게되면 스토어에 새로운 비밀번호를 암호화하여 저장하거나 가져온 값을 복호화 하는 것이 가능하다. 이렇게 하면 사용자는 하나의 마스터 패스워드로 모든 비밀번호를 관리할 수 있게 된다.
+
+## 마스터 언록 키 생성
+
+앞서 마스터 패스워드가 유출되면 모든 비밀번호를 유출된다고 언급했다. 마스터 패스워드만 유출되지 않으면 안전하다는 것은 알 수 있지만 솔직히 사용하기엔 불안하다. 이를 해결하기 위해 한 가지 아이디어를 떠올려보자. 대칭 키로 마스터 패스워드의 해싱 값만 사용하는 것이 아니라 **사용자의 디바이스에 종속된 랜덤한 키를 추가로 사용**하면 어떨까? 즉, **마스터 패스워드의 해싱 값과 랜덤 생성된 비밀 키를 XOR 연산**하여 대칭 키로 사용하는 것이다. 이렇게 사용한다면 마스터 패스워드가 유출되더라도 디바이스 자체를 탈취당하지 않는다면 안전하다.
+
+<Image src="/images/2024-04-14-encrypted-vault-system/generate-master-unlock-key-process.png" caption="아주 간단한 도식" />
+
+랜덤 생성된 비밀 키는 각 OS에서 사용되는 암호 저장 서비스를 이용하여 생성, 보관하면 된다. macOS라면 **Keychain**, Windows라면 **Credential Manager**을 사용할 수 있다.[^7]
+
+## 구현
+
+이제 이론적인 부분을 끝내고 실제로 구현해보자. 전체 프로세스에 대한 도식은 다음과 같다.
+
+<Image src="/images/2024-04-14-encrypted-vault-system/local-vault-system.png" caption="전체 프로세스 도식" />
+
+CLI 툴로 구현한다고 가정했을 때 필요한 기능은 다음과 같다.
+
+* AES 암호화
+* 해싱 (여기서는 PBKDF2를 사용)
+* 랜덤 비밀 키 생성
+* 마스터 언록 키 생성
+* 새로운 비밀번호 추가
+* 저장된 비밀번호 확인
+* 저장된 비밀번호 삭제
+* 마스터 패스워드 인증
+
+여기서는 코드 예제로 쉽게 테스트할 수 있는 Python 3를 사용할 것이다. 그렇게 어려운 코드는 아니므로 다른 언어로도 쉽게 구현할 수 있을 것이다.
+
+먼저 AES 암호화 모듈을 만들어보자. 이를 위해 `pycryptodome`을 설치해서 사용할 것이다.
+
+```bash
+pip install pycryptodome
+```
+
+설치를 마쳤다면 다음 코드를 작성해보자.
+
+```python
+import base64
+import hashlib
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+
+
+class AESCipher(object):
+    def __init__(self, key: str):
+        self.key = hashlib.sha256(key.encode()).digest()
+
+    def encrypt(self, message: str) -> str:
+        message = message.encode()
+        raw = pad(message, AES.block_size)
+        cipher = AES.new(self.key, AES.MODE_CBC)
+        enc = cipher.encrypt(raw)
+
+        ciphertext = base64.b64encode(enc).decode('utf-8')
+        iv = base64.b64encode(cipher.iv).decode('utf-8')
+
+        return ciphertext, iv
+
+    def decrypt(self, enc: str, iv: str) -> str:
+        enc = base64.b64decode(enc)
+        cipher = AES.new(self.key, AES.MODE_CBC, base64.b64decode(iv))
+        dec = cipher.decrypt(enc)
+        return unpad(dec, AES.block_size).decode('utf-8')
+
+
+aes = AESCipher("key")
+encrypted, iv = aes.encrypt("password")
+print(encrypted) # 6F9aHBhcbWhExUkVjBWFvw== or something like this
+decrypted = aes.decrypt(encrypted, iv)
+print(decrypted) # password
+```
+
+`AESCipher` 클래스는 평문의 암호화와 복호화를 담당한다. 참고로 코드 중 `iv`는 **Initialization Vector**의 약자로 암호화할 때 사용하는 초기화 벡터를 의미한다. 이는 암호화할 때 사용한 `iv`를 복호화할 때도 사용해야 한다. 이를 통해 암호화된 메세지가 같은 메세지라도 매번 다른 암호문을 생성할 수 있다.
+
+그리고 `pad`와 `unpad`는 문자열에 패딩을 추가하고 제거하는 함수이다. 이를 통해 암호화할 때 블록 크기의 배수로 만들어주고 복호화할 때 다시 제거해준다. 더 자세한 내용은 AES 알고리즘을 참고하자.
+
+다음으로 해싱 모듈을 만들어보자.
+
+```python
+import base64
+import hashlib
+from Crypto.Protocol.KDF import PBKDF2
+
+
+def hash_password(password: str, salt: str) -> str:
+    return base64.b64encode(PBKDF2(password, salt, dkLen=48, count=100000)).decode('utf-8')
+
+def hash_sha256(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
+
+print(hash_password("password", "salt")) # ... 48 length hash
+print(hash_sha256("password")) # ... 48 length hash
+```
+
+`hash_password` 함수는 PBKDF2를 이용하여 해싱한 후 base64로 인코딩하여 반환한다. 이때 `dkLen`은 해싱된 길이를 의미하며 `count`는 해싱 반복 횟수를 의미한다. 이 값이 클수록 보안이 높아지지만 속도가 느려진다. `hash_sha256` 함수는 SHA-256 해싱을 수행한다.
+
+이제 기본적인 암호화 모듈을 만들었으니 랜덤 비밀 키를 생성해 비밀번호 관리 서비스에 등록하는 모듈을 만들어보자. 여기서는 macOS를 기준으로 작성한다.
+
+```python
+import base64
+import subprocess
+import os
+
+
+def generate_random_key() -> bytes:
+    return base64.b64encode(os.urandom(32)).decode('utf-8')
+
+def keychain_get_password(service, account):
+    command = f"/usr/bin/security find-generic-password -s '{service}' -a '{account}' -g -w"
+    result = subprocess.run(command, shell=True, capture_output=True)
+    password = result.stdout.decode().strip()
+    return password
+
+def keychain_store_password(service, account, password):
+    cmd = 'security add-generic-password -U -a %s -s %s -p %s' % (account, service, password)
+    p = os.popen(cmd)
+    s = p.read()
+    p.close()
+
+
+# If password exists, print it
+if not keychain_get_password("local-vault", "manager"):
+    print("Password does not exist")
+    keychain_store_password("local-vault", "manager", generate_random_key())
+    print("Password stored")
+
+print(keychain_get_password("local-vault", "manager")) # print random key
+```
+
+위 코드를 실행하면 macOS 키체인에 정상적으로 값이 들어간 것을 확인할 수 있다.
+
+<Image src="/images/2024-04-14-encrypted-vault-system/macos-keychain.png" caption="입력한 값으로 키체인에 추가되어있다" />
+
+이제 기반 모듈은 모두 만들었다. 이제 이를 이용하여 애플리케이션을 만들어 볼 것이다. 먼저 가장 중요한 마스터 언록 키를 생성하는 모듈을 만들어보자.
+
+```python
+import base64
+from hash import hash_password, hash_sha256
+from random_key import generate_random_key, keychain_get_password, keychain_store_password
+
+
+# Hash master password with salt
+def hash_master_password(master_password: str, salt: str) -> bytes:
+    return hash_password(master_password, salt)
+
+# XOR two strings
+def xor_two_str(a: str, b: str) -> str:
+    a = base64.b64decode(a)
+    b = base64.b64decode(b)
+    return base64.b64encode(bytes([x ^ y for x, y in zip(a, b)])).decode('utf-8')
+
+# Generate master unlock key
+def generate_master_unlock_key(master_password: str) -> str:
+    hashed_master_password = hash_master_password(master_password, "salt")
+
+    if not keychain_get_password("local-vault", "manager"):
+        keychain_store_password("local-vault", "manager", generate_random_key())
+    random_secret_key = keychain_get_password("local-vault", "manager")
+    hashed_random_secret_key = hash_sha256(random_secret_key)
+
+    # XOR two hashed strings
+    return xor_two_str(hashed_master_password, hashed_random_secret_key)
+
+
+print(generate_master_unlock_key("master_password")) # ... 42 length string
+```
+
+마스터 패스워드를 PBKDF2로 해싱한 값과 랜덤 비밀 키를 SHA-256으로 해싱한 값을 XOR 연산하여 마스터 언록 키를 생성한다. 이렇게 생성된 마스터 언록 키는 사용자의 디바이스에 종속된 키가 되어 모든 비밀번호를 관리할 수 있게 된다.
+
+이제 이를 이용하여 새로운 비밀번호를 추가하고 저장된 비밀번호를 확인하고 삭제하는 모듈을 만들어보자.
 
 
 
-## 정리
 
-개인 비밀번호 관리자는 사용자가 입력한 마스터 패스워드를 해싱하여 비밀 키를 만들고 이를 저장하여 검증에 이용한다. 검증에 성공했다면 마스터 패스워드를 이용하여 대칭키 암호화로 추가할 비밀번호를 암호화한다. 사용자가 만약 비밀번호를 요청하면 대칭키를 이용해 복호화하여 반환한다. 이렇게 하면 사용자는 하나의 마스터 패스워드로 모든 비밀번호를 관리할 수 있게 된다.
+<!--
 
-<!-- 
+# 다중 금고
 
-# 팀 단위 관리
-
-마스터 패스워드
-대칭키
-비대칭키
-하이브리드 암호화
+## 하이브리드 암호화
 
 ## 영지식 증명
+
+## 구현
 
 -->
 
@@ -143,7 +346,12 @@ Substitution과 Permutation을 한 번 수행하는 것을 SPN(Substitution-Perm
 
 암호라는 것은 모든 것이 공개되는 인터넷 세계에선 필수라고 할 수 있다. 그럼에도 불구하고 필자를 포함한 많은 개발자들이 암호에 대해 잘 알지 못한다. 이 도메인을 전문적으로 다루거나 종사하는 것이 아니라면 모든 것을 다 알아야할 필요는 없겠지만 단순히 패스워드를 해싱하는 수준에서 벗어나 더 넓은 세계를 탐구해보는 것은 좋을 것이다.
 
-참고로 이 글에서 쓰여진 코드는 정말 안전한지 검증된 것은 아니다. 따라서 이 글을 참고하여 실제 제품에 반영하고자 한다면 충분히 검증 후 도입하기를 권장한다. 여기서 사용된 알고리즘은 보편적으로 사용하는 것을 택했으며 더 안전한 방법이 있을 수 있다.
+참고로 이 글에서 쓰여진 코드는 정말 안전한지 검증된 것은 아니다. 그리고 만약 로컬이 아닌 네트워크 환경을 고려한다면 더 많은 것을 고려해야 한다. 따라서 이 글을 참고하여 실제 제품에 반영하고자 한다면 충분히 검증 후 도입하기를 권장한다. 여기서 사용된 알고리즘은 보편적으로 사용하는 것을 택했으며 더 안전한 방법이 있을 수 있다.
 
 [^1]: 비즈네르는 다른 암호를 만든 블레즈 드 비즈네르라는 프랑스 인이지만 역사상의 인용 오류 때문에 그냥 비즈네르라는 이름이 굳어버렸다 / 처음 배우는 암호화 1장 32쪽
 [^2]: 키가 될 수 있는 조합 수
+[^3]: Advanced Encryption Standard의 약자로 미국 표준 기술 연구소에 의해 표준으로 지정된 암호화 방식이다
+[^4]: 태양계의 수명이 끝나도 원본 키를 찾을 수 없다
+[^5]: 만든 사람의 이름인 Ron Rivest, Adi Shamir, Leonard Adleman에서 따온 이름이다
+[^6]: 이름부터 Secure Hash Algorithm, 안전한 해시 알고리즘이다
+[^7]: Linux 계열 OS는 어떤 방법을 사용할 수 있을지 모르겠다. 추후에 알게되면 추가하겠다.
