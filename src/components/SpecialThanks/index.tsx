@@ -53,7 +53,7 @@ const SpecialThanks = () => {
               target="_blank"
               style={{ marginRight: 4 }}
             >
-              <Avatar src={sponser.avatar} />
+              <Avatar src={sponser.avatar} alt={sponser.name} />
             </a>
           ))}
         </div>
