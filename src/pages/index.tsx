@@ -10,6 +10,7 @@ const Index = () => {
     {
       allMdx(
         limit: 9
+        sort: { fields: { date: DESC } }
         filter: {
           fields: { type: { eq: "post" } }
           frontmatter: { draft: { ne: true }, hide: { ne: true } }

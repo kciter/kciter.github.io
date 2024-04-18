@@ -8,7 +8,6 @@ module.exports = {
   plugins: [
     `gatsby-plugin-tsconfig-paths`,
     `gatsby-plugin-react-helmet`,
-    // `gatsby-remark-reading-time`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {

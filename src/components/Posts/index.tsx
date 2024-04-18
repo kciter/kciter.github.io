@@ -8,10 +8,11 @@ interface PostsProps {
   page?: number;
 }
 
-const RelatedPost = ({ page = 1 }: PostsProps) => {
+const Posts = ({ page = 1 }: PostsProps) => {
   const result = useStaticQuery(graphql`
     {
       allMdx(
+        sort: { fields: { date: DESC } }
         filter: {
           fields: { type: { eq: "post" } }
           frontmatter: { draft: { ne: true }, hide: { ne: true } }
@@ -21,6 +22,9 @@ const RelatedPost = ({ page = 1 }: PostsProps) => {
           node {
             excerpt
             fields {
+              timeToRead {
+                minutes
+              }
               date
               slug
             }
@@ -55,7 +59,7 @@ const RelatedPost = ({ page = 1 }: PostsProps) => {
                 <i className="fa fa-calendar" aria-hidden="true" />{" "}
                 {dayjs(post.node.fields.date).locale("en").format("LL")} -{" "}
                 <i className="fa fa-clock-o" aria-hidden="true" />{" "}
-                {/* {Math.round(post.node.fields.readingTime.minutes)} minute read */}
+                {Math.round(post.node.fields.timeToRead.minutes)} minute read
               </span>
             </p>
           </div>
@@ -65,4 +69,4 @@ const RelatedPost = ({ page = 1 }: PostsProps) => {
   );
 };
 
-export default RelatedPost;
+export default Posts;

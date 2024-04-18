@@ -1,9 +1,9 @@
-const { createFilePath } = require(`gatsby-source-filesystem`);
-const { GraphQLBoolean } = require("gatsby/graphql");
-const path = require("path");
-const dayjs = require("dayjs");
+import readingTime from "reading-time";
+import { createFilePath } from 'gatsby-source-filesystem'
+import path from "path";
+import dayjs from "dayjs";
 
-exports.onCreateNode = ({ node, getNode, actions }) => {
+export const onCreateNode = ({ node, getNode, actions }) => {
   const { createNodeField } = actions;
   if (node.internal.type === `Mdx`) {
     const type = "post"; // node.fileAbsolutePath.includes("/posts") ? "post" : "snippet";
@@ -15,6 +15,11 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
     );
 
     const slug = `/${type}s/${title}`;
+    createNodeField({
+      node,
+      name: `timeToRead`,
+      value: readingTime(node.body),
+    });
     createNodeField({ node, name: `slug`, value: slug });
     createNodeField({ node, name: `date`, value: date });
     createNodeField({ node, name: `year`, value: dayjs(date).format("YYYY") });
@@ -22,7 +27,7 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
   }
 };
 
-exports.createPages = async ({ graphql, actions }) => {
+export const createPages = async ({ graphql, actions }) => {
   const { createPage } = actions;
 
   const result = await graphql(`
