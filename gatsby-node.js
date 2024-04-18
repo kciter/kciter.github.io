@@ -6,7 +6,7 @@ const dayjs = require("dayjs");
 exports.onCreateNode = ({ node, getNode, actions }) => {
   const { createNodeField } = actions;
   if (node.internal.type === `Mdx`) {
-    const type = node.fileAbsolutePath.includes("/posts") ? "post" : "snippet";
+    const type = "post"; // node.fileAbsolutePath.includes("/posts") ? "post" : "snippet";
 
     const filename = createFilePath({ node, getNode, basePath: `${type}s` });
 
@@ -27,7 +27,7 @@ exports.createPages = async ({ graphql, actions }) => {
 
   const result = await graphql(`
     {
-      allMdx(filter: { fileAbsolutePath: { glob: "**/posts/*.(md|mdx)" } }) {
+      allMdx {
         edges {
           node {
             fields {

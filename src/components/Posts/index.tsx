@@ -12,7 +12,6 @@ const RelatedPost = ({ page = 1 }: PostsProps) => {
   const result = useStaticQuery(graphql`
     {
       allMdx(
-        sort: { fields: [fields___date], order: DESC }
         filter: {
           fields: { type: { eq: "post" } }
           frontmatter: { draft: { ne: true }, hide: { ne: true } }
@@ -20,13 +19,10 @@ const RelatedPost = ({ page = 1 }: PostsProps) => {
       ) {
         edges {
           node {
-            excerpt(truncate: true)
+            excerpt
             fields {
               date
               slug
-              readingTime {
-                minutes
-              }
             }
             frontmatter {
               title
@@ -59,7 +55,7 @@ const RelatedPost = ({ page = 1 }: PostsProps) => {
                 <i className="fa fa-calendar" aria-hidden="true" />{" "}
                 {dayjs(post.node.fields.date).locale("en").format("LL")} -{" "}
                 <i className="fa fa-clock-o" aria-hidden="true" />{" "}
-                {Math.round(post.node.fields.readingTime.minutes)} minute read
+                {/* {Math.round(post.node.fields.readingTime.minutes)} minute read */}
               </span>
             </p>
           </div>

@@ -8,7 +8,7 @@ module.exports = {
   plugins: [
     `gatsby-plugin-tsconfig-paths`,
     `gatsby-plugin-react-helmet`,
-    `gatsby-remark-reading-time`,
+    // `gatsby-remark-reading-time`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -95,63 +95,63 @@ module.exports = {
       },
     },
     `gatsby-plugin-cname`,
-    {
-      resolve: `gatsby-plugin-feed`,
-      options: {
-        query: `
-          {
-            site {
-              siteMetadata {
-                title
-                description
-                siteUrl
-                site_url: siteUrl
-              }
-            }
-          }
-        `,
-        feeds: [
-          {
-            serialize: ({ query: { site, allMdx } }) => {
-              return allMdx.edges.map(edge => {
-                return Object.assign({}, edge.node.frontmatter, {
-                  description: edge.node.excerpt,
-                  date: edge.node.fields.date,
-                  url: site.siteMetadata.siteUrl + edge.node.fields.slug,
-                  guid: site.siteMetadata.siteUrl + edge.node.fields.slug,
-                });
-              });
-            },
-            query: `
-              {
-                allMdx(
-                  sort: { fields: [fields___date], order: DESC }
-                  filter: {
-                    fields: { type: { eq: "post" } }
-                    frontmatter: { draft: { ne: true } }
-                  }
-                ) {
-                  edges {
-                    node {
-                      excerpt(truncate: true)
-                      fields {
-                        date
-                        slug
-                      }
-                      frontmatter {
-                        title
-                        image
-                      }
-                    }
-                  }
-                }
-              }
-            `,
-            output: "/feed.xml",
-            title: "kciter.so",
-          },
-        ],
-      },
-    },
+    // {
+    //   resolve: `gatsby-plugin-feed`,
+    //   options: {
+    //     query: `
+    //       {
+    //         site {
+    //           siteMetadata {
+    //             title
+    //             description
+    //             siteUrl
+    //             site_url: siteUrl
+    //           }
+    //         }
+    //       }
+    //     `,
+    //     feeds: [
+    //       {
+    //         serialize: ({ query: { site, allMdx } }) => {
+    //           return allMdx.edges.map(edge => {
+    //             return Object.assign({}, edge.node.frontmatter, {
+    //               description: edge.node.excerpt,
+    //               date: edge.node.fields.date,
+    //               url: site.siteMetadata.siteUrl + edge.node.fields.slug,
+    //               guid: site.siteMetadata.siteUrl + edge.node.fields.slug,
+    //             });
+    //           });
+    //         },
+    //         query: `
+    //           {
+    //             allMdx(
+    //               sort: { fields: [fields___date], order: DESC }
+    //               filter: {
+    //                 fields: { type: { eq: "post" } }
+    //                 frontmatter: { draft: { ne: true } }
+    //               }
+    //             ) {
+    //               edges {
+    //                 node {
+    //                   excerpt
+    //                   fields {
+    //                     date
+    //                     slug
+    //                   }
+    //                   frontmatter {
+    //                     title
+    //                     image
+    //                   }
+    //                 }
+    //               }
+    //             }
+    //           }
+    //         `,
+    //         output: "/feed.xml",
+    //         title: "kciter.so",
+    //       },
+    //     ],
+    //   },
+    // },
   ],
 };

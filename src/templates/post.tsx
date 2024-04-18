@@ -154,7 +154,7 @@ export const pageQuery = graphql`
     mdx(fields: { slug: { eq: $slug } }) {
       body
       tableOfContents
-      excerpt(truncate: true)
+      excerpt
       fields {
         slug
         date
