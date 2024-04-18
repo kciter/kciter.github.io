@@ -55,8 +55,12 @@ h4 {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  padding-top: 24px;
+  margin-top: 48px;
   color: #454f5b;
+}
+
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+  color: #454f5b !important;
 }
 
 a {
@@ -170,7 +174,7 @@ hr {
   text-decoration: underline;
 }
 
-.post-content a.footnote-ref {
+.post-content a.footnote-ref, .post-content a[data-footnote-ref] {
   color: #FF6F00;
 }
 
@@ -494,16 +498,17 @@ figcaption {
   Footnotes
 */
 .footnotes {
-  margin-top: 12px;
+  border-top: 1px solid #eee;
+  margin-top: 48px;
   /* padding-top: px; */
   font-size: 12px;
 }
 
-.footnotes hr {
+/* .footnotes hr {
   margin: 0;
   border: none;
   border-top: 1px solid #eee;
-}
+} */
 
 .footnotes ol {
   padding-left: 16px;
@@ -511,8 +516,12 @@ figcaption {
 }
 
 .footnotes ol li {
-  margin-top: 12px;
+  margin-top: 8px;
   padding-left: 4px;
+}
+
+.footnotes ol p {
+  margin: 0;
 }
 
 .footnotes ol li::marker {

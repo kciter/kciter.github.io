@@ -41,7 +41,7 @@ const PostTemplate = ({ data, location, pageContext, children }: PageProps) => {
     if (typeof document === undefined) return;
 
     $(function () {
-      $(".post-container a.footnote-ref").each((_, item) => {
+      $(".post-container a[data-footnote-ref]").each((_, item) => {
         const href = $(item).attr("href")?.slice(1);
         const text = $("#" + href)
           .text()

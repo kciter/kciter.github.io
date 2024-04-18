@@ -1,4 +1,12 @@
-module.exports = {
+import remarkGfm from "remark-gfm";
+import remarkExternalLinks from "remark-external-links";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import { fileURLToPath } from "url";
+
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
+
+export default {
   siteMetadata: {
     siteUrl: "https://kciter.so",
     title: `kciter.so | devlog`,
@@ -37,47 +45,58 @@ module.exports = {
       },
     },
     // {
-    //   resolve: `gatsby-source-filesystem`,
+    //   resolve: `gatsby-transformer-remark`,
     //   options: {
-    //     name: `posts`,
-    //     path: `${__dirname}/src/snippets`,
+    //     footnotes: true,
+    //     gfm: true,
+    //     plugins: [
+    //       {
+    //         resolve: `gatsby-remark-autolink-headers`,
+    //         options: {
+    //           className: `anchor-header`,
+    //           maintainCase: false,
+    //           removeAccents: true,
+    //           elements: [`h1`, `h2`, `h3`, `h4`],
+    //         },
+    //       },
+    //       {
+    //         resolve: "gatsby-remark-images",
+    //         options: { maxWidth: 1300, showCaptions: ["alt"] },
+    //       },
+    //       `gatsby-remark-prismjs`,
+    //     ],
     //   },
     // },
-    {
-      resolve: `gatsby-transformer-remark`,
-      options: {
-        plugins: [
-          {
-            resolve: `gatsby-remark-autolink-headers`,
-            options: {
-              className: `anchor-header`,
-              maintainCase: false,
-              removeAccents: true,
-              elements: [`h1`, `h2`, `h3`, `h4`],
-            },
-          },
-          {
-            resolve: "gatsby-remark-images",
-            options: { maxWidth: 1300, showCaptions: ["alt"] },
-          },
-          `gatsby-remark-prismjs`,
-        ],
-      },
-    },
     {
       resolve: `gatsby-plugin-mdx`,
       options: {
         extensions: [`.mdx`, `.md`],
+        mdxOptions: {
+          remarkPlugins: [
+            // Add GitHub Flavored Markdown (GFM) support
+            remarkGfm,
+            // To pass options, use a 2-element array with the
+            // configuration in an object in the second element
+            [remarkExternalLinks, { target: false }],
+          ],
+          rehypePlugins: [
+            // Generate heading ids for rehype-autolink-headings
+            rehypeSlug,
+            // To pass options, use a 2-element array with the
+            // configuration in an object in the second element
+            [rehypeAutolinkHeadings, { behavior: `wrap` }],
+          ],
+        },
         gatsbyRemarkPlugins: [
-          {
-            resolve: `gatsby-remark-autolink-headers`,
-            options: {
-              className: `anchor-header`,
-              maintainCase: false,
-              removeAccents: true,
-              elements: [`h1`, `h2`, `h3`, `h4`],
-            },
-          },
+          // {
+          //   resolve: `gatsby-remark-autolink-headers`,
+          //   options: {
+          //     className: `anchor-header`,
+          //     maintainCase: false,
+          //     removeAccents: true,
+          //     elements: [`h1`, `h2`, `h3`, `h4`],
+          //   },
+          // },
           {
             resolve: "gatsby-remark-images",
             options: { maxWidth: 1300, showCaptions: ["alt"] },

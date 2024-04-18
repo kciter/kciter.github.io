@@ -243,7 +243,7 @@ fun divide(a: Int, b: Int): Double = a.toDouble() / b.toDouble()
 
 <Image src="/images/2023-07-17-railway-oriented-programming/functor.png" />
 
-위 이미지를 보면 펑터는 박스와 같다는 것을 알 수 있다. 박스 안에는 값이 들어있고 이를 **꺼내서(unwrap value)** 함수를 **적용(apply function)**한다. 그리고 다시 박스에 **집어넣는다(rewrap value)**. 왜 이런 번거로운 짓을 하는 걸까? 그 이유는 **값에 함수를 적용할 때 발생하는 문제를 해결**하기 위함이다. 다시 다음 이미지를 살펴보자.
+위 이미지를 보면 펑터는 박스와 같다는 것을 알 수 있다. 박스 안에는 값이 들어있고 이를 **꺼내서(unwrap value)** 함수를 <strong>적용(apply function)</strong>한다. 그리고 다시 박스에 **집어넣는다(rewrap value)**. 왜 이런 번거로운 짓을 하는 걸까? 그 이유는 **값에 함수를 적용할 때 발생하는 문제를 해결**하기 위함이다. 다시 다음 이미지를 살펴보자.
 
 <Image src="/images/2023-07-17-railway-oriented-programming/functor-error.png" />
 
