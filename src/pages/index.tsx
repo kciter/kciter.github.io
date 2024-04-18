@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import DefaultTemplate from "@templates/default";
 import SEO from "@components/SEO";
 import RelatedPost from "@components/RelatedPost";
@@ -32,12 +32,16 @@ const Index = () => {
     }
   `);
 
-  const posts = result.allMdx.edges
-    .sort(
-      (a: any, b: any) =>
-        +new Date(b.node.fields.date) - +new Date(a.node.fields.date)
-    )
-    .splice(0, 9);
+  const posts = useMemo(
+    () =>
+      result.allMdx.edges
+        .sort(
+          (a: any, b: any) =>
+            +new Date(b.node.fields.date) - +new Date(a.node.fields.date)
+        )
+        .splice(0, 9),
+    [result]
+  );
 
   return (
     <DefaultTemplate>
