@@ -46,7 +46,7 @@ import { SpinningCube, ASCII3DRenderer } from '@materials/ascii-3d-renderer';
 
 참고로 간격이 일정해야 하므로 반드시 고정폭 글꼴을 사용해야 한다. 앞서 소개했던 유튜브 영상에서 나오는 큐브처럼 명암을 표현하면 다음과 같다.
 
-<div style="box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.1); border-radius: 4px; padding: 16px; width: 80%; margin: 0 auto 8px auto">
+<div style={{boxShadow: '1px 1px 2px 2px rgba(0, 0, 0, 0.1)', borderRadius: 4, padding: 16, width: '80%', margin: '0 auto 8px auto'}}>
   <SpinningCube />
 </div>
 <figcaption>마치 상자가 회전하는 것처럼 보인다</figcaption>
@@ -422,7 +422,7 @@ class Renderer {
 
 JavaScript(TypeScript를 빌드)로 구현했기 때문에 웹에서 실행이 가능하다. 결과적으로 다음과 같은 결과물을 웹에서 볼 수 있다.
 
-<div style="box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.1); border-radius: 4px; padding: 16px; width: 80%; margin: 0 auto 8px auto">
+<div style={{boxShadow: '1px 1px 2px 2px rgba(0, 0, 0, 0.1)', borderRadius: 4, padding: 16, width: '80%', margin: '0 auto 8px auto'}}>
   <ASCII3DRenderer />
 </div>
 <figcaption>명암도 잘 구분된다</figcaption>

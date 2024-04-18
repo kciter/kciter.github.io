@@ -44,6 +44,9 @@ export const createPages = async ({ graphql, actions }) => {
               draft
               series
             }
+            internal {
+              contentFilePath
+            }
           }
         }
       }
@@ -55,7 +58,7 @@ export const createPages = async ({ graphql, actions }) => {
   result.data.allMdx.edges.forEach(({ node }) => {
     createPage({
       path: node.fields.slug,
-      component: postTemplate,
+      component: `${postTemplate}?__contentFilePath=${node.internal.contentFilePath}`,
       context: {
         slug: node.fields.slug,
         series: node.frontmatter.series

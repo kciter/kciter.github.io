@@ -3,8 +3,6 @@ import { graphql, PageProps, useStaticQuery } from "gatsby";
 import DefaultTemplate from "./default";
 import SEO from "@components/SEO";
 import dayjs from "dayjs";
-import { MDXProvider } from "@mdx-js/react";
-import { MDXRenderer } from "gatsby-plugin-mdx";
 import PostFooter from "@components/PostFooter";
 import RelatedPost from "@components/RelatedPost";
 import TableOfContents from "@components/TableOfContents";
@@ -16,14 +14,8 @@ import Series from "@components/Series";
 
 dayjs.extend(require("dayjs/plugin/localizedFormat"));
 
-const PostTemplate = ({ data, location, pageContext }: PageProps) => {
-  const {
-    body,
-    tableOfContents,
-    fields,
-    frontmatter,
-    excerpt,
-  } = (data as any).mdx;
+const PostTemplate = ({ data, location, pageContext, children }: PageProps) => {
+  const { tableOfContents, fields, frontmatter, excerpt } = (data as any).mdx;
 
   const { series } = pageContext as any;
 
@@ -126,13 +118,11 @@ const PostTemplate = ({ data, location, pageContext }: PageProps) => {
         ))} */}
 
       <div className="post-content">
-        {/* <MDXProvider> */}
         {draft ? (
           <div className="not-yet-published">Not yet published</div>
         ) : (
-          <MDXRenderer>{body}</MDXRenderer>
+          children
         )}
-        {/* </MDXProvider> */}
       </div>
 
       <PostFooter tags={frontmatter.tags} comment={frontmatter.comments} />
