@@ -38,17 +38,16 @@
     "@types/react-dom": "^17.0.3",
     "@types/react-helmet": "^6.1.1",
     "gh-pages": "^3.1.0",
-    "prettier": "2.2.1"
+    "prettier": "2.2.1",
+    "eslint-plugin-mdx": "3.1.5"
   },
   "license": "MIT",
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "start": "npm run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
+    "lint:mdx": "eslint . --ext md,mdx",
     "deploy": "gatsby build && gh-pages -d public -b main"
   },
   "repository": {

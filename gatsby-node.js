@@ -22,10 +22,10 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
   }
 };
 
-exports.createPages = ({ graphql, actions }) => {
+exports.createPages = async ({ graphql, actions }) => {
   const { createPage } = actions;
 
-  graphql(`
+  const result = await graphql(`
     {
       allMdx(filter: { fileAbsolutePath: { glob: "**/posts/*.(md|mdx)" } }) {
         edges {
@@ -43,60 +43,34 @@ exports.createPages = ({ graphql, actions }) => {
         }
       }
     }
-  `).then(result => {
-    result.data.allMdx.edges.forEach(({ node }) => {
-      createPage({
-        path: node.fields.slug,
-        component: path.resolve(`src/templates/post.tsx`),
-        context: {
-          slug: node.fields.slug,
-          series: node.frontmatter.series
-            ? {
-                title: node.frontmatter.series,
-                items: result.data.allMdx.edges
-                  .filter(edge => {
-                    return (
-                      edge.node.frontmatter.series === node.frontmatter.series
-                    );
-                  })
-                  .map(edge => {
-                    return {
-                      title: edge.node.frontmatter.title,
-                      url: edge.node.fields.slug,
-                    };
-                  }),
-              }
-            : undefined,
-        },
-      });
+  `);
+
+  const postTemplate = path.resolve(`src/templates/post.tsx`);
+
+  result.data.allMdx.edges.forEach(({ node }) => {
+    createPage({
+      path: node.fields.slug,
+      component: postTemplate,
+      context: {
+        slug: node.fields.slug,
+        series: node.frontmatter.series
+          ? {
+              title: node.frontmatter.series,
+              items: result.data.allMdx.edges
+                .filter(edge => {
+                  return (
+                    edge.node.frontmatter.series === node.frontmatter.series
+                  );
+                })
+                .map(edge => {
+                  return {
+                    title: edge.node.frontmatter.title,
+                    url: edge.node.fields.slug,
+                  };
+                }),
+            }
+          : undefined,
+      },
     });
   });
-
-  // graphql(`
-  //   {
-  //     allMdx(filter: { fileAbsolutePath: { glob: "**/snippets/*.(md|mdx)" } }) {
-  //       edges {
-  //         node {
-  //           fields {
-  //             slug
-  //           }
-  //           frontmatter {
-  //             title
-  //             categories
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // `).then(result => {
-  //   result.data.allMdx.edges.forEach(({ node }) => {
-  //     createPage({
-  //       path: node.fields.slug,
-  //       component: path.resolve(`src/templates/snippet.tsx`),
-  //       context: {
-  //         slug: node.fields.slug,
-  //       },
-  //     });
-  //   });
-  // });
 };

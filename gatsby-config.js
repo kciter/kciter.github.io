@@ -17,7 +17,21 @@ module.exports = {
       },
     },
     {
+      resolve: `gatsby-plugin-page-creator`,
+      options: {
+        name: `pages`,
+        path: `${__dirname}/src/pages`,
+      },
+    },
+    {
       resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `posts`,
+        path: `${__dirname}/src/posts`,
+      },
+    },
+    {
+      resolve: `gatsby-plugin-page-creator`,
       options: {
         name: `posts`,
         path: `${__dirname}/src/posts`,
