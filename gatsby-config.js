@@ -8,22 +8,6 @@ module.exports = {
   plugins: [
     `gatsby-plugin-tsconfig-paths`,
     `gatsby-plugin-react-helmet`,
-    // `gatsby-plugin-image`,
-    `gatsby-transformer-sharp`,
-    `gatsby-plugin-sharp`,
-    {
-      resolve: `gatsby-plugin-manifest`,
-      options: {
-        name: `gatsby-starter-default`,
-        short_name: `starter`,
-        start_url: `/`,
-        background_color: `#ffffff`,
-        theme_color: `#ffffff`,
-        display: `minimal-ui`,
-        icon: `src/assets/favicon.png`, // This path is relative to the root of the site.
-      },
-    },
-    `gatsby-plugin-gatsby-cloud`,
     `gatsby-remark-reading-time`,
     {
       resolve: `gatsby-source-filesystem`,
