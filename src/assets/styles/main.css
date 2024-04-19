@@ -12,10 +12,23 @@ html {
 }
 
 body {
+  margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   font-size: 16px;
   color: #212b36;
   line-height: 1.75rem;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0px;
+  z-index: -100;
+  background-image: url(/header-gradient.svg);
+  background-repeat: no-repeat;
+  background-position: center top, center bottom;
+  background-size: 1400px;
+  opacity: 0.4;
 }
 
 @media (max-width: 30em) {
@@ -98,6 +111,7 @@ hr {
 */
 
 .container {
+  padding-top: 16px;
   margin-left: auto;
   margin-right: auto;
   /* width: 615px; */
@@ -117,14 +131,27 @@ hr {
 */
 
 .masthead {
-  padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   margin-bottom: 4rem;
   font-family: "Quattrocento Sans", sans-serif;
+
+  background-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(44px);
+  padding: 10px 16px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
 }
 
 .masthead a:hover {
   color:black;
+}
+
+.masthead-title {
+  width: 100%;
+  margin-top: 16px;
 }
 
 .masthead-title a {
@@ -355,12 +382,14 @@ figcaption {
 */
 
 .menu {
+  width: 100%;
   padding-top: 0.5rem;
-  display: block;
+  display: flex;
+  justify-content: space-between;
 }
 
 .menu-content {
-  float: left;
+  /* float: left; */
 }
 
 .menu-content a {
@@ -374,7 +403,7 @@ figcaption {
 }
 
 .social-icons {
-  float: right;
+  /* float: right; */
 }
 
 .social-icons a {

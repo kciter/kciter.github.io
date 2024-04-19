@@ -49,7 +49,33 @@ const Index = () => {
 
       <Bio />
 
-      <h2 style={{ textAlign: "center" }}>Posts</h2>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 8,
+        }}
+      >
+        <h3 style={{ letterSpacing: 2, margin: 0, fontSize: 18 }}>
+          RECENT POSTS
+        </h3>
+        <a
+          style={{
+            fontSize: 14,
+            fontWeight: 500,
+            textDecoration: "none",
+            backgroundSize: "100%",
+            backgroundRepeat: "repeat",
+            backgroundClip: "text",
+            backgroundImage:
+              "linear-gradient(90deg, #80D0F2 0%, #5C82FF 50%, #C480FF 100%)",
+            cursor: "pointer",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          All posts ▸
+        </a>
+      </div>
       {posts && <RelatedPost posts={posts} style={{ padding: 0 }} />}
     </DefaultTemplate>
   );

@@ -16,7 +16,7 @@ import Image from '@components/Image';
 
 따라서 이에 대한 대안으로 자신의 속성과 행동을 자식 컴포넌트에 넘긴 후 자식이 직접 부모 컴포넌트를 대신하여 렌더링하는 방법인 `Render Delegation`[^1]이 등장했다. 이는 [Radix](https://www.radix-ui.com)라는 오픈소스 리액트 컴포넌트 라이브러리를 통해 유명해진 방법으로 Render Delegation 기능을 제공하는 라이브러리는 보통 `asChild`라는 속성을 통해 해당 기능을 이용할 수 있게 제공한다.
 
-<Image src="/images/2024-02-18-render-delegation-react-component/render-delegation-component.png" width="70%" caption="Render Delegation 컴포넌트의 구성" />
+<Image src="/images/2024-02-18-render-delegation-react-component/render-delegation-component.png" caption="Render Delegation 컴포넌트의 구성" />
 
 Render Delegation 컴포넌트는 보통 `Slot`과 `Slottable`이라는 두 컴포넌트를 통해 구성된다. `Slot`은 자식 컴포넌트를 렌더링하는 역할을 하고 `Slottable`은 `Slot`에 들어갈 것이 무엇인지를 나타낸다.
 
@@ -561,6 +561,22 @@ export const Slot = ({ children, ...props }: SlotProps) => {
 
 이런 경우 정답은 없다. 정답이 되도록 규칙을 만드는 것이 더 좋은 방법이다. 참고로 Radix에서는 부모 컴포넌트에 `ref`를 붙이도록 규칙을 정했다. 이 글에서도 Radix와 같은 규칙을 따를 것이다.
 
+```tsx
+type PossibleRef<T> = React.Ref<T> | undefined;
+
+function setRef<T>(ref: PossibleRef<T>, value: T) {
+  if (typeof ref === "function") {
+    ref(value);
+  } else if (ref !== null && ref !== undefined) {
+    (ref as React.MutableRefObject<T>).current = value;
+  }
+}
+
+function composeRefs<T>(...refs: PossibleRef<T>[]) {
+  return (node: T) => refs.forEach((ref) => setRef(ref, node));
+}
+```
+
 ## prop 병합 문제
 
 또 다른 특수한 상황은 부모 컴포넌트와 자식 컴포넌트의 `prop` 명칭이 같은 경우다.
@@ -588,7 +604,6 @@ https://www.bekk.christmas/post/2023/01/polymorphism-in-react
 ## 자동 완성 성능
 
 ## 타입 추론 문제
-
 
 # 마치며
 
