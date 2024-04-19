@@ -135,6 +135,8 @@ hr {
   margin-bottom: 4rem;
   font-family: "Quattrocento Sans", sans-serif;
 
+  margin-left: -16px;
+  margin-right: -16px;
   background-color: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(44px);
   padding: 10px 16px;
@@ -143,6 +145,18 @@ hr {
   flex-direction: row;
   -webkit-box-pack: justify;
   justify-content: space-between;
+}
+
+@media (max-width: 30rem) {
+  .masthead {
+    margin-top: -16px;
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-bottom: 32px;
+    border-radius: 0;
+    grid-template-columns: 1fr;
+    background: none;
+  }
 }
 
 .masthead a:hover {

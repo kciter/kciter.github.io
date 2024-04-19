@@ -64,13 +64,13 @@ const Index = () => {
             fontSize: 14,
             fontWeight: 500,
             textDecoration: "none",
-            backgroundSize: "100%",
-            backgroundRepeat: "repeat",
-            backgroundClip: "text",
-            backgroundImage:
-              "linear-gradient(90deg, #80D0F2 0%, #5C82FF 50%, #C480FF 100%)",
+            // backgroundSize: "100%",
+            // backgroundRepeat: "repeat",
+            // backgroundClip: "text",
+            // backgroundImage:
+            //   "linear-gradient(90deg, #80D0F2 0%, #5C82FF 50%, #C480FF 100%)",
             cursor: "pointer",
-            WebkitTextFillColor: "transparent",
+            // WebkitTextFillColor: "transparent",
           }}
         >
           All posts ▸
