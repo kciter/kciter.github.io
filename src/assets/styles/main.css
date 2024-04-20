@@ -1003,6 +1003,14 @@ th, td {
   text-align: center;
 }
 
+
+@media (max-width: 30rem) {
+  .avatars a:not(:first-of-type) {
+    margin-left: -16px;
+  }
+}
+
+
 /*
   Post Bio
 */
