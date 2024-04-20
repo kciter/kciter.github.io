@@ -268,7 +268,7 @@ const App = () => {
 
 결과적으로 `icon` 속성은 `Button` 컴포넌트에서 설정한 대로 따르지만, 그 외 속성은 `asChild` 속성에 따라 위임된다. 즉, **위임하고 싶은 부분만 따로 지정해서 구현하는 것**이 가능하다. 이렇게 `Slottable`을 사용하면 조금 더 풍부한 표현이 가능해진다. 참고로 `Slot`만 사용하는 것은 `Slot` 내부에 `Slottable`을 최상위로 둬서 사용하는 것과 같다.
 
-# JavaScript에서 구현하기
+# 구현하기
 
 이제 `Slot`과 `Slottable` 컴포넌트가 어떻게 동작하는지 알았으니 이 두 컴포넌트를 직접 만들어보자. 여기서는 먼저 편의를 위해 JavaScript로 구현해 볼 것이다.
 
@@ -406,9 +406,9 @@ export const Slot = ({ children, ...props }) => {
 
 <Image src="/images/2024-02-18-render-delegation-react-component/handmade-slottable.png" width="70%" caption="아주 잘 동작한다" />
 
-# TypeScript에서 구현
+## TypeScript 지원
 
-이제 TypeScript에서 구현해 보자. 타입을 신경써야 해서 구현이 복잡하지 않을까 싶지만 Render Delegation 컴포넌트는 Polymorphic 컴포넌트와 다르게 변형할 컴포넌트가 코드에서 분리되기 때문에 타입 추론이 쉽다. 그래서 TypeScript에서 구현하는 것은 JavaScript 구현과 크게 다르지 않다.
+이번에는 TypeScript으로 작성해 보자. 타입을 신경써야 해서 구현이 복잡하지 않을까 싶지만 Render Delegation 컴포넌트는 Polymorphic 컴포넌트와 다르게 변형할 컴포넌트가 코드에서 분리되기 때문에 타입 추론이 쉽다. 그래서 TypeScript로 구현하는 것은 JavaScript 구현과 크게 다르지 않다.
 
 먼저 Slot 컴포넌트에 타입을 붙이면서 다시 구현해 보자.
 
@@ -557,13 +557,16 @@ export const Slot = ({ children, ...props }: SlotProps) => {
   </a>
 </Button>
 ```
-<figcaption>어디에 `ref`를 넣어야할까?</figcaption>
+<figcaption style={{marginTop:-12}}>어디에 `ref`를 넣어야할까?</figcaption>
 
-이런 경우 정답은 없다. 정답이 되도록 규칙을 만드는 것이 더 좋은 방법이다. 참고로 Radix에서는 부모 컴포넌트에 `ref`를 붙이도록 규칙을 정했다. 이 글에서도 Radix와 같은 규칙을 따를 것이다.
+Radix에서는 어느 쪽에 붙이더라도 `asChild`를 사용한다면 같은 결과를 얻을 수 있다. 하지만 타입 추론 문제로 인해 `asChild`를 사용하는 경우 자식 컴포넌트에 `ref`를 붙이고 `asChild`를 사용하지 않으면 부모 컴포넌트에 `ref`를 사용하게 된다. 만약 타입 추론이 필요없다면 어느 쪽에 붙여도 상관 없다.
+
+아래 코드는 Radix에서 제공하는 코드를 참고한 것이다. 한 번 살펴보자.
 
 ```tsx
 type PossibleRef<T> = React.Ref<T> | undefined;
 
+// ref를 설정하는 함수
 function setRef<T>(ref: PossibleRef<T>, value: T) {
   if (typeof ref === "function") {
     ref(value);
@@ -572,10 +575,157 @@ function setRef<T>(ref: PossibleRef<T>, value: T) {
   }
 }
 
+// ref를 합성하는 함수
 function composeRefs<T>(...refs: PossibleRef<T>[]) {
   return (node: T) => refs.forEach((ref) => setRef(ref, node));
 }
 ```
+
+위 코드를 보면 `ref`를 설정하는 `setRef` 함수와 여러 `ref`를 합성하여 하나의 `ref`를 만드는 `composeRefs` 함수가 있다. 이제 이를 이용하여 `Slot` 컴포넌트에 `ref`를 설정할 수 있도록 구현해보자.
+
+```tsx
+/**
+ * Slot.tsx
+ */
+
+// forwardRef로 감싸서 ref를 받아올 수 있도록 만든다.
+export const Slot = React.forwardRef<any, SlotProps>((props, ref) => {
+  const { children, ...slotProps } = props;
+  const childrenArray = React.Children.toArray(children);
+  const slottable = childrenArray.find(isSlottable);
+
+  if (slottable) {
+    // ...
+
+    return React.isValidElement(newElement)
+      ? React.cloneElement(
+          newElement,
+          {
+            ...slotProps,
+            ...newElement.props,
+            // forwardRef로 받아온 ref가 있고 자식 컴포넌트에 ref가 있다면 합성한다.
+            // forwardRef로 받아온 ref가 없다면 자식 컴포넌트의 ref를 넣어준다.
+            ref: ref ? composeRefs(ref, (newElement as any).ref) : (newElement as any).ref,
+          },
+          newChildren
+        )
+      : null;
+  }
+
+  if (React.isValidElement(children)) {
+    return React.cloneElement(children, {
+      ...props,
+      ...children.props,
+      // 이곳에도 마찬가지로 ref를 설정한다.
+      ref: ref ? composeRefs(ref, (newElement as any).ref) : (newElement as any).ref,
+    });
+  }
+
+  console.warn("Slot component should have only one React element as a child");
+
+  return null;
+});
+```
+
+위와 같이 코드를 작성했다면 `Button` 컴포넌트도 `ref`를 받을 수 있게 수정해보자.
+
+```tsx
+/**
+ * Button.tsx
+ */
+
+import React from "react";
+import { AsChildProps, Slot } from "./Slot";
+import { Slottable } from "./Slottable";
+
+interface Props {
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+  onClick?: () => void;
+}
+
+export type ButtonProps = AsChildProps<Props>;
+
+                      /* 우선 ref 타입을 any로 설정했다 */
+export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
+  const { asChild, children, icon } = props;
+  const Element = asChild ? Slot : "button";
+  return (
+    <Element
+      ref={ref}
+      style={{
+        padding: "10px",
+        border: "1px solid #000",
+        borderRadius: "5px",
+        backgroundColor: "transparent",
+        fontSize: 12,
+      }}
+    >
+      {icon}
+      <Slottable>{children}</Slottable>
+    </Element>
+  );
+});
+```
+
+이어서 잘 돌아가는지 확인해보자.
+
+```tsx
+/**
+ * App.tsx
+ */
+
+import { useEffect, useRef } from "react";
+import { Button } from "./components/Button";
+
+const Icon = () => <span>🔴</span>;
+
+const App = () => {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const parentRef = useRef<HTMLAnchorElement>(null);
+  const childRef = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    console.log(buttonRef.current, parentRef.current, childRef.current);
+    console.log(buttonRef.current === parentRef.current, parentRef.current === childRef.current);
+  }, []);
+
+  return (
+    <div>
+      <Button icon={<Icon />} ref={buttonRef}>
+        This is button
+      </Button>
+
+      <Button icon={<Icon />} asChild ref={parentRef}>
+        <a href="https://kciter.so" ref={childRef}>
+          This is link
+        </a>
+      </Button>
+    </div>
+  );
+};
+
+export default App;
+```
+
+로그를 확인해보면 다음과 같이 잘 동작하는 것을 확인할 수 있다.
+
+<Image src="/images/2024-02-18-render-delegation-react-component/ref-log.png" caption="ref가 잘 설정된 것을 확인할 수 있다" />
+
+만약 `Button` 컴포넌트에 `ref` 타입을 명시해준다면 부모 컴포넌트에 자식 컴포넌트 `ref` 타입인 `HTMLAnchorElement`을 사용할 수 없다.
+
+```tsx
+/**
+ * Button.tsx
+ */
+
+type ButtonElement = React.ElementRef<'button'>;
+export const Button = React.forwardRef<ButtonElement, ButtonProps>((props, ref) => {
+  // ...
+});
+```
+
+<Image src="/images/2024-02-18-render-delegation-react-component/cannot-type-inference.png" caption="위 코드와 같이 변경하면 타입 에러가 발생한다" />
 
 ## prop 병합 문제
 
@@ -583,27 +733,149 @@ function composeRefs<T>(...refs: PossibleRef<T>[]) {
 
 ```tsx
 <Button type="primary" asChild>
-  <Anchor varient="" href="https://kciter.so">
+  <Anchor type="underline" href="https://kciter.so">
     Click me!
   </Anchor>
 </Button>
 ```
 
-# 고급 사용법
+지금까지 작성한 코드로는 무조건 자식 컴포넌트가 부모 컴포넌트의 `prop`을 덮어쓰게 된다. 예를 들어 다음과 같은 코드를 작성했다고 가정해보자.
 
-## 다중 결합
+```tsx
+<Button icon={<Icon />} onClick={() => alert("Hi!")} asChild>
+  <a onClick={() => alert("Hello!")} ref={childRef}>
+    Show alert
+  </a>
+</Button>
+```
+
+만약 위 코드에서 주입된 두 `onClick`이 같이 실행되길 원한다면 지금까지 구현한 코드로는 불가능하다. 이처럼 어떤 `prop`은 특별한 규칙을 가져야 할 수도 있다. 이런 경우를 위해 `Slot` 컴포넌트에 `prop`을 병합하는 함수을 추가해보자. 다음 코드 또한 Radix에서 사용되는 코드다. 이해를 위해 필자가 몇 가지 주석을 추가했다. 한 번 살펴보자.
+
+```tsx
+type AnyProps = Record<string, any>;
+
+function mergeProps(slotProps: AnyProps, childProps: AnyProps) {
+  // 우선 Child prop을 넣어준다
+  const overrideProps = { ...childProps };
+
+  // Child prop을 순회하면서
+  for (const propName in childProps) {
+    const slotPropValue = slotProps[propName];
+    const childPropValue = childProps[propName];
+
+    const isHandler = /^on[A-Z]/.test(propName);
+    
+    // on으로 시작되는 이벤트 핸들러일 때
+    if (isHandler) {
+      // 둘 다 존재하는 경우 두 핸들러가 같이 실행될 수 있도록 합쳐준다
+      if (slotPropValue && childPropValue) {
+        overrideProps[propName] = (...args: unknown[]) => {
+          childPropValue(...args);
+          slotPropValue(...args);
+        };
+      }
+      // 만약 Slot에만 존재하면 그것만 사용한다
+      else if (slotPropValue) {
+        overrideProps[propName] = slotPropValue;
+      }
+    }
+    // style prop인 경우 Slot과 Child의 style을 합쳐준다
+    else if (propName === 'style') {
+      overrideProps[propName] = { ...slotPropValue, ...childPropValue };
+    }
+    // className prop도 마찬가지로 합쳐준다
+    else if (propName === 'className') {
+      overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(' ');
+    }
+  }
+
+  // slotProps과 앞서 만들어준 overrideProps를 합쳐준다
+  // Spread 연산자를 사용했기에 같은 이름이라면 overrideProps가 덮어쓴다
+  return { ...slotProps, ...overrideProps };
+}
+```
+
+위 함수를 이용해 `Slot` 컴포넌트를 수정해보자.
+
+```tsx
+/**
+ * Slot.tsx
+ */
+
+export const Slot = React.forwardRef<any, SlotProps>((props, ref) => {
+  // ...
+
+  if (slottable) {
+    // ...
+    return React.isValidElement(newElement)
+      ? React.cloneElement(
+          newElement,
+          {
+            // Slot의 prop과 자식 컴포넌트의 prop을 병합한다
+            ...mergeProps(slotProps, newElement.props) as any,
+            ref: ref ? composeRefs(ref, (newElement as any).ref) : (newElement as any).ref,
+          },
+          newChildren
+        )
+      : null;
+  }
+
+  if (React.isValidElement(children)) {
+    return React.cloneElement(children, {
+      // 여기도 추가해준다
+      ...mergeProps(slotProps, children.props) as any,
+      ref: ref ? composeRefs(ref, (children as any).ref) : (children as any).ref,
+    });
+  }
+
+  // ...
+
+  return null;
+});
+```
+
+그리고 다음과 같은 코드로 테스트해보자.
+
+```tsx
+/**
+ * App.tsx
+ */
+
+import { Button } from "./components/Button";
+
+const App = () => {
+  // ...
+
+  return (
+    <div>
+      {/* ... */}
+      <Button icon={<Icon />} onClick={() => alert("Hi!")} asChild>
+        <a onClick={() => alert("Hello!")} ref={childRef}>
+          Show alert
+        </a>
+      </Button>
+    </div>
+  );
+};
+
+export default App;
+```
+
+위 코드를 작성한 후 버튼을 클릭하면 두 번의 알림이 뜨는 것을 확인할 수 있다. 다만, 이러한 병합 규칙은 코드를 보는게 아니라면 알 수 없다. 따라서 이런 경우에는 만들어 둔 **병합 함수의 규칙을 확실히 전파**할 필요가 있다.
 
 # Polymorphic vs Render Delegation
 
-https://sandroroth.com/blog/react-polymorphic-components/
-https://github.com/ariakit/ariakit/issues/1245
-https://www.bekk.christmas/post/2023/01/polymorphism-in-react
+이전에 다룬 Polymorphic과 Render Delegation 중 어떤 것을 사용해야 할지 고민이 될 수 있다. 둘 다 해결하려는 목적은 비슷한지만 사용하는 방법이 다르고 각각 장단점이 있다.
 
-## 모호성 문제
+가독성 측면에서 Render Delegation은 두 컴포넌트를 확실하게 분리하기 때문에 어디에 어떤 `prop`이 사용되는지 확실하게 알 수 있다. 반면 Polymorphic은 컴포넌트를 하나로 통합하기 때문에 어떤 컴포넌트의 `prop`인지 알기 어려운 경우가 있다. 반면 컴포넌트 구성이 복잡하지 않고 완전 대체가 가능한 경우에는 Polymorphic이 더 간단하게 사용할 수 있다. 예를 들어, `Header`라는 컴포넌트가 있고 `as`를 사용하여 `h1`로 변경하거나 `h2`로 변경하는 경우에는 Polymorphic이 더 직관적일 수 있다.
 
-## 자동 완성 성능
+그래서 필자가 생각하기에 Polymorphic은 **컴포넌트 전체를 감싸는 것을 변경**하는 경우에 적합하다. 예를 들어 버튼 컴포넌트에서 `button`으로 사용되는 DOM을 `a`로 변경하거나 `input[type=submit]`으로 변경하는 것이다. 반면 Render Delegation은 **컴포넌트의 일부분을 위임**하는 것에 적합하다.
 
-## 타입 추론 문제
+이 외에도 몇 가지 논의할 주제가 있다. 타입 추론에 대한 성능이나 코드의 복잡도, 렌더링 속도 등이다. Polymorphic 컴포넌트는 타입 구성이 복잡하기에 투입 추론에 대한 성능이 느리다. 반면 Render Delegation은 그에 비해 간단하기 때문에 타입 추론이 빠르다. 이는 자동 완성 성능에도 영향이 있으므로 생산성에 영향을 미칠 수 있는 문제다. 이런 문제에 더 관심이 있다면 다음 링크도 한 번 살펴보면 좋다.
+
+* https://github.com/ariakit/ariakit/issues/1245
+* https://sandroroth.com/blog/react-polymorphic-components/
+* https://www.bekk.christmas/post/2023/01/polymorphism-in-react
 
 # 마치며
 
