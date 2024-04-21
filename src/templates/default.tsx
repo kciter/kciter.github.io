@@ -5,6 +5,8 @@ import { Helmet } from "react-helmet";
 import "../assets/styles/prismjs-theme.css";
 import "../assets/styles/main.css";
 
+import { Global, css } from "@emotion/react"
+
 interface DefaultTemplateProps {
   children: React.ReactNode;
 }
@@ -12,6 +14,8 @@ interface DefaultTemplateProps {
 const DefaultTemplate = ({ children }: DefaultTemplateProps) => {
   return (
     <>
+      <Global styles={globalStyles} />
+
       <Helmet>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="utf-8" />
@@ -49,3 +53,39 @@ const DefaultTemplate = ({ children }: DefaultTemplateProps) => {
 };
 
 export default DefaultTemplate;
+
+const globalStyles = css`
+html {
+  text-size-adjust: none;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  font-size: 16px;
+  color: #212b36;
+  line-height: 1.75rem;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0px;
+    z-index: -100;
+    background-image: url(/header-gradient.svg);
+    background-repeat: no-repeat;
+    background-position: center top, center bottom;
+    background-size: 1400px;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 30em) {
+    body {
+      font-size: 14px;
+      line-height: 1.5rem;
+    }
+    body h1 {
+      font-size: 1.5rem;
+    }
+  }
+}
+`

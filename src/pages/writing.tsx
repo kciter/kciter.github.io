@@ -4,6 +4,7 @@ import SEO from "@components/SEO";
 import Posts from "@components/Posts";
 
 const Index = () => {
+
   return (
     <DefaultTemplate>
       <SEO title="Writing" />

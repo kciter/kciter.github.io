@@ -14,6 +14,7 @@ export default {
     author: `Lee Sun-Hyoup`,
   },
   plugins: [
+    `gatsby-plugin-emotion`,
     `gatsby-plugin-tsconfig-paths`,
     `gatsby-plugin-react-helmet`,
     {
@@ -44,29 +45,6 @@ export default {
         path: `${__dirname}/src/posts`,
       },
     },
-    // {
-    //   resolve: `gatsby-transformer-remark`,
-    //   options: {
-    //     footnotes: true,
-    //     gfm: true,
-    //     plugins: [
-    //       {
-    //         resolve: `gatsby-remark-autolink-headers`,
-    //         options: {
-    //           className: `anchor-header`,
-    //           maintainCase: false,
-    //           removeAccents: true,
-    //           elements: [`h1`, `h2`, `h3`, `h4`],
-    //         },
-    //       },
-    //       {
-    //         resolve: "gatsby-remark-images",
-    //         options: { maxWidth: 1300, showCaptions: ["alt"] },
-    //       },
-    //       `gatsby-remark-prismjs`,
-    //     ],
-    //   },
-    // },
     {
       resolve: `gatsby-plugin-mdx`,
       options: {
@@ -88,15 +66,6 @@ export default {
           ],
         },
         gatsbyRemarkPlugins: [
-          // {
-          //   resolve: `gatsby-remark-autolink-headers`,
-          //   options: {
-          //     className: `anchor-header`,
-          //     maintainCase: false,
-          //     removeAccents: true,
-          //     elements: [`h1`, `h2`, `h3`, `h4`],
-          //   },
-          // },
           {
             resolve: "gatsby-remark-images",
             options: { maxWidth: 1300, showCaptions: ["alt"] },
