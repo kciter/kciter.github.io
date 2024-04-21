@@ -32,25 +32,6 @@ const PostFooter = ({ tags, comment }: PostFooterProps) => {
           <div id="comments">
             <Giscus repo="kciter/kciter.github.io" theme="light" />
           </div>
-
-          {/* <script
-            async
-            dangerouslySetInnerHTML={{
-              __html: `
-$(function() {
-  $('#comment-button').click(function () {
-    $('#comments').toggle();
-
-    if ($('#comments').css('display') === 'block') {
-      $('#comment-button').text('댓글 닫기');
-    } else {
-      $('#comment-button').text('댓글 열기');
-    }
-  });
-});
-`,
-            }}
-          /> */}
         </>
       )}
     </>
