@@ -6,6 +6,7 @@ import "../assets/styles/prismjs-theme.css";
 import "../assets/styles/main.css";
 
 import { Global, css } from "@emotion/react"
+import styled from "@emotion/styled";
 
 interface DefaultTemplateProps {
   children: React.ReactNode;
@@ -41,13 +42,13 @@ const DefaultTemplate = ({ children }: DefaultTemplateProps) => {
         />
       </Helmet>
 
-      <div className="container">
+      <Container>
         <Header />
 
         <div className="post-container">{children}</div>
 
         <Footer />
-      </div>
+      </Container>
     </>
   );
 };
@@ -88,4 +89,15 @@ body {
     }
   }
 }
+`
+
+const Container = styled.div`
+  padding-top: 16px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 715px;
+  
+  @media (max-width: 768px) {
+    width: 90vw;
+  }
 `

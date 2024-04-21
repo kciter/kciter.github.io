@@ -1,4 +1,4 @@
-import Avatar from "@components/Avatar";
+import styled from "@emotion/styled";
 import React from "react";
 
 interface Sponsor {
@@ -47,10 +47,11 @@ const sponsors: Sponsor[] = [
 
 const SpecialThanks = () => {
   return (
-    <div className="special-thanks">
-      <h3>이 글을 후원해주신 고마운 분들</h3>
-      <div className="sponsors">
-        <div className="avatars">
+    <Container>
+      <Title>이 글을 후원해주신 고마운 분들</Title>
+
+      <SponsorContainer>
+        <Sponsors>
           {sponsors.map(sponser => (
             <a
               key={sponser.name}
@@ -58,19 +59,63 @@ const SpecialThanks = () => {
               target="_blank"
               style={{ marginRight: 4 }}
             >
-              <Avatar src={sponser.avatar} alt={sponser.name} />
+              <Sponsor src={sponser.avatar} alt={sponser.name} />
             </a>
           ))}
-        </div>
+        </Sponsors>
+
         <iframe
           src="https://github.com/sponsors/kciter/button"
           title="Sponsor kciter"
           style={{ border: 0 }}
           className="sponser-button"
         ></iframe>
-      </div>
-    </div>
+      </SponsorContainer>
+    </Container>
   );
 };
 
 export default SpecialThanks;
+
+const Container = styled.div`
+  margin-bottom: 8px;
+`;
+
+const Title = styled.div`
+  margin-top: 48px;
+  color: #454f5b;
+  margin: 8px 0;
+  font-size: 1.3em;
+  font-weight: bold;
+`;
+
+const SponsorContainer = styled.div`
+  display: flex;
+
+  .sponser-button {
+    width: 120px;
+    height: 32px;
+    border-radius: 7px;
+    background-color: white;
+    color-scheme: light;
+  }
+`;
+
+const Sponsors = styled.div`
+  display: flex;
+  flex: 1;
+
+  @media (max-width: 30rem) {
+    a:not(:first-of-type) {
+      margin-left: -16px;
+    }
+  }
+`;
+
+const Sponsor = styled.img`
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+`;

@@ -11,6 +11,7 @@ import $ from "jquery";
 import { useEffect } from "react";
 import { useState } from "react";
 import Series from "@components/Series";
+import styled from "@emotion/styled";
 
 dayjs.extend(require("dayjs/plugin/localizedFormat"));
 
@@ -119,7 +120,7 @@ const PostTemplate = ({ data, location, pageContext, children }: PageProps) => {
 
       <div className="post-content">
         {draft ? (
-          <div className="not-yet-published">Not yet published</div>
+          <NotYetPublished>Not yet published</NotYetPublished>
         ) : (
           children
         )}
@@ -179,3 +180,10 @@ export const pageQuery = graphql`
     }
   }
 `;
+
+const NotYetPublished = styled.div`
+  margin: 16px 0;
+  font-weight: bold;
+  font-size: 20px;
+  text-align: center;
+`

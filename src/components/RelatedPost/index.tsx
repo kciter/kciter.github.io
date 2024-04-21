@@ -1,3 +1,4 @@
+import styled from "@emotion/styled";
 import { graphql, useStaticQuery } from "gatsby";
 import React from "react";
 
@@ -9,23 +10,63 @@ interface RelatedPostProps {
 
 const RelatedPost = ({ posts, current, style }: RelatedPostProps) => {
   return (
-    <div className="related" style={style}>
-      <div className="related-posts">
+    <Container style={style}>
+      <Posts>
         {posts.map(
           (post: any) =>
             post.node.fields.slug !== current && (
-              <div className="related-post" key={post.node.fields.slug}>
+              <Post key={post.node.fields.slug}>
                 <a href={post.node.fields.slug}>
                   <img src={post.node.frontmatter.image} />
-                  <div className="title">{post.node.frontmatter.title}</div>
+                  <Title>{post.node.frontmatter.title}</Title>
                   <small>{post.node.fields.date}</small>
                 </a>
-              </div>
+              </Post>
             )
         )}
-      </div>
-    </div>
+      </Posts>
+    </Container>
   );
 };
 
 export default RelatedPost;
+
+const Container = styled.div`
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+`
+
+const Posts = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  row-gap: 10px;
+	column-gap: 20px;
+
+  @media (max-width: 30rem) {
+    grid-template-columns: 1fr;
+  }
+`
+
+const Post = styled.div`
+  img {
+    height: 140px;
+    object-fit: cover;
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.05);
+
+    @media (max-width: 30rem) {
+      width: 100%
+    }
+  }
+
+  a {
+    text-decoration: none;
+  }
+`
+
+const Title = styled.div`
+  margin-top: 12px;
+  /* font-family: serif; */
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 100;
+`

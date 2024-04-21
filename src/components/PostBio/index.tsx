@@ -15,8 +15,8 @@ const PostBio = () => {
             @kciter
           </a>
         </div>
-        <div className="description">
-          제가 쓴 글이 당신에게 가치있는 지식이 되기를 바랍니다 / CoBalt. CTO.
+        <div className="description" style={{lineHeight: 1.2}}>
+          가치있는 지식이 되기를 바랍니다 / CoBalt. CTO.
         </div>
         <div className="socials">
           <Social />
