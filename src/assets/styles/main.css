@@ -28,7 +28,7 @@ body::before {
   background-repeat: no-repeat;
   background-position: center top, center bottom;
   background-size: 1400px;
-  opacity: 0.4;
+  opacity: 0.5;
 }
 
 @media (max-width: 30em) {
@@ -87,6 +87,12 @@ a:hover {
 }
 
 img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+video {
   max-width: 100%;
   height: auto;
   border-radius: 5px;
