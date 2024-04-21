@@ -1,6 +1,7 @@
 import React from "react";
 import Social from "@components/Social";
 import { Link } from "gatsby";
+import styled from "@emotion/styled";
 
 const Header = () => {
   const menus = [
@@ -10,30 +11,109 @@ const Header = () => {
   ];
 
   return (
-    <header className="masthead">
-      <h3 className="masthead-title">
-        <a href="/" style={{ marginRight: 5 }}>
-          kciter.so
-        </a>
-        <small className="masthead-subtitle">devlog</small>
-        <div className="menu">
-          <nav className="menu-content">
-            <a href="https://kciter.so/resume" target="_blank">
-              Résumé
-            </a>
-            {menus.map(item => (
-              <React.Fragment key={item.name}>
-                <Link to={item.path}>{item.name}</Link>
-              </React.Fragment>
-            ))}
-          </nav>
-          <nav className="social-icons">
-            <Social />
-          </nav>
-        </div>
-      </h3>
-    </header>
+    <Container>
+      <TitleContainer>
+        <Title>kciter.so</Title>
+        <Subtitle>devlog</Subtitle>
+      </TitleContainer>
+      
+      <MenuContainer>
+        <Menu>
+          <a href="https://kciter.so/resume" target="_blank">
+            Résumé
+          </a>
+          {menus.map(item => (
+            <React.Fragment key={item.name}>
+              <Link to={item.path}>{item.name}</Link>
+            </React.Fragment>
+          ))}
+        </Menu>
+
+        <SocialIcons>
+          <Social />
+        </SocialIcons>
+      </MenuContainer>
+    </Container>
   );
 };
 
 export default Header;
+
+const Container = styled.div`
+  padding-bottom: 0.5rem;
+  margin-bottom: 4rem;
+  font-family: "Quattrocento Sans", sans-serif;
+
+  margin-left: -16px;
+  margin-right: -16px;
+  background-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(44px);
+  padding: 10px 16px;
+  border-radius: 12px;
+
+  @media (max-width: 30rem) {
+    margin-top: -16px;
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-bottom: 32px;
+    border-radius: 0;
+    grid-template-columns: 1fr;
+    background: none;
+  }
+`
+
+const TitleContainer = styled.div`
+  width: 100%;
+  margin-top: 16px;
+`
+
+const Title = styled.a`
+  font-size: 2rem;
+  font-weight: 900;
+  text-decoration: none;
+  color: #505050;
+  margin-right: 5px;
+
+  &:hover {
+    color: black;
+  }
+`
+
+const Subtitle = styled.small`
+  color: #999;
+`
+
+const MenuContainer = styled.nav`
+  width: 100%;
+  padding-top: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+
+  
+`
+
+const Menu = styled.div`
+  a {
+    color: black;
+    font-size: 1rem;
+    padding-right: 15px;
+    text-decoration: none;
+
+    &:last-of-type {
+      padding-right: 0;
+    }
+  }
+`
+
+const SocialIcons = styled.div`
+  a {
+    color: #999;
+    font-size: 1rem;
+  }
+
+  @media (max-width: 30em) {
+    a {
+      color: black;
+    }
+  }
+`

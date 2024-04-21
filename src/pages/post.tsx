@@ -1,6 +1,6 @@
 import React, { useLayoutEffect } from "react";
 import { graphql, PageProps, useStaticQuery } from "gatsby";
-import DefaultTemplate from "./default";
+import DefaultTemplate from "@templates/default";
 import SEO from "@components/SEO";
 import dayjs from "dayjs";
 import PostFooter from "@components/PostFooter";

@@ -11,7 +11,7 @@ interface PostFooterProps {
 const PostFooter = ({ tags, comment }: PostFooterProps) => {
   return (
     <>
-      <div id="page-footer">
+      <div>
         {tags && (
           <div id="tags">
             {tags.map(tag => (
