@@ -78,7 +78,7 @@ body {
     opacity: 0.4;
   }
 
-  @media (max-width: 30em) {
+  @media (max-width: 768px) {
     body {
       font-size: 14px;
       line-height: 1.5rem;

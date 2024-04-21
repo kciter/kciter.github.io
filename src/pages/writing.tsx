@@ -57,10 +57,13 @@ const Index = () => {
               </PostClock>
             </Inner>
           </PostMeta>
-          <PostContent>
+          <PostContent recent={dayjs(post.node.fields.date).isAfter(dayjs().subtract(1, "month"))}>
             <Inner style={{
-              transform: post.node.frontmatter.tags.length > 0 ? "translateY(-5px)" : "translateY(-10px)"
+              transform: post.node.frontmatter.tags.length > 0 ? "translateY(-14px)" : "translateY(-10px)"
             }}>
+              <PostDateMobile>
+                {dayjs(post.node.fields.date).locale("en").format("ll")}
+              </PostDateMobile>
               {post.node.frontmatter.tags.length > 0 && (
                 <PostTags>
                   {post.node.frontmatter.tags.map((tag: string) => (
@@ -97,12 +100,20 @@ const Post = styled.div`
   padding: 0;
   list-style: none;
   line-height: 26px;
+
+  @media (max-width: 768px) {
+    height: 440px;
+  }
 `
 
 const PostMeta = styled.div`
   width: 15%;
   padding-right: 24px;
   text-align: right;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `
 
 const PostDate = styled.div`
@@ -111,20 +122,32 @@ const PostDate = styled.div`
   color: #444;
 `
 
+const PostDateMobile = styled.div`
+  display: none;
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 4px;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+`
+
 const PostClock = styled.div`
   font-size: 10px;
   color: #aaa;
   line-height: 1.6;
 `
 
-const PostContent = styled.div`
+const PostContent = styled.div<{ recent: boolean }>`
   position: relative;
   flex: 1;
   padding-left: 24px;
   border-left: 1px solid #ddd;
 
-  &:before {
-    background: #666;
+  &::before {
+    background: ${(props) => props.recent ? '#00CB8C' : '#888'};
     border: 1px solid #eee;
     content: "";
     display: block;
@@ -138,7 +161,7 @@ const PostContent = styled.div`
 `
 
 const PostTags = styled.div`
-  display: flex;
+  display: block;
   width: 100%;
   margin-bottom: 8px;
 `
@@ -155,6 +178,9 @@ const PostTag = styled.div`
   border-radius: 50px;
   border: 1px solid #dfe3e8;
   /* cursor: pointer; */
+  word-wrap: normal;
+  word-break: keep-all;
+  background-color: white;
 `
 
 const PostTitle = styled.h1`
@@ -178,4 +204,8 @@ const ThumbnailImage = styled.img`
 const Inner = styled.div`
   display: block;
   transform: translateY(-10px);
+
+  @media (max-width: 768px) {
+    transform: translateY(-12px) !important;
+  }
 `

@@ -156,6 +156,7 @@ sup {
   margin: 0;
   padding: 0;
   border: none;
+  line-height: 1.2;
 }
 
 .post-date {
@@ -302,11 +303,7 @@ th, td {
 
 .fa-envelope {
   padding: 5px;
-	-o-transition:.5s;
-  	-ms-transition:.5s;
-  	-moz-transition:.5s;
-  	-webkit-transition:.5s;
-  	transition: .5s;
+  transition: .5s;
 }
 
 .fa-envelope:hover {
@@ -315,11 +312,7 @@ th, td {
 
 .fa-twitter {
   padding: 5px;
-	-o-transition:.5s;
-  	-ms-transition:.5s;
-  	-moz-transition:.5s;
-  	-webkit-transition:.5s;
-  	transition: .5s;
+	transition: color .5s;
 }
 
 .fa-twitter:hover {
@@ -328,11 +321,7 @@ th, td {
 
 .fa-instagram {
   padding: 5px;
-	-o-transition:.5s;
-  	-ms-transition:.5s;
-  	-moz-transition:.5s;
-  	-webkit-transition:.5s;
-  	transition: .5s;
+	transition: color .5s;
 }
 
 .fa-instagram:hover {
@@ -341,11 +330,7 @@ th, td {
 
 .fa-github {
   padding: 5px;
-	-o-transition:.5s;
-  	-ms-transition:.5s;
-  	-moz-transition:.5s;
-  	-webkit-transition:.5s;
-  	transition: .5s;
+	transition: color .5s;
 }
 
 .fa-github:hover {
@@ -354,11 +339,7 @@ th, td {
 
 .fa-linkedin {
   padding: 5px;
-	-o-transition:.5s;
-  	-ms-transition:.5s;
-  	-moz-transition:.5s;
-  	-webkit-transition:.5s;
-  	transition: .5s;
+	transition: color .5s;
 }
 
 .fa-linkedin:hover {
@@ -367,11 +348,7 @@ th, td {
 
 .fa-facebook {
   padding: 5px;
-	-o-transition:.5s;
-  	-ms-transition:.5s;
-  	-moz-transition:.5s;
-  	-webkit-transition:.5s;
-  	transition: .5s;
+	transition: color .5s;
 }
 
 .fa-facebook:hover {
@@ -380,11 +357,7 @@ th, td {
 
 .fa-google-plus {
   padding: 5px;
-	-o-transition:.5s;
-  	-ms-transition:.5s;
-  	-moz-transition:.5s;
-  	-webkit-transition:.5s;
-  	transition: .5s;
+	transition: color .5s;
 }
 
 .fa-google-plus:hover {
@@ -393,11 +366,7 @@ th, td {
 
 .fa-pinterest {
   padding: 5px;
-	-o-transition:.5s;
-  	-ms-transition:.5s;
-  	-moz-transition:.5s;
-  	-webkit-transition:.5s;
-  	transition: .5s;
+	transition: color .5s;
 }
 
 .fa-pinterest:hover {
@@ -406,11 +375,7 @@ th, td {
 
 .fa-medium {
   padding: 5px;
-	-o-transition:.5s;
-  	-ms-transition:.5s;
-  	-moz-transition:.5s;
-  	-webkit-transition:.5s;
-  	transition: .5s;
+	transition: color .5s;
 }
 
 .fa-medium:hover {
@@ -419,11 +384,7 @@ th, td {
 
 .fa-codepen {
   padding: 5px;
-	-o-transition:.5s;
-  	-ms-transition:.5s;
-  	-moz-transition:.5s;
-  	-webkit-transition:.5s;
-  	transition: .5s;
+	transition: color .5s;
 }
 
 .fa-codepen:hover {
@@ -432,11 +393,7 @@ th, td {
 
 .fa-rss-square {
   padding: 5px;
-	-o-transition:.5s;
-  	-ms-transition:.5s;
-  	-moz-transition:.5s;
-  	-webkit-transition:.5s;
-  	transition: .5s;
+	transition: color .5s;
 }
 
 .fa-rss-square:hover {

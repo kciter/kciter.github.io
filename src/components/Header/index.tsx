@@ -73,9 +73,15 @@ const Title = styled.a`
   color: #505050;
   margin-right: 5px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  background-size: 300% 100%;
+  background-position: top left;
+  background-image: linear-gradient(to right, #505050, #505050 33.33333%, #00AB6C 66.66666%, #00CB8C);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 
   &:hover {
-    color: black;
+    background-position: top left 100%;
   }
 `
 
@@ -88,11 +94,12 @@ const MenuContainer = styled.nav`
   padding-top: 0.5rem;
   display: flex;
   justify-content: space-between;
-
-  
 `
 
 const Menu = styled.div`
+  display: flex;
+  align-items: center;
+
   a {
     color: black;
     font-size: 1rem;
@@ -106,6 +113,9 @@ const Menu = styled.div`
 `
 
 const SocialIcons = styled.div`
+  display: flex;
+  align-items: center;
+
   a {
     color: #999;
     font-size: 1rem;
