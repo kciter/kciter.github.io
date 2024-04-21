@@ -65,7 +65,6 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   font-size: 16px;
   color: #212b36;
-  line-height: 1.75rem;
 
   &::before {
     content: "";
@@ -76,7 +75,7 @@ body {
     background-repeat: no-repeat;
     background-position: center top, center bottom;
     background-size: 1400px;
-    opacity: 0.5;
+    opacity: 0.4;
   }
 
   @media (max-width: 30em) {

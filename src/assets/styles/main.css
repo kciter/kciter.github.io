@@ -99,6 +99,7 @@ hr {
 
 .post-container {
   position: relative;
+  line-height: 1.75rem;
   /* margin-bottom: 4rem; */
 }
 

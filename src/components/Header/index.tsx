@@ -13,7 +13,7 @@ const Header = () => {
   return (
     <Container>
       <TitleContainer>
-        <Title>kciter.so</Title>
+        <Title href="/">kciter.so</Title>
         <Subtitle>devlog</Subtitle>
       </TitleContainer>
       
@@ -40,13 +40,12 @@ const Header = () => {
 export default Header;
 
 const Container = styled.div`
-  padding-bottom: 0.5rem;
-  margin-bottom: 4rem;
+  margin-bottom: 40px;
   font-family: "Quattrocento Sans", sans-serif;
 
   margin-left: -16px;
   margin-right: -16px;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(44px);
   padding: 10px 16px;
   border-radius: 12px;
@@ -64,15 +63,16 @@ const Container = styled.div`
 
 const TitleContainer = styled.div`
   width: 100%;
-  margin-top: 16px;
+  margin-top: 8px;
 `
 
 const Title = styled.a`
-  font-size: 2rem;
+  font-size: 32px;
   font-weight: 900;
   text-decoration: none;
   color: #505050;
   margin-right: 5px;
+  cursor: pointer;
 
   &:hover {
     color: black;
