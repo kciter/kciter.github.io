@@ -53,7 +53,7 @@ export const createPages = async ({ graphql, actions }) => {
     }
   `);
 
-  const postTemplate = path.resolve(`src/pages/post.tsx`);
+  const postTemplate = path.resolve(`src/templates/post.tsx`);
 
   result.data.allMdx.edges.forEach(({ node }) => {
     createPage({
