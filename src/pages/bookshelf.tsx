@@ -82,16 +82,16 @@ interface Props {
 const BookItem = ({ link, coverImage }: Props) => {
   return (
     <ItemContainer>
-      <div style={{ position: "relative" }}>
-        <div style={{ position: "relative" }}>
+      <BookPage>
+        <BookPage>
           <Inner />
           <BookCover to={link}>
             <img src={coverImage} />
             <Effect />
             <Light />
           </BookCover>
-        </div>
-      </div>
+        </BookPage>
+      </BookPage>
     </ItemContainer>
   );
 };
@@ -122,6 +122,10 @@ const Inner = styled.div`
     inset -7px 0 0 #dbdbdb,
     inset -8px 0 0 white,
     inset -9px 0 0 #dbdbdb;
+`;
+
+const BookPage = styled.div`
+  position: relative;
 `;
 
 const BookCover = styled(Link)`

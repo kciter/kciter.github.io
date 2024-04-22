@@ -57,29 +57,33 @@ const Index = () => {
               </PostClock>
             </MetaInner>
           </PostMeta>
-          <PostContent recent={dayjs(post.node.fields.date).isAfter(dayjs().subtract(1, "month"))}>
-            <Link to={post.node.fields.slug} style={{textDecoration: 'none'}}>
-              <ContentInner style={{
-                transform: post.node.frontmatter.tags.length > 0 ? "translateY(-8px)" : "translateY(-10px)"
-              }}>
+          <PostContent
+            recent={dayjs(post.node.fields.date).isAfter(
+              dayjs().subtract(1, "month"),
+            )}
+          >
+            <Link to={post.node.fields.slug} style={{ textDecoration: "none" }}>
+              <ContentInner
+                style={{
+                  marginTop: post.node.frontmatter.tags.length > 0 ? -8 : -10,
+                }}
+              >
                 <PostDateMobile>
                   {dayjs(post.node.fields.date).locale("en").format("ll")}
                 </PostDateMobile>
                 {post.node.frontmatter.tags.length > 0 && (
                   <PostTags>
                     {post.node.frontmatter.tags.map((tag: string) => (
-                      <PostTag key={tag}>
-                        {tag}
-                      </PostTag>
+                      <PostTag key={tag}>{tag}</PostTag>
                     ))}
                   </PostTags>
                 )}
                 <PostTitle>
-                  <Link to={post.node.fields.slug}>{post.node.frontmatter.title}</Link>
+                  <Link to={post.node.fields.slug}>
+                    {post.node.frontmatter.title}
+                  </Link>
                 </PostTitle>
-                <PostDescription>
-                  {post.node.excerpt}
-                </PostDescription>
+                <PostDescription>{post.node.excerpt}</PostDescription>
                 <ThumbnailImage src={post.node.frontmatter.image} />
               </ContentInner>
             </Link>
@@ -104,7 +108,7 @@ const Post = styled.div`
   @media (max-width: 768px) {
     height: 440px;
   }
-`
+`;
 
 const PostMeta = styled.div`
   width: 15%;
@@ -114,13 +118,13 @@ const PostMeta = styled.div`
   @media (max-width: 768px) {
     display: none;
   }
-`
+`;
 
 const PostDate = styled.div`
   font-size: 16px;
   font-weight: bold;
   color: #444;
-`
+`;
 
 const PostDateMobile = styled.div`
   display: none;
@@ -132,13 +136,13 @@ const PostDateMobile = styled.div`
   @media (max-width: 768px) {
     display: block;
   }
-`
+`;
 
 const PostClock = styled.div`
   font-size: 10px;
   color: #aaa;
   line-height: 1.6;
-`
+`;
 
 const PostContent = styled.div<{ recent: boolean }>`
   position: relative;
@@ -148,7 +152,7 @@ const PostContent = styled.div<{ recent: boolean }>`
   min-width: 0%;
 
   &::after {
-    background: ${(props) => props.recent ? '#00a962' : '#888'};
+    background: ${props => (props.recent ? "#00a962" : "#888")};
     border: 1px solid #eee;
     content: "";
     display: block;
@@ -159,8 +163,10 @@ const PostContent = styled.div<{ recent: boolean }>`
     width: 10px;
     border-radius: 12px;
 
-    box-shadow: ${(props) => props.recent ? 'rgb(51, 217, 178) 0px 0px 0px 0px' : 'none'};
-    animation: ${(props) => props.recent ? '2s ease 0s infinite normal none running pulse' : 'none'};
+    box-shadow: ${props =>
+      props.recent ? "rgb(51, 217, 178) 0px 0px 0px 0px" : "none"};
+    animation: ${props =>
+      props.recent ? "2s ease 0s infinite normal none running pulse" : "none"};
 
     @keyframes pulse {
       0% {
@@ -177,7 +183,7 @@ const PostContent = styled.div<{ recent: boolean }>`
       }
     }
   }
-`
+`;
 
 const PostTags = styled.div`
   position: relative;
@@ -187,7 +193,7 @@ const PostTags = styled.div`
   overflow: hidden;
   flex-wrap: nowrap;
   white-space: nowrap;
-  
+
   &::after {
     position: absolute;
     top: 0;
@@ -197,7 +203,7 @@ const PostTags = styled.div`
     height: 100%;
     background-image: linear-gradient(90deg, transparent 0%, white 100%);
   }
-`
+`;
 
 const PostTag = styled.div`
   display: inline-flex;
@@ -217,7 +223,7 @@ const PostTag = styled.div`
   &:last-of-type {
     margin-right: 0;
   }
-`
+`;
 
 const PostTitle = styled.h1`
   font-size: 20px;
@@ -225,48 +231,58 @@ const PostTitle = styled.h1`
   margin: 0;
   margin-bottom: 8px;
   padding: 0;
-`
+`;
 
 const PostDescription = styled.p`
   font-size: 14px;
   line-height: 1.4;
   margin: 0;
   margin-bottom: 8px;
-`
+`;
 
 const ThumbnailImage = styled.img`
   display: block;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-`
+`;
 
 const MetaInner = styled.div`
   display: block;
   transform: translateY(-10px);
-`
+`;
 
 const ContentInner = styled.div`
   display: block;
+  transition: all 333ms ease 0s;
 
   @media (max-width: 768px) {
-    transform: translateY(-12px) !important;
+    margin-top: -12px !important;
   }
 
-  &::before {
-    content: "";
-    border-radius: 16px;
-    display: block;
+  transform: scale3d(1, 1, 1);
+
+  &::after {
     position: absolute;
-    z-index: -1;
-    inset: -2px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    transform: scale(1.04);
+    transition: opacity 2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow:
+      0 8px 17px 0 rgba(0, 0, 0, 0.2),
+      0 6px 20px 0 rgba(0, 0, 0, 0.15);
+    content: "";
     opacity: 0;
-    transform: scale(0.9);
-    transition: all 333ms ease 0s;
-    
-    &:hover {
+    z-index: -1;
+  }
+
+  &:hover {
+    transform: scale3d(1.006, 1.006, 1);
+
+    &::after {
       opacity: 1;
-      background: linear-gradient(135deg, rgba(234, 234, 234, 0.7) 0%, rgba(244, 244, 244, 0.7) 100%);
-      transform: scale(1.04);
     }
   }
-`
+`;
