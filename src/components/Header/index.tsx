@@ -171,7 +171,10 @@ const SocialIcons = styled.div`
   }
 
   @media (max-width: 768px) {
+    /* display: none; */
+
     a {
+      color: black;
       font-size: 0.9rem;
     }
   }

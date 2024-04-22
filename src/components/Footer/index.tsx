@@ -35,7 +35,7 @@ const FooterContainer = styled.footer`
 
 const Copyright = styled.div`
   display: block;
-  margin-top: 3px;
+  margin-top: 16px;
   margin-bottom: 1rem;
   color: #9a9a9a;
   font-family: 'Quattrocento Sans', sans-serif;
