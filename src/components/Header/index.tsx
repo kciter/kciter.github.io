@@ -1,14 +1,36 @@
 import React from "react";
 import Social from "@components/Social";
-import { Link } from "gatsby";
+import { graphql, Link, useStaticQuery } from "gatsby";
 import styled from "@emotion/styled";
+import dayjs from "dayjs";
 
 const Header = () => {
-  const menus = [
-    { name: "Writing", path: "/writing" },
-    // { name: "Snippet", path: "/snippets" },
-    { name: "About", path: "/about" },
-  ];
+  const result = useStaticQuery(graphql`
+    {
+      allMdx(
+        limit: 3
+        sort: { fields: { date: DESC } }
+        filter: {
+          frontmatter: { draft: { ne: true }, hide: { ne: true } }
+        }
+      ) {
+        edges {
+          node {
+            fields {
+              date
+            }
+          }
+        }
+      }
+    }
+  `);
+
+  const posts = result.allMdx.edges;
+  const updated = posts.filter((post: any) => {
+    return dayjs(post.node.fields.date).isAfter(dayjs().subtract(1, "month"));
+  }).length > 0;
+
+  console.log(updated);
 
   return (
     <Container>
@@ -19,14 +41,9 @@ const Header = () => {
       
       <MenuContainer>
         <Menu>
-          <a href="https://kciter.so/resume" target="_blank">
-            Résumé
-          </a>
-          {menus.map(item => (
-            <React.Fragment key={item.name}>
-              <Link to={item.path}>{item.name}</Link>
-            </React.Fragment>
-          ))}
+          <Link to="https://kciter.so/resume" target="_blank" className="item">Résumé</Link>
+          <Link to="/writing" className={`item ${updated ? 'updated' : ''}`}>Writing</Link>
+          <Link to="/about" className="item">About</Link>
         </Menu>
 
         <SocialIcons>
@@ -100,14 +117,46 @@ const Menu = styled.div`
   display: flex;
   align-items: center;
 
-  a {
+  .item {
+    position: relative;
     color: black;
     font-size: 1rem;
-    padding-right: 15px;
+    margin-right: 15px;
     text-decoration: none;
 
     &:last-of-type {
-      padding-right: 0;
+      margin-right: 0;
+    }
+
+    &.updated::before {
+      background: #00a962;
+      border: 1px solid #eee;
+      content: "";
+      display: block;
+      height: 6px;
+      right: -6px;
+      position: absolute;
+      top: -2px;
+      width: 6px;
+      border-radius: 12px;
+
+      box-shadow: rgb(51, 217, 178) 0px 0px 0px 0px;
+      animation: 2s ease 0s infinite normal none running pulse;
+
+      @keyframes pulse {
+        0% {
+          transform: scale(0.95);
+          box-shadow: rgba(51, 217, 178, 0.7) 0px 0px 0px 0px;
+        }
+        70% {
+          transform: scale(1);
+          box-shadow: rgba(51, 217, 178, 0) 0px 0px 0px 6px;
+        }
+        100% {
+          transform: scale(0.95);
+          box-shadow: rgba(51, 217, 178, 0) 0px 0px 0px 0px;
+        }
+      }
     }
   }
 `

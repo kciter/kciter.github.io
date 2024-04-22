@@ -22,6 +22,10 @@ const Link = ({ children, href }: LinkProps) => {
 const About = () => {
   const writings = [
     {
+      href: "https://product.kyobobook.co.kr/detail/S000212233308",
+      text: "리액트 훅을 활용한 마이크로 상태 관리",
+    },
+    {
       href: "http://www.yes24.com/24/goods/56894866",
       text: "Vue.js 이 정도는 알아야지",
     },
@@ -107,8 +111,8 @@ const About = () => {
       <ul>
         <li>
           <strong>Cobalt. Inc.</strong> CTO, 2018. 07 ~ <br />
-          Developed document communicating platform,{" "}
-          <a href="https://present.do">Present</a>
+          Create proposals that impresses wow, streamline workflows, and gain actionable insights to close deals faster.{" "}
+          <a href="https://present.do">REALIZER</a>
         </li>
       </ul>
 
