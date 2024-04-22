@@ -3,7 +3,7 @@ import DefaultTemplate from "@templates/default";
 import SEO from "@components/SEO";
 import RelatedPost from "@components/RelatedPost";
 import Bio from "@components/Bio";
-import { graphql, PageProps, useStaticQuery } from "gatsby";
+import { graphql, Link, PageProps, useStaticQuery } from "gatsby";
 
 const Index = () => {
   const result = useStaticQuery(graphql`
@@ -59,7 +59,8 @@ const Index = () => {
         <h3 style={{ letterSpacing: 2, margin: 0, fontSize: 18 }}>
           RECENT POSTS
         </h3>
-        <a
+        <Link
+          to="/writing"
           style={{
             fontSize: 14,
             fontWeight: 500,
@@ -74,7 +75,7 @@ const Index = () => {
           }}
         >
           All posts ▸
-        </a>
+        </Link>
       </div>
       {posts && <RelatedPost posts={posts} style={{ padding: 0 }} />}
     </DefaultTemplate>
