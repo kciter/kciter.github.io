@@ -99,6 +99,7 @@ const Title = styled.a`
 
   &:hover {
     background-position: top left 100%;
+    font-weight: 700;
   }
 `
 

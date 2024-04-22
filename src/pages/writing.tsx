@@ -158,8 +158,8 @@ const PostContent = styled.div<{ recent: boolean }>`
     width: 10px;
     border-radius: 12px;
 
-    box-shadow: rgb(51, 217, 178) 0px 0px 0px 0px;
-    animation: 2s ease 0s infinite normal none running pulse;
+    box-shadow: ${(props) => props.recent ? 'rgb(51, 217, 178) 0px 0px 0px 0px' : 'none'};
+    animation: ${(props) => props.recent ? '2s ease 0s infinite normal none running pulse' : 'none'};
 
     @keyframes pulse {
       0% {
