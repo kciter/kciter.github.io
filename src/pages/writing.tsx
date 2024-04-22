@@ -145,7 +145,6 @@ const PostContent = styled.div<{ recent: boolean }>`
   flex: 1;
   padding-left: 24px;
   border-left: 1px solid #ddd;
-  overflow: hidden;
   min-width: 0%;
 
   &::after {
