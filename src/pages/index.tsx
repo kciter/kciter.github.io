@@ -37,10 +37,10 @@ const Index = () => {
       result.allMdx.edges
         .sort(
           (a: any, b: any) =>
-            +new Date(b.node.fields.date) - +new Date(a.node.fields.date)
+            +new Date(b.node.fields.date) - +new Date(a.node.fields.date),
         )
         .splice(0, 9),
-    [result]
+    [result],
   );
 
   return (

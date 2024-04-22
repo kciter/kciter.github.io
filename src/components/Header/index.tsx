@@ -10,9 +10,7 @@ const Header = () => {
       allMdx(
         limit: 3
         sort: { fields: { date: DESC } }
-        filter: {
-          frontmatter: { draft: { ne: true }, hide: { ne: true } }
-        }
+        filter: { frontmatter: { draft: { ne: true }, hide: { ne: true } } }
       ) {
         edges {
           node {
@@ -26,11 +24,10 @@ const Header = () => {
   `);
 
   const posts = result.allMdx.edges;
-  const updated = posts.filter((post: any) => {
-    return dayjs(post.node.fields.date).isAfter(dayjs().subtract(1, "month"));
-  }).length > 0;
-
-  console.log(updated);
+  const updated =
+    posts.filter((post: any) => {
+      return dayjs(post.node.fields.date).isAfter(dayjs().subtract(1, "month"));
+    }).length > 0;
 
   return (
     <Container>
@@ -38,12 +35,21 @@ const Header = () => {
         <Title href="/">kciter.so</Title>
         <Subtitle>devlog</Subtitle>
       </TitleContainer>
-      
+
       <MenuContainer>
         <Menu>
-          <Link to="https://kciter.so/resume" target="_blank" className="item">Résumé</Link>
-          <Link to="/writing" className={`item ${updated ? 'updated' : ''}`}>Writing</Link>
-          <Link to="/about" className="item">About</Link>
+          <Link to="https://kciter.so/resume" target="_blank" className="item">
+            Résumé
+          </Link>
+          <Link to="/writing" className={`item ${updated ? "updated" : ""}`}>
+            Writing
+          </Link>
+          <Link to="/bookshelf" className="item">
+            Bookshelf
+          </Link>
+          <Link to="/about" className="item">
+            About
+          </Link>
         </Menu>
 
         <SocialIcons>
@@ -76,12 +82,12 @@ const Container = styled.div`
     grid-template-columns: 1fr;
     background-color: transparent;
   }
-`
+`;
 
 const TitleContainer = styled.div`
   width: 100%;
   margin-top: 8px;
-`
+`;
 
 const Title = styled.a`
   font-size: 32px;
@@ -93,7 +99,13 @@ const Title = styled.a`
   transition: all 0.3s ease;
   background-size: 300% 100%;
   background-position: top left;
-  background-image: linear-gradient(to right, #505050, #505050 33.33333%, #00AB6C 66.66666%, #00CB8C);
+  background-image: linear-gradient(
+    to right,
+    #505050,
+    #505050 33.33333%,
+    #00ab6c 66.66666%,
+    #00cb8c
+  );
   background-clip: text;
   -webkit-text-fill-color: transparent;
 
@@ -101,18 +113,18 @@ const Title = styled.a`
     background-position: top left 100%;
     font-weight: 700;
   }
-`
+`;
 
 const Subtitle = styled.small`
   color: #999;
-`
+`;
 
 const MenuContainer = styled.nav`
   width: 100%;
   padding-top: 0.5rem;
   display: flex;
   justify-content: space-between;
-`
+`;
 
 const Menu = styled.div`
   display: flex;
@@ -160,7 +172,7 @@ const Menu = styled.div`
       }
     }
   }
-`
+`;
 
 const SocialIcons = styled.div`
   display: flex;
@@ -172,11 +184,11 @@ const SocialIcons = styled.div`
   }
 
   @media (max-width: 768px) {
-    /* display: none; */
+    display: none;
 
     a {
       color: black;
       font-size: 0.9rem;
     }
   }
-`
+`;
