@@ -2,7 +2,7 @@ import React from "react";
 import DefaultTemplate from "@templates/default";
 import SEO from "@components/SEO";
 import dayjs from "dayjs";
-import { graphql, useStaticQuery } from "gatsby";
+import { graphql, Link, useStaticQuery } from "gatsby";
 import styled from "@emotion/styled";
 
 dayjs.extend(require("dayjs/plugin/localizedFormat"));
@@ -74,14 +74,14 @@ const Index = () => {
                 </PostTags>
               )}
               <PostTitle>
-                <a href={post.node.fields.slug}>{post.node.frontmatter.title}</a>
+                <Link to={post.node.fields.slug}>{post.node.frontmatter.title}</Link>
               </PostTitle>
               <PostDescription>
                 {post.node.excerpt} <a href={post.node.fields.slug}>Read more</a>
               </PostDescription>
-              <a href={post.node.fields.slug}>
+              <Link to={post.node.fields.slug}>
                 <ThumbnailImage src={post.node.frontmatter.image} />
-              </a>
+              </Link>
             </Inner>
           </PostContent>
         </Post>
@@ -147,7 +147,7 @@ const PostContent = styled.div<{ recent: boolean }>`
   border-left: 1px solid #ddd;
 
   &::before {
-    background: ${(props) => props.recent ? '#00CB8C' : '#888'};
+    background: ${(props) => props.recent ? '#00a962' : '#888'};
     border: 1px solid #eee;
     content: "";
     display: block;
@@ -157,6 +157,24 @@ const PostContent = styled.div<{ recent: boolean }>`
     top: -4px;
     width: 10px;
     border-radius: 12px;
+
+    box-shadow: rgb(51, 217, 178) 0px 0px 0px 0px;
+    animation: 2s ease 0s infinite normal none running pulse;
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: rgba(51, 217, 178, 0.7) 0px 0px 0px 0px;
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: rgba(51, 217, 178, 0) 0px 0px 0px 10px;
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: rgba(51, 217, 178, 0) 0px 0px 0px 0px;
+      }
+    }
   }
 `
 

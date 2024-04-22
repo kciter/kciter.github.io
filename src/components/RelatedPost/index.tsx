@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { graphql, useStaticQuery } from "gatsby";
+import { graphql, Link, useStaticQuery } from "gatsby";
 import React from "react";
 
 interface RelatedPostProps {
@@ -16,11 +16,11 @@ const RelatedPost = ({ posts, current, style }: RelatedPostProps) => {
           (post: any) =>
             post.node.fields.slug !== current && (
               <Post key={post.node.fields.slug}>
-                <a href={post.node.fields.slug}>
+                <Link to={post.node.fields.slug}>
                   <img src={post.node.frontmatter.image} />
                   <Title>{post.node.frontmatter.title}</Title>
                   <small>{post.node.fields.date}</small>
-                </a>
+                </Link>
               </Post>
             )
         )}

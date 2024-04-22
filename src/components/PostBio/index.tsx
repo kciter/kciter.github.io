@@ -1,4 +1,5 @@
 import Social from "@components/Social";
+import { Link } from "gatsby";
 import React from "react";
 
 const PostBio = () => {
@@ -11,9 +12,9 @@ const PostBio = () => {
       <div className="summary">
         <div>
           Written by{" "}
-          <a className="name" href="/about">
+          <Link className="name" to="/about">
             @kciter
-          </a>
+          </Link>
         </div>
         <div className="description" style={{lineHeight: 1.2}}>
           가치있는 지식이 되기를 바랍니다 / CoBalt. CTO.
