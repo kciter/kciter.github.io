@@ -38,6 +38,9 @@ dependencies:
   gatsby-plugin-google-tagmanager:
     specifier: 5.13.1
     version: 5.13.1(gatsby@5.13.4)(react-dom@18.2.0)(react@18.2.0)
+  gatsby-plugin-manifest:
+    specifier: ^5.13.1
+    version: 5.13.1(gatsby@5.13.4)(graphql@16.8.1)
   gatsby-plugin-mdx:
     specifier: 5.13.1
     version: 5.13.1(@mdx-js/react@3.0.1)(gatsby-source-filesystem@5.13.1)(gatsby@5.13.4)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
@@ -50,9 +53,6 @@ dependencies:
   gatsby-plugin-tsconfig-paths:
     specifier: 1.0.6
     version: 1.0.6(gatsby@5.13.4)
-  gatsby-remark-autolink-headers:
-    specifier: 6.13.1
-    version: 6.13.1(gatsby@5.13.4)(react-dom@18.2.0)(react@18.2.0)
   gatsby-remark-images:
     specifier: 7.13.1
     version: 7.13.1(gatsby-plugin-sharp@5.13.1)(gatsby@5.13.4)
@@ -6958,6 +6958,22 @@ packages:
       web-vitals: 1.1.2
     dev: false
 
+  /gatsby-plugin-manifest@5.13.1(gatsby@5.13.4)(graphql@16.8.1):
+    resolution: {integrity: sha512-F8zGMYz2tRDAzQO7hLrYv+xCFyIoeySeGsEk9j1KTdWB4liVQvLtFSXzj7yljyOTinDmA7mDStCiQFStC0rHZQ==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      gatsby: ^5.0.0-next
+    dependencies:
+      '@babel/runtime': 7.24.4
+      gatsby: 5.13.4(babel-eslint@10.1.0)(react-dom@18.2.0)(react@18.2.0)(typescript@5.4.5)
+      gatsby-core-utils: 4.13.1
+      gatsby-plugin-utils: 4.13.1(gatsby@5.13.4)(graphql@16.8.1)
+      semver: 7.6.0
+      sharp: 0.32.6
+    transitivePeerDependencies:
+      - graphql
+    dev: false
+
   /gatsby-plugin-mdx@5.13.1(@mdx-js/react@3.0.1)(gatsby-source-filesystem@5.13.1)(gatsby@5.13.4)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-ZL/z1j8zBzQSqFTEoVdC+jPNpN/CXse2h87wUz78V+BMjp40ccR0DCo62KgF40HVz4iCEYVufqfjQNc0nLoSow==}
     peerDependencies:
@@ -7118,24 +7134,6 @@ packages:
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-    dev: false
-
-  /gatsby-remark-autolink-headers@6.13.1(gatsby@5.13.4)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-nKmmA2n4xJnMV6AR+QPU7eQzjxoseLfGcNlT7k43goPRhDkRgL4DsXOMs8d06ZrAmJf8Wps5LVg+KtUUGBkjxw==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      gatsby: ^5.0.0-next
-      react: ^18.0.0 || ^0.0.0
-      react-dom: ^18.0.0 || ^0.0.0
-    dependencies:
-      '@babel/runtime': 7.24.4
-      gatsby: 5.13.4(babel-eslint@10.1.0)(react-dom@18.2.0)(react@18.2.0)(typescript@5.4.5)
-      github-slugger: 1.5.0
-      lodash: 4.17.21
-      mdast-util-to-string: 2.0.0
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      unist-util-visit: 2.0.3
     dev: false
 
   /gatsby-remark-images@7.13.1(gatsby-plugin-sharp@5.13.1)(gatsby@5.13.4):
@@ -7526,10 +7524,6 @@ packages:
   /github-from-package@0.0.0:
     resolution: {integrity: sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==}
     requiresBuild: true
-    dev: false
-
-  /github-slugger@1.5.0:
-    resolution: {integrity: sha512-wIh+gKBI9Nshz2o46B0B3f5k/W+WI9ZAv6y5Dn5WJ5SK1t0TnDimB4WE5rmTD05ZAIn8HALCZVmCsvj0w0v0lw==}
     dev: false
 
   /github-slugger@2.0.0:
@@ -9347,6 +9341,7 @@ packages:
 
   /mdast-util-to-string@2.0.0:
     resolution: {integrity: sha512-AW4DRS3QbBayY/jJmD8437V1Gombjf8RSOUCMFBuo5iHi58AGEgVCKQ+ezHkZZDpAQS75hcBMpLqjpJTjtUL7w==}
+    dev: true
 
   /mdast-util-to-string@3.2.0:
     resolution: {integrity: sha512-V4Zn/ncyN1QNSqSBxTrMOLpjr+IKdHl2v3KVLoWmDPscP4r9GcCi71gjgvUV1SFSKh92AjAG4peFuBl2/YgCJg==}

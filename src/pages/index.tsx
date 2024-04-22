@@ -32,16 +32,7 @@ const Index = () => {
     }
   `);
 
-  const posts = useMemo(
-    () =>
-      result.allMdx.edges
-        .sort(
-          (a: any, b: any) =>
-            +new Date(b.node.fields.date) - +new Date(a.node.fields.date),
-        )
-        .splice(0, 9),
-    [result],
-  );
+  const posts = result.allMdx.edges;
 
   return (
     <DefaultTemplate>
@@ -77,7 +68,10 @@ const Index = () => {
           All posts ▸
         </Link>
       </div>
-      {posts && <RelatedPost posts={posts} style={{ padding: 0 }} />}
+
+      {posts && (
+        <RelatedPost posts={posts} style={{ padding: 0, paddingTop: 10 }} />
+      )}
     </DefaultTemplate>
   );
 };
