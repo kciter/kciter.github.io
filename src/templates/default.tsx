@@ -90,6 +90,10 @@ body {
     .post-content {
       line-height: 1.8;
     }
+
+    &::before {
+      display: none;
+    }
   }
 }
 `
