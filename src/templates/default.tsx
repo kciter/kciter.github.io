@@ -81,12 +81,14 @@ body {
   }
 
   @media (max-width: 768px) {
-    body {
-      font-size: 14px;
-      line-height: 1.5rem;
-    }
-    body h1 {
+    font-size: 14px;
+
+    h1 {
       font-size: 1.5rem;
+    }
+
+    .post-content {
+      line-height: 1.8;
     }
   }
 }
