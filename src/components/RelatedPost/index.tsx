@@ -39,7 +39,7 @@ const Container = styled.div`
 const Posts = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  row-gap: 10px;
+  row-gap: 20px;
 	column-gap: 20px;
 
   @media (max-width: 30rem) {
@@ -49,6 +49,7 @@ const Posts = styled.div`
 
 const Post = styled.div`
   img {
+    display: block;
     height: 140px;
     object-fit: cover;
     box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.05);
@@ -60,6 +61,26 @@ const Post = styled.div`
 
   a {
     text-decoration: none;
+  }
+
+  position: relative;
+  
+  &::before {
+    content: "";
+    border-radius: 16px;
+    display: block;
+    position: absolute;
+    z-index: -1;
+    inset: -2px;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 333ms ease 0s;
+    
+    &:hover {
+      opacity: 1;
+      background: linear-gradient(135deg, rgba(234, 234, 234, 0.7) 0%, rgba(244, 244, 244, 0.7) 100%);
+      transform: scale(1.04);
+    }
   }
 `
 

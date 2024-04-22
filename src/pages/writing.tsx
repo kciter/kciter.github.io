@@ -47,7 +47,7 @@ const Index = () => {
       {posts.map((post: any) => (
         <Post key={post.node.fields.slug}>
           <PostMeta>
-            <Inner>
+            <MetaInner>
               <PostDate>
                 {dayjs(post.node.fields.date).locale("en").format("ll")}
               </PostDate>
@@ -55,34 +55,34 @@ const Index = () => {
                 <i className="fa fa-clock-o" aria-hidden="true" />{" "}
                 {Math.round(post.node.fields.timeToRead.minutes)} minute read
               </PostClock>
-            </Inner>
+            </MetaInner>
           </PostMeta>
           <PostContent recent={dayjs(post.node.fields.date).isAfter(dayjs().subtract(1, "month"))}>
-            <Inner style={{
-              transform: post.node.frontmatter.tags.length > 0 ? "translateY(-14px)" : "translateY(-10px)"
-            }}>
-              <PostDateMobile>
-                {dayjs(post.node.fields.date).locale("en").format("ll")}
-              </PostDateMobile>
-              {post.node.frontmatter.tags.length > 0 && (
-                <PostTags>
-                  {post.node.frontmatter.tags.map((tag: string) => (
-                    <PostTag key={tag}>
-                      {tag}
-                    </PostTag>
-                  ))}
-                </PostTags>
-              )}
-              <PostTitle>
-                <Link to={post.node.fields.slug}>{post.node.frontmatter.title}</Link>
-              </PostTitle>
-              <PostDescription>
-                {post.node.excerpt} <a href={post.node.fields.slug}>Read more</a>
-              </PostDescription>
-              <Link to={post.node.fields.slug}>
+            <Link to={post.node.fields.slug} style={{textDecoration: 'none'}}>
+              <ContentInner style={{
+                transform: post.node.frontmatter.tags.length > 0 ? "translateY(-8px)" : "translateY(-10px)"
+              }}>
+                <PostDateMobile>
+                  {dayjs(post.node.fields.date).locale("en").format("ll")}
+                </PostDateMobile>
+                {post.node.frontmatter.tags.length > 0 && (
+                  <PostTags>
+                    {post.node.frontmatter.tags.map((tag: string) => (
+                      <PostTag key={tag}>
+                        {tag}
+                      </PostTag>
+                    ))}
+                  </PostTags>
+                )}
+                <PostTitle>
+                  <Link to={post.node.fields.slug}>{post.node.frontmatter.title}</Link>
+                </PostTitle>
+                <PostDescription>
+                  {post.node.excerpt}
+                </PostDescription>
                 <ThumbnailImage src={post.node.frontmatter.image} />
-              </Link>
-            </Inner>
+              </ContentInner>
+            </Link>
           </PostContent>
         </Post>
       ))}
@@ -146,7 +146,7 @@ const PostContent = styled.div<{ recent: boolean }>`
   padding-left: 24px;
   border-left: 1px solid #ddd;
 
-  &::before {
+  &::after {
     background: ${(props) => props.recent ? '#00a962' : '#888'};
     border: 1px solid #eee;
     content: "";
@@ -179,13 +179,13 @@ const PostContent = styled.div<{ recent: boolean }>`
 `
 
 const PostTags = styled.div`
-  display: block;
+  display: flex;
   width: 100%;
   margin-bottom: 8px;
 `
 
 const PostTag = styled.div`
-  display: inline-flex;
+  display: flex;
   justify-content: center;
   align-items: center;
   height: 16px;
@@ -205,25 +205,50 @@ const PostTitle = styled.h1`
   font-size: 20px;
   border: none;
   margin: 0;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   padding: 0;
 `
 
 const PostDescription = styled.p`
   font-size: 14px;
   line-height: 1.4;
+  margin: 0;
+  margin-bottom: 8px;
 `
 
 const ThumbnailImage = styled.img`
+  display: block;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 `
 
-const Inner = styled.div`
+const MetaInner = styled.div`
   display: block;
   transform: translateY(-10px);
+`
+
+const ContentInner = styled.div`
+  display: block;
 
   @media (max-width: 768px) {
     transform: translateY(-12px) !important;
+  }
+
+  &::before {
+    content: "";
+    border-radius: 16px;
+    display: block;
+    position: absolute;
+    z-index: -1;
+    inset: -2px;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 333ms ease 0s;
+    
+    &:hover {
+      opacity: 1;
+      background: linear-gradient(135deg, rgba(234, 234, 234, 0.7) 0%, rgba(244, 244, 244, 0.7) 100%);
+      transform: scale(1.04);
+    }
   }
 `
