@@ -67,7 +67,7 @@ const Container = styled.div`
   padding: 10px 16px;
   border-radius: 12px;
 
-  @media (max-width: 30rem) {
+  @media (max-width: 768px) {
     margin-top: -16px;
     margin-left: -16px;
     margin-right: -16px;
@@ -170,7 +170,7 @@ const SocialIcons = styled.div`
     font-size: 1rem;
   }
 
-  @media (max-width: 30em) {
+  @media (max-width: 768px) {
     a {
       color: black;
     }

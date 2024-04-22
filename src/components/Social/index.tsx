@@ -1,3 +1,4 @@
+import { Link } from "gatsby";
 import React from "react";
 
 const Social = () => {
@@ -14,13 +15,13 @@ const Social = () => {
     <>
       {items.map((item, index) => (
         <React.Fragment key={item.icon}>
-          <a
-            href={item.link}
+          <Link
+            to={item.link}
             target="_blank"
             style={{ marginRight: index !== items.length - 1 ? 5 : undefined }}
           >
             <i className={`fa fa-${item.icon}`} aria-hidden="true" />
-          </a>
+          </Link>
         </React.Fragment>
       ))}
     </>
