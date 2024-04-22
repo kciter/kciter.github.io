@@ -145,6 +145,8 @@ const PostContent = styled.div<{ recent: boolean }>`
   flex: 1;
   padding-left: 24px;
   border-left: 1px solid #ddd;
+  overflow: hidden;
+  min-width: 0%;
 
   &::after {
     background: ${(props) => props.recent ? '#00a962' : '#888'};
@@ -179,16 +181,31 @@ const PostContent = styled.div<{ recent: boolean }>`
 `
 
 const PostTags = styled.div`
+  position: relative;
   display: flex;
-  width: 100%;
+  max-width: 100%;
   margin-bottom: 8px;
+  overflow: hidden;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  
+  &::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    content: "";
+    width: 80px;
+    height: 100%;
+    background-image: linear-gradient(90deg, transparent 0%, white 100%);
+  }
 `
 
 const PostTag = styled.div`
-  display: flex;
+  display: inline-flex;
   justify-content: center;
   align-items: center;
   height: 16px;
+  min-width: 0;
   padding: 0 8px;
   margin-right: 4px;
   font-size: 9px;
@@ -196,9 +213,11 @@ const PostTag = styled.div`
   border-radius: 50px;
   border: 1px solid #dfe3e8;
   /* cursor: pointer; */
-  word-wrap: normal;
-  word-break: keep-all;
   background-color: white;
+
+  &:last-of-type {
+    margin-right: 0;
+  }
 `
 
 const PostTitle = styled.h1`
