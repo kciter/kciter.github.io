@@ -49,6 +49,8 @@ const DefaultTemplate = ({ children }: DefaultTemplateProps) => {
 
         <Footer />
       </Container>
+
+      <Texture />
     </>
   );
 };
@@ -99,4 +101,17 @@ const Container = styled.div`
   @media (max-width: 768px) {
     width: 90vw;
   }
+`
+
+const Texture = styled.div`
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: -99;
+  width: 100%;
+  height: calc(200px + 100vh);
+  opacity: 0.25;
+  pointer-events: none;
+  transform: translateY(0px);
+  filter: contrast(120%) brightness(120%);
 `

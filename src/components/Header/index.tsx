@@ -74,7 +74,7 @@ const Container = styled.div`
     margin-bottom: 32px;
     border-radius: 0;
     grid-template-columns: 1fr;
-    background: none;
+    background-color: transparent;
   }
 `
 
