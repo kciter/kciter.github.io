@@ -8,7 +8,7 @@ const Social = () => {
     { icon: "linkedin", link: "https://www.linkedin.com/in/kciter" },
     { icon: "twitter", link: "https://twitter.com/kciter" },
     // { icon: "envelope", link: "mailto:kciter@naver.com" },
-    // { icon: "rss-square", link: "/feed.xml" },
+    { icon: "rss-square", link: "/feed.xml" },
   ];
 
   return (
