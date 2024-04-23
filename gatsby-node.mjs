@@ -1,5 +1,5 @@
 import readingTime from "reading-time";
-import { createFilePath } from 'gatsby-source-filesystem'
+import { createFilePath } from "gatsby-source-filesystem";
 import path from "path";
 import dayjs from "dayjs";
 
@@ -11,7 +11,7 @@ export const onCreateNode = ({ node, getNode, actions }) => {
     const filename = createFilePath({ node, getNode, basePath: `${type}s` });
 
     const [, date, title] = filename.match(
-      /^\/([\d]{4}-[\d]{2}-[\d]{2})-{1}(.+)\/$/
+      /^\/([\d]{4}-[\d]{2}-[\d]{2})-{1}(.+)\/$/,
     );
 
     const slug = `/${type}s/${title}`;
