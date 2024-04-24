@@ -54,7 +54,9 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "lint:mdx": "eslint . --ext md,mdx",
-    "deploy": "gatsby build && gh-pages -d public -b main"
+    "deploy": "gatsby build && gh-pages -d public -b main",
+    "prettier:write": "prettier --write \"**/*.{js,jsx,ts,tsx,json}\"",
+    "prettier:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json}\""
   },
   "repository": {
     "type": "git",

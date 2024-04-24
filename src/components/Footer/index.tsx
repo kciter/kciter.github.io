@@ -1,7 +1,7 @@
-import React from "react";
-import Social from "@components/Social";
-import { Link } from "gatsby";
-import styled from "@emotion/styled";
+import React from 'react';
+import Social from '@components/Social';
+import { Link } from 'gatsby';
+import styled from '@emotion/styled';
 
 const Footer = () => {
   return (
@@ -31,7 +31,7 @@ const FooterContainer = styled.footer`
       color: #333;
     }
   }
-`
+`;
 
 const Copyright = styled.div`
   display: block;
@@ -40,4 +40,4 @@ const Copyright = styled.div`
   color: #9a9a9a;
   font-family: 'Quattrocento Sans', sans-serif;
   font-size: 0.8rem;
-`
+`;

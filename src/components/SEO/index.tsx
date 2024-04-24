@@ -5,10 +5,10 @@
  * See: https://www.gatsbyjs.com/docs/use-static-query/
  */
 
-import * as React from "react";
-import PropTypes from "prop-types";
-import { Helmet } from "react-helmet";
-import { useStaticQuery, graphql } from "gatsby";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import { Helmet } from 'react-helmet';
+import { useStaticQuery, graphql } from 'gatsby';
 
 interface SEOProps {
   title?: string;
@@ -18,19 +18,17 @@ interface SEOProps {
 }
 
 const SEO = ({ title, description, meta }: SEOProps) => {
-  const { site } = useStaticQuery(
-    graphql`
-      query {
-        site {
-          siteMetadata {
-            title
-            description
-            author
-          }
+  const { site } = useStaticQuery(graphql`
+    query {
+      site {
+        siteMetadata {
+          title
+          description
+          author
         }
       }
-    `
-  );
+    }
+  `);
 
   const metaDescription = description || site.siteMetadata.description;
   const metaTitle = title || site.siteMetadata?.title;
@@ -38,61 +36,61 @@ const SEO = ({ title, description, meta }: SEOProps) => {
   return (
     <Helmet
       htmlAttributes={{
-        ko: "ko",
+        ko: 'ko'
       }}
       title={metaTitle}
       titleTemplate={title ? `%s | kciter.so` : undefined}
       meta={[
         {
           name: `description`,
-          content: metaDescription,
+          content: metaDescription
         },
         {
           property: `author`,
-          content: `Lee Sun-Hyoup`,
+          content: `Lee Sun-Hyoup`
         },
         {
           property: `og:title`,
-          content: metaTitle,
+          content: metaTitle
         },
         {
           property: `og:description`,
-          content: metaDescription,
+          content: metaDescription
         },
         {
           property: `og:type`,
-          content: `website`,
+          content: `website`
         },
         {
           property: `og:site_name`,
-          content: `kciter.so`,
+          content: `kciter.so`
         },
         {
           property: `og:locale`,
-          content: `ko_KR`,
+          content: `ko_KR`
         },
         {
           name: `twitter:card`,
-          content: `summary`,
+          content: `summary`
         },
         {
           name: `twitter:creator`,
-          content: "Sunhyoup Lee",
+          content: 'Sunhyoup Lee'
         },
         {
           name: `twitter:title`,
-          content: metaTitle,
+          content: metaTitle
         },
         {
           name: `twitter:description`,
-          content: metaDescription,
+          content: metaDescription
         },
         {
           property: `og:image`,
           content:
-            meta.find((item: any) => item.property === "og:image")?.content ??
-            "https://kciter.so/images/og.png",
-        },
+            meta.find((item: any) => item.property === 'og:image')?.content ??
+            'https://kciter.so/images/og.png'
+        }
       ].concat(meta)}
     />
   );
@@ -101,14 +99,14 @@ const SEO = ({ title, description, meta }: SEOProps) => {
 SEO.defaultProps = {
   lang: `en`,
   meta: [],
-  description: ``,
+  description: ``
 };
 
 SEO.propTypes = {
   description: PropTypes.string,
   lang: PropTypes.string,
   meta: PropTypes.arrayOf(PropTypes.object),
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired
 };
 
 export default SEO;

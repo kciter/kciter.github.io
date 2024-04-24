@@ -1,7 +1,7 @@
-import React from "react";
-import DefaultTemplate from "@templates/default";
-import { Helmet } from "react-helmet";
-import styled from "@emotion/styled";
+import React from 'react';
+import DefaultTemplate from '@templates/default';
+import { Helmet } from 'react-helmet';
+import styled from '@emotion/styled';
 
 const NotFoundPage = () => (
   <DefaultTemplate>
@@ -14,7 +14,7 @@ const NotFoundPage = () => (
 
       <NotFoundImage />
 
-      <p style={{ textAlign: "center" }}>There is nothing here.</p>
+      <p style={{ textAlign: 'center' }}>There is nothing here.</p>
     </div>
   </DefaultTemplate>
 );
@@ -25,6 +25,6 @@ const NotFoundImage = styled.div`
   width: 100%;
   height: 400px;
   border-radius: 12px;
-  background: url(/not-found.gif) no-repeat center center; 
+  background: url(/not-found.gif) no-repeat center center;
   background-size: contain;
-`
+`;

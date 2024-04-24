@@ -1,6 +1,6 @@
-import React from "react";
-import { useEffect } from "react";
-import Sticky from "sticky-js";
+import React from 'react';
+import { useEffect } from 'react';
+import Sticky from 'sticky-js';
 
 interface Item {
   url: string;
@@ -13,24 +13,14 @@ interface SeriesProps {
   currentItem: string;
 }
 
-const List = ({
-  items,
-  currentItem,
-}: {
-  items: [Item];
-  currentItem: string;
-}) => {
+const List = ({ items, currentItem }: { items: [Item]; currentItem: string }) => {
   return (
     <ul>
       {items.map(item => {
         return (
           <li
             key={item.url}
-            style={
-              currentItem === item.title
-                ? { color: "red", fontWeight: "bold" }
-                : undefined
-            }
+            style={currentItem === item.title ? { color: 'red', fontWeight: 'bold' } : undefined}
           >
             <a href={item.url}>{item.title}</a>
           </li>
@@ -43,7 +33,7 @@ const List = ({
 const Series = ({ items, title, currentItem }: SeriesProps) => {
   useEffect(() => {
     if (typeof document === undefined) return;
-    new Sticky(".series");
+    new Sticky('.series');
   }, [items]);
 
   return (

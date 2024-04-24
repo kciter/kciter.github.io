@@ -1,5 +1,5 @@
-import styled from "@emotion/styled";
-import React from "react";
+import styled from '@emotion/styled';
+import React from 'react';
 
 interface Sponsor {
   avatar: string;
@@ -9,40 +9,40 @@ interface Sponsor {
 
 const sponsors: Sponsor[] = [
   {
-    avatar: "https://avatars.githubusercontent.com/u/82202674?v=4",
-    name: "seohyeon2222",
-    url: "https://github.com/seohyeon2222",
+    avatar: 'https://avatars.githubusercontent.com/u/82202674?v=4',
+    name: 'seohyeon2222',
+    url: 'https://github.com/seohyeon2222'
   },
   {
-    avatar: "https://avatars.githubusercontent.com/u/25360781?v=4",
-    name: "ibcylon",
-    url: "https://github.com/ibcylon",
+    avatar: 'https://avatars.githubusercontent.com/u/25360781?v=4',
+    name: 'ibcylon',
+    url: 'https://github.com/ibcylon'
   },
   {
-    avatar: "https://avatars.githubusercontent.com/u/118495919?v=4",
-    name: "18-12847",
-    url: "https://github.com/18-12847",
+    avatar: 'https://avatars.githubusercontent.com/u/118495919?v=4',
+    name: '18-12847',
+    url: 'https://github.com/18-12847'
   },
   {
-    avatar: "https://avatars.githubusercontent.com/u/22555243?v=4",
-    name: "light8reeze",
-    url: "https://github.com/light8reeze",
+    avatar: 'https://avatars.githubusercontent.com/u/22555243?v=4',
+    name: 'light8reeze',
+    url: 'https://github.com/light8reeze'
   },
   {
-    avatar: "https://avatars.githubusercontent.com/u/17980230?v=4",
-    name: "TerryChoi",
-    url: "https://github.com/JongtaekChoi",
+    avatar: 'https://avatars.githubusercontent.com/u/17980230?v=4',
+    name: 'TerryChoi',
+    url: 'https://github.com/JongtaekChoi'
   },
   {
-    avatar: "https://avatars.githubusercontent.com/u/6335605?v=4",
-    name: "pilgwon",
-    url: "https://github.com/pilgwon",
+    avatar: 'https://avatars.githubusercontent.com/u/6335605?v=4',
+    name: 'pilgwon',
+    url: 'https://github.com/pilgwon'
   },
   {
-    avatar: "https://avatars.githubusercontent.com/u/62709718?v=4",
-    name: "Wonse Shin",
-    url: "https://github.com/shinwonse",
-  },
+    avatar: 'https://avatars.githubusercontent.com/u/62709718?v=4',
+    name: 'Wonse Shin',
+    url: 'https://github.com/shinwonse'
+  }
 ];
 
 const SpecialThanks = () => {
@@ -53,12 +53,7 @@ const SpecialThanks = () => {
       <SponsorContainer>
         <Sponsors>
           {sponsors.map(sponser => (
-            <a
-              key={sponser.name}
-              href={sponser.url}
-              target="_blank"
-              style={{ marginRight: 4 }}
-            >
+            <a key={sponser.name} href={sponser.url} target="_blank" style={{ marginRight: 4 }}>
               <Sponsor src={sponser.avatar} alt={sponser.name} />
             </a>
           ))}

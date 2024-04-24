@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef } from 'react';
 
 const width = 60;
 const height = 22;
@@ -8,7 +8,7 @@ let A = 0,
 
 let cubeWidth = 20;
 let zBuffer = new Array(width * height).fill(0);
-let buffer = new Array(width * height).fill(" ");
+let buffer = new Array(width * height).fill(' ');
 const distanceFromCam = 100;
 const K1 = 40;
 
@@ -38,19 +38,10 @@ function calculateY(i: number, j: number, k: number) {
 }
 
 function calculateZ(i: number, j: number, k: number) {
-  return (
-    k * Math.cos(A) * Math.cos(B) -
-    j * Math.sin(A) * Math.cos(B) +
-    i * Math.sin(B)
-  );
+  return k * Math.cos(A) * Math.cos(B) - j * Math.sin(A) * Math.cos(B) + i * Math.sin(B);
 }
 
-function calculateForSurface(
-  cubeX: number,
-  cubeY: number,
-  cubeZ: number,
-  ch: string
-) {
+function calculateForSurface(cubeX: number, cubeY: number, cubeZ: number, ch: string) {
   x = calculateX(cubeX, cubeY, cubeZ);
   y = calculateY(cubeX, cubeY, cubeZ);
   z = calculateZ(cubeX, cubeY, cubeZ) + distanceFromCam;
@@ -71,7 +62,7 @@ function calculateForSurface(
 
 export const SpinningCube = () => {
   const ref = useRef<HTMLDivElement>(null);
-  const [result, setResult] = React.useState("");
+  const [result, setResult] = React.useState('');
 
   React.useEffect(() => {
     let fpsInterval = 24;
@@ -85,25 +76,23 @@ export const SpinningCube = () => {
       if (elapsed > fpsInterval) {
         then = now - (elapsed % fpsInterval);
 
-        buffer.fill(".");
+        buffer.fill('.');
         zBuffer.fill(0);
         cubeWidth = 12;
 
         // First cube
         for (let cubeX = -cubeWidth; cubeX < cubeWidth; cubeX += 0.6) {
           for (let cubeY = -cubeWidth; cubeY < cubeWidth; cubeY += 0.6) {
-            calculateForSurface(cubeX, cubeY, -cubeWidth, "@");
-            calculateForSurface(cubeWidth, cubeY, cubeX, "$");
-            calculateForSurface(-cubeWidth, cubeY, -cubeX, "%");
-            calculateForSurface(-cubeX, cubeY, cubeWidth, "#");
-            calculateForSurface(cubeX, -cubeWidth, -cubeY, ";");
-            calculateForSurface(cubeX, cubeWidth, cubeY, "+");
+            calculateForSurface(cubeX, cubeY, -cubeWidth, '@');
+            calculateForSurface(cubeWidth, cubeY, cubeX, '$');
+            calculateForSurface(-cubeWidth, cubeY, -cubeX, '%');
+            calculateForSurface(-cubeX, cubeY, cubeWidth, '#');
+            calculateForSurface(cubeX, -cubeWidth, -cubeY, ';');
+            calculateForSurface(cubeX, cubeWidth, cubeY, '+');
           }
         }
 
-        setResult(
-          buffer.join("").replace(/.{60}/g, "$&<br />").replace(/\./g, "&nbsp;")
-        );
+        setResult(buffer.join('').replace(/.{60}/g, '$&<br />').replace(/\./g, '&nbsp;'));
 
         A += 0.05;
         B += 0.05;
@@ -124,10 +113,10 @@ export const SpinningCube = () => {
     <div
       ref={ref}
       style={{
-        fontFamily: "monospace",
+        fontFamily: 'monospace',
         fontSize: ((ref.current?.clientWidth || 0) / 700) * 14,
         lineHeight: (ref.current?.clientWidth || 0) < 500 ? 1.8 : 1.4,
-        textAlign: "center",
+        textAlign: 'center'
       }}
       dangerouslySetInnerHTML={{ __html: result }}
     />

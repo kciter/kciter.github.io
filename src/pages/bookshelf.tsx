@@ -1,8 +1,8 @@
-import React from "react";
-import DefaultTemplate from "@templates/default";
-import SEO from "@components/SEO";
-import { graphql, Link, useStaticQuery } from "gatsby";
-import styled from "@emotion/styled";
+import React from 'react';
+import DefaultTemplate from '@templates/default';
+import SEO from '@components/SEO';
+import { graphql, Link, useStaticQuery } from 'gatsby';
+import styled from '@emotion/styled';
 
 const BookshelfPage = () => {
   const result = useStaticQuery(graphql`
@@ -47,10 +47,7 @@ const BookshelfPage = () => {
 
       <Container>
         {posts.map((post: any) => (
-          <BookItem
-            link={post.node.fields.slug}
-            coverImage={post.node.frontmatter.cover}
-          />
+          <BookItem link={post.node.fields.slug} coverImage={post.node.frontmatter.cover} />
         ))}
       </Container>
     </DefaultTemplate>

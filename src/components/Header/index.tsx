@@ -1,8 +1,8 @@
-import React from "react";
-import Social from "@components/Social";
-import { graphql, Link, useStaticQuery } from "gatsby";
-import styled from "@emotion/styled";
-import dayjs from "dayjs";
+import React from 'react';
+import Social from '@components/Social';
+import { graphql, Link, useStaticQuery } from 'gatsby';
+import styled from '@emotion/styled';
+import dayjs from 'dayjs';
 
 const Header = () => {
   const result = useStaticQuery(graphql`
@@ -26,7 +26,7 @@ const Header = () => {
   const posts = result.allMdx.edges;
   const updated =
     posts.filter((post: any) => {
-      return dayjs(post.node.fields.date).isAfter(dayjs().subtract(1, "month"));
+      return dayjs(post.node.fields.date).isAfter(dayjs().subtract(1, 'month'));
     }).length > 0;
 
   return (
@@ -41,7 +41,7 @@ const Header = () => {
           {/* <Link to="https://kciter.so/resume" target="_blank" className="item">
             Résumé
           </Link> */}
-          <Link to="/writing" className={`item ${updated ? "updated" : ""}`}>
+          <Link to="/writing" className={`item ${updated ? 'updated' : ''}`}>
             Writing
           </Link>
           <Link to="/bookshelf" className="item">
@@ -64,7 +64,7 @@ export default Header;
 
 const Container = styled.div`
   margin-bottom: 40px;
-  font-family: "Quattrocento Sans", sans-serif;
+  font-family: 'Quattrocento Sans', sans-serif;
 
   margin-left: -16px;
   margin-right: -16px;
@@ -144,7 +144,7 @@ const Menu = styled.div`
     &.updated::before {
       background: #00a962;
       border: 1px solid #eee;
-      content: "";
+      content: '';
       display: block;
       height: 6px;
       right: -6px;

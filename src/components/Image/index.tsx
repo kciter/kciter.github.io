@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from "react";
-import ReactDOM from "react-dom";
+import React, { useCallback, useState } from 'react';
+import ReactDOM from 'react-dom';
 
 interface ImageProps {
   src: string;
@@ -16,7 +16,7 @@ const Image = ({ src, caption, width, expandable }: ImageProps) => {
       <img
         src={src}
         width={width}
-        style={{ cursor: expandable ? "zoom-in" : "default" }}
+        style={{ cursor: expandable ? 'zoom-in' : 'default' }}
         onClick={expandable ? () => toggleExpanded(true) : undefined}
       />
       {caption && <figcaption dangerouslySetInnerHTML={{ __html: caption }} />}
@@ -24,13 +24,13 @@ const Image = ({ src, caption, width, expandable }: ImageProps) => {
         ReactDOM.createPortal(
           <div
             style={{
-              position: "fixed",
+              position: 'fixed',
               top: 0,
               left: 0,
-              width: "100%",
-              height: "100%",
-              cursor: "zoom-out",
-              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              width: '100%',
+              height: '100%',
+              cursor: 'zoom-out',
+              backgroundColor: 'rgba(0, 0, 0, 0.7)'
             }}
             onClick={() => toggleExpanded(false)}
           >
@@ -38,12 +38,12 @@ const Image = ({ src, caption, width, expandable }: ImageProps) => {
               style={{
                 borderRadius: 8,
                 maxWidth: 1200,
-                width: "80%",
-                position: "fixed",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                backgroundColor: "white",
+                width: '80%',
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                backgroundColor: 'white'
               }}
             >
               <img src={src} width="100%" />

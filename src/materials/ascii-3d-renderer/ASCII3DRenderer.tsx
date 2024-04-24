@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from "react";
-import { ASCII3DRenderer as Renderer } from "./renderer";
+import React, { useEffect, useRef } from 'react';
+import { ASCII3DRenderer as Renderer } from './renderer';
 
 export const ASCII3DRenderer = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -16,8 +16,8 @@ export const ASCII3DRenderer = () => {
       style={{
         fontSize: ((ref.current?.clientWidth || 0) / 700) * 14,
         lineHeight: 1,
-        width: "100%",
-        fontFamily: "monospace",
+        width: '100%',
+        fontFamily: 'monospace'
       }}
     />
   );

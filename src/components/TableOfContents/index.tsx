@@ -1,7 +1,7 @@
-import styled from "@emotion/styled";
-import React from "react";
-import { useEffect } from "react";
-import Sticky from "sticky-js";
+import styled from '@emotion/styled';
+import React from 'react';
+import { useEffect } from 'react';
+import Sticky from 'sticky-js';
 
 interface Item {
   url: string;
@@ -16,7 +16,7 @@ export interface TableOfContentsProps {
 const TableOfContents = ({ items }: TableOfContentsProps) => {
   useEffect(() => {
     if (typeof document === undefined) return;
-    new Sticky(".toc");
+    new Sticky('.toc');
   }, [items]);
 
   return (
@@ -51,7 +51,7 @@ const Container = styled.div`
   @media (max-width: 1400px) {
     display: none;
   }
-`
+`;
 
 const List = ({ items }: TableOfContentsProps) => {
   return (
@@ -101,4 +101,4 @@ const ListContainer = styled.ul`
     color: #212b36;
     background-color: #f4f6f8;
   }
-`
+`;

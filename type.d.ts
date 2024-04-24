@@ -1,3 +1,3 @@
 /// <reference types="@mdx-js/loader" />
 
-declare module "sticky-js";
+declare module 'sticky-js';

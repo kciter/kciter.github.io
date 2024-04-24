@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from "react";
-import ReactDOM from "react-dom";
+import React, { useCallback, useState } from 'react';
+import ReactDOM from 'react-dom';
 
 interface ImageProps {
   src: string;
@@ -12,7 +12,16 @@ interface ImageProps {
   loop?: boolean;
 }
 
-const Video = ({ src, caption, width, expandable, autoPlay, controls, muted, loop }: ImageProps) => {
+const Video = ({
+  src,
+  caption,
+  width,
+  expandable,
+  autoPlay,
+  controls,
+  muted,
+  loop
+}: ImageProps) => {
   const [isExpanded, toggleExpanded] = useState(false);
 
   return (
@@ -20,7 +29,7 @@ const Video = ({ src, caption, width, expandable, autoPlay, controls, muted, loo
       <video
         src={src}
         width={width}
-        style={{ cursor: expandable ? "zoom-in" : "default" }}
+        style={{ cursor: expandable ? 'zoom-in' : 'default' }}
         onClick={expandable ? () => toggleExpanded(true) : undefined}
         autoPlay={autoPlay}
         controls={controls}
@@ -32,13 +41,13 @@ const Video = ({ src, caption, width, expandable, autoPlay, controls, muted, loo
         ReactDOM.createPortal(
           <div
             style={{
-              position: "fixed",
+              position: 'fixed',
               top: 0,
               left: 0,
-              width: "100%",
-              height: "100%",
-              cursor: "zoom-out",
-              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              width: '100%',
+              height: '100%',
+              cursor: 'zoom-out',
+              backgroundColor: 'rgba(0, 0, 0, 0.7)'
             }}
             onClick={() => toggleExpanded(false)}
           >
@@ -46,12 +55,12 @@ const Video = ({ src, caption, width, expandable, autoPlay, controls, muted, loo
               style={{
                 borderRadius: 8,
                 maxWidth: 1200,
-                width: "80%",
-                position: "fixed",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                backgroundColor: "white",
+                width: '80%',
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                backgroundColor: 'white'
               }}
             >
               <img src={src} width="100%" />

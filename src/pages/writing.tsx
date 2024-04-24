@@ -1,11 +1,11 @@
-import React from "react";
-import DefaultTemplate from "@templates/default";
-import SEO from "@components/SEO";
-import dayjs from "dayjs";
-import { graphql, Link, useStaticQuery } from "gatsby";
-import styled from "@emotion/styled";
+import React from 'react';
+import DefaultTemplate from '@templates/default';
+import SEO from '@components/SEO';
+import dayjs from 'dayjs';
+import { graphql, Link, useStaticQuery } from 'gatsby';
+import styled from '@emotion/styled';
 
-dayjs.extend(require("dayjs/plugin/localizedFormat"));
+dayjs.extend(require('dayjs/plugin/localizedFormat'));
 
 const Index = () => {
   const result = useStaticQuery(graphql`
@@ -48,28 +48,22 @@ const Index = () => {
         <Post key={post.node.fields.slug}>
           <PostMeta>
             <MetaInner>
-              <PostDate>
-                {dayjs(post.node.fields.date).locale("en").format("ll")}
-              </PostDate>
+              <PostDate>{dayjs(post.node.fields.date).locale('en').format('ll')}</PostDate>
               <PostClock>
-                <i className="fa fa-clock-o" aria-hidden="true" />{" "}
+                <i className="fa fa-clock-o" aria-hidden="true" />{' '}
                 {Math.round(post.node.fields.timeToRead.minutes)} minute read
               </PostClock>
             </MetaInner>
           </PostMeta>
-          <PostContent
-            recent={dayjs(post.node.fields.date).isAfter(
-              dayjs().subtract(1, "month"),
-            )}
-          >
-            <Link to={post.node.fields.slug} style={{ textDecoration: "none" }}>
+          <PostContent recent={dayjs(post.node.fields.date).isAfter(dayjs().subtract(1, 'month'))}>
+            <Link to={post.node.fields.slug} style={{ textDecoration: 'none' }}>
               <ContentInner
                 style={{
-                  marginTop: post.node.frontmatter.tags.length > 0 ? -8 : -10,
+                  marginTop: post.node.frontmatter.tags.length > 0 ? -8 : -10
                 }}
               >
                 <PostDateMobile>
-                  {dayjs(post.node.fields.date).locale("en").format("ll")}
+                  {dayjs(post.node.fields.date).locale('en').format('ll')}
                 </PostDateMobile>
                 {post.node.frontmatter.tags.length > 0 && (
                   <PostTags>
@@ -79,9 +73,7 @@ const Index = () => {
                   </PostTags>
                 )}
                 <PostTitle>
-                  <Link to={post.node.fields.slug}>
-                    {post.node.frontmatter.title}
-                  </Link>
+                  <Link to={post.node.fields.slug}>{post.node.frontmatter.title}</Link>
                 </PostTitle>
                 <PostDescription>{post.node.excerpt}</PostDescription>
                 <ThumbnailImage src={post.node.frontmatter.image} />
@@ -152,9 +144,9 @@ const PostContent = styled.div<{ recent: boolean }>`
   min-width: 0%;
 
   &::after {
-    background: ${props => (props.recent ? "#00a962" : "#888")};
+    background: ${props => (props.recent ? '#00a962' : '#888')};
     border: 1px solid #eee;
-    content: "";
+    content: '';
     display: block;
     height: 10px;
     left: -7px;
@@ -163,10 +155,9 @@ const PostContent = styled.div<{ recent: boolean }>`
     width: 10px;
     border-radius: 12px;
 
-    box-shadow: ${props =>
-      props.recent ? "rgb(51, 217, 178) 0px 0px 0px 0px" : "none"};
+    box-shadow: ${props => (props.recent ? 'rgb(51, 217, 178) 0px 0px 0px 0px' : 'none')};
     animation: ${props =>
-      props.recent ? "2s ease 0s infinite normal none running pulse" : "none"};
+      props.recent ? '2s ease 0s infinite normal none running pulse' : 'none'};
 
     @keyframes pulse {
       0% {
@@ -198,7 +189,7 @@ const PostTags = styled.div`
     position: absolute;
     top: 0;
     right: 0;
-    content: "";
+    content: '';
     width: 80px;
     height: 100%;
     background-image: linear-gradient(90deg, transparent 0%, white 100%);
@@ -273,7 +264,7 @@ const ContentInner = styled.div`
     box-shadow:
       0 8px 17px 0 rgba(0, 0, 0, 0.2),
       0 6px 20px 0 rgba(0, 0, 0, 0.15);
-    content: "";
+    content: '';
     opacity: 0;
     z-index: -1;
   }

@@ -1,6 +1,6 @@
-import styled from "@emotion/styled";
-import { graphql, Link, useStaticQuery } from "gatsby";
-import React from "react";
+import styled from '@emotion/styled';
+import { graphql, Link, useStaticQuery } from 'gatsby';
+import React from 'react';
 
 interface RelatedPostProps {
   posts: any;
@@ -20,7 +20,7 @@ const RelatedPost = ({ posts, current, style }: RelatedPostProps) => {
                 <Title>{post.node.frontmatter.title}</Title>
                 <small>{post.node.fields.date}</small>
               </Post>
-            ),
+            )
         )}
       </Posts>
     </Container>
@@ -84,7 +84,7 @@ const Post = styled(Link)`
     box-shadow:
       0 8px 17px 0 rgba(0, 0, 0, 0.2),
       0 6px 20px 0 rgba(0, 0, 0, 0.15);
-    content: "";
+    content: '';
     opacity: 0;
     z-index: -1;
   }

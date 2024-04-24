@@ -1,14 +1,12 @@
 // @ts-nocheck
 var A = Object.defineProperty;
 var b = (y, t, h) =>
-  t in y
-    ? A(y, t, { enumerable: !0, configurable: !0, writable: !0, value: h })
-    : (y[t] = h);
-var n = (y, t, h) => (b(y, typeof t != "symbol" ? t + "" : t, h), h);
+  t in y ? A(y, t, { enumerable: !0, configurable: !0, writable: !0, value: h }) : (y[t] = h);
+var n = (y, t, h) => (b(y, typeof t != 'symbol' ? t + '' : t, h), h);
 class z {
   constructor(t, h) {
-    n(this, "x");
-    n(this, "y");
+    n(this, 'x');
+    n(this, 'y');
     (this.x = t), (this.y = h);
   }
   add(t) {
@@ -30,9 +28,9 @@ class z {
 }
 class r {
   constructor(t, h, s) {
-    n(this, "x");
-    n(this, "y");
-    n(this, "z");
+    n(this, 'x');
+    n(this, 'y');
+    n(this, 'z');
     (this.x = t), (this.y = h), (this.z = s);
   }
   static zero() {
@@ -88,10 +86,10 @@ class r {
 }
 class w {
   constructor(t, h, s, e) {
-    n(this, "x");
-    n(this, "y");
-    n(this, "z");
-    n(this, "w");
+    n(this, 'x');
+    n(this, 'y');
+    n(this, 'z');
+    n(this, 'w');
     (this.x = t), (this.y = h), (this.z = s), (this.w = e);
   }
   add(t) {
@@ -118,22 +116,22 @@ class w {
 }
 class o {
   constructor(t, h, s, e, i, m, a, c, l, d, p, F, B, u, f, M) {
-    n(this, "m00");
-    n(this, "m01");
-    n(this, "m02");
-    n(this, "m03");
-    n(this, "m10");
-    n(this, "m11");
-    n(this, "m12");
-    n(this, "m13");
-    n(this, "m20");
-    n(this, "m21");
-    n(this, "m22");
-    n(this, "m23");
-    n(this, "m30");
-    n(this, "m31");
-    n(this, "m32");
-    n(this, "m33");
+    n(this, 'm00');
+    n(this, 'm01');
+    n(this, 'm02');
+    n(this, 'm03');
+    n(this, 'm10');
+    n(this, 'm11');
+    n(this, 'm12');
+    n(this, 'm13');
+    n(this, 'm20');
+    n(this, 'm21');
+    n(this, 'm22');
+    n(this, 'm23');
+    n(this, 'm30');
+    n(this, 'm31');
+    n(this, 'm32');
+    n(this, 'm33');
     (this.m00 = t),
       (this.m01 = h),
       (this.m02 = s),
@@ -259,17 +257,17 @@ class o {
 }
 class R {
   constructor(t) {
-    n(this, "vertices");
+    n(this, 'vertices');
     this.vertices = t;
   }
 }
 class I {
   constructor() {
-    n(this, "eye");
-    n(this, "look");
-    n(this, "up");
-    n(this, "rotation");
-    n(this, "viewMatrix");
+    n(this, 'eye');
+    n(this, 'look');
+    n(this, 'up');
+    n(this, 'rotation');
+    n(this, 'viewMatrix');
     (this.eye = new r(0, 0, 0)),
       (this.look = new r(0, 0, 1)),
       (this.up = new r(0, 1, 0)),
@@ -329,7 +327,7 @@ class g {
       (e.onload = i => {
         var a;
         const m = (a = i.target) == null ? void 0 : a.result;
-        m ? h(this.parseOBJ(m)) : s(new Error("Failed to load file"));
+        m ? h(this.parseOBJ(m)) : s(new Error('Failed to load file'));
       }),
         e.readAsText(t);
     });
@@ -345,30 +343,22 @@ class g {
     for (const i of h) {
       const m = i
         .trim()
-        .split(" ")
-        .filter(a => a !== "");
-      m[0] === "v"
+        .split(' ')
+        .filter(a => a !== '');
+      m[0] === 'v'
         ? s.push(new r(parseFloat(m[1]), parseFloat(m[2]), parseFloat(m[3])))
-        : m[0] === "f" &&
-          e.push(
-            new R([
-              s[parseInt(m[1]) - 1],
-              s[parseInt(m[2]) - 1],
-              s[parseInt(m[3]) - 1],
-            ])
-          );
+        : m[0] === 'f' &&
+          e.push(new R([s[parseInt(m[1]) - 1], s[parseInt(m[2]) - 1], s[parseInt(m[3]) - 1]]));
     }
     return e;
   }
 }
 class S {
   constructor() {
-    n(this, "position");
-    n(this, "rotate");
-    n(this, "scale");
-    (this.position = new r(0, 0, 0)),
-      (this.rotate = new r(0, 0, 0)),
-      (this.scale = new r(1, 1, 1));
+    n(this, 'position');
+    n(this, 'rotate');
+    n(this, 'scale');
+    (this.position = new r(0, 0, 0)), (this.rotate = new r(0, 0, 0)), (this.scale = new r(1, 1, 1));
   }
   transform(t) {
     const h = o
@@ -398,26 +388,22 @@ class S {
 }
 class Y {
   constructor(t, h, s) {
-    n(this, "el");
-    n(this, "width");
-    n(this, "height");
-    n(this, "frameBuffer");
-    n(this, "depthBuffer");
-    n(this, "mesh", []);
-    n(this, "camera");
-    n(this, "world");
-    n(this, "angle");
+    n(this, 'el');
+    n(this, 'width');
+    n(this, 'height');
+    n(this, 'frameBuffer');
+    n(this, 'depthBuffer');
+    n(this, 'mesh', []);
+    n(this, 'camera');
+    n(this, 'world');
+    n(this, 'angle');
     // private Shade = '.;ox%@';
-    n(this, "Shade", "·┼╬░▒▓█");
+    n(this, 'Shade', '·┼╬░▒▓█');
     (this.el = t),
       (this.width = h),
       (this.height = s),
-      (this.frameBuffer = new Array(s + 1)
-        .fill(null)
-        .map(() => new Array(h + 1).fill(" "))),
-      (this.depthBuffer = new Array(s + 1)
-        .fill(null)
-        .map(() => new Array(h + 1).fill(255))),
+      (this.frameBuffer = new Array(s + 1).fill(null).map(() => new Array(h + 1).fill(' '))),
+      (this.depthBuffer = new Array(s + 1).fill(null).map(() => new Array(h + 1).fill(255))),
       (this.camera = new I()),
       (this.world = new S()),
       (this.angle = 0);
@@ -450,12 +436,7 @@ class Y {
   }
   process() {
     (this.camera.eye = new r(0, 0, -5)), this.camera.calculateViewMatrix();
-    const t = this.camera.calculatePerspectiveMatrix(
-      70,
-      this.width / 2 / this.height,
-      0.1,
-      1e3
-    );
+    const t = this.camera.calculatePerspectiveMatrix(70, this.width / 2 / this.height, 0.1, 1e3);
     this.world.setRotateX(this.angle),
       this.world.setRotateY(this.angle),
       this.world.setRotateZ(this.angle),
@@ -500,21 +481,15 @@ class Y {
       l = new z(s.x * i + i, -s.y * m + m),
       d = Math.floor(Math.max(0, Math.min(a.x, Math.min(c.x, l.x)))),
       p = Math.floor(Math.max(0, Math.min(a.y, Math.min(c.y, l.y)))),
-      F = Math.floor(
-        Math.min(this.width, Math.max(a.x, Math.max(c.x, l.x)) + 1)
-      ),
-      B = Math.floor(
-        Math.min(this.height, Math.max(a.y, Math.max(c.y, l.y)) + 1)
-      );
+      F = Math.floor(Math.min(this.width, Math.max(a.x, Math.max(c.x, l.x)) + 1)),
+      B = Math.floor(Math.min(this.height, Math.max(a.y, Math.max(c.y, l.y)) + 1));
     for (let u = p; u < B; u++)
       for (let f = d; f < F; f++)
         if (this.isPointInTriangle(f, u, a, c, l)) {
           const M = u * this.width + f;
           if (M > this.height * this.width || M < 0) continue;
           (t.w + h.w + s.w) / 3 <= this.depthBuffer[u][f] &&
-            ((this.frameBuffer[u][f] = this.Shade[
-              Math.round((this.Shade.length - 1) * e)
-            ]),
+            ((this.frameBuffer[u][f] = this.Shade[Math.round((this.Shade.length - 1) * e)]),
             (this.depthBuffer[u][f] = (t.w + h.w + s.w) / 3));
         }
   }
@@ -532,15 +507,13 @@ class Y {
     return l == d && d == p;
   }
   drawFrameBuffer() {
-    const t = this.frameBuffer
-      .map(h => h.join("").replace(/\ /g, "&nbsp;"))
-      .join("<br />");
+    const t = this.frameBuffer.map(h => h.join('').replace(/\ /g, '&nbsp;')).join('<br />');
     this.el.innerHTML = t;
   }
   clearFrameBuffer() {
     (this.frameBuffer = new Array(this.height + 1)
       .fill(null)
-      .map(() => new Array(this.width + 1).fill(" "))),
+      .map(() => new Array(this.width + 1).fill(' '))),
       (this.depthBuffer = new Array(this.height + 1)
         .fill(null)
         .map(() => new Array(this.width + 1).fill(255)));
