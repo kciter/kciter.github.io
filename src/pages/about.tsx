@@ -57,8 +57,7 @@ const About = () => {
       text: "Metal 기반 특별한 UI/UX 제공하기",
     },
     {
-      href:
-        "https://www.slideshare.net/sunhyouplee/vuejs-reactive-programming-vuetiful-korea-2nd",
+      href: "https://www.slideshare.net/sunhyouplee/vuejs-reactive-programming-vuetiful-korea-2nd",
       text: "Vue.js와 Reactive Programming",
     },
     {
@@ -66,8 +65,7 @@ const About = () => {
       text: "Tour of Vue.js",
     },
     {
-      href:
-        "https://www.slideshare.net/sunhyouplee/functional-reactive-programming-with-rxswift-62123571",
+      href: "https://www.slideshare.net/sunhyouplee/functional-reactive-programming-with-rxswift-62123571",
       text: "Functional Reactive Programming With Swift",
     },
     {
@@ -111,8 +109,9 @@ const About = () => {
       <ul>
         <li>
           <strong>Cobalt. Inc.</strong> CTO, 2018. 07 ~ <br />
-          Create proposals that impresses wow, streamline workflows, and gain actionable insights to close deals faster.{" "}
-          <a href="https://present.do">REALIZER</a>
+          Create proposals that impresses wow, streamline workflows, and gain
+          actionable insights to close deals faster.{" "}
+          <a href="https://realizer.ai">REALIZER</a>
         </li>
       </ul>
 
