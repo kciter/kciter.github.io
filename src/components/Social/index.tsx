@@ -15,13 +15,13 @@ const Social = () => {
     <>
       {items.map((item, index) => (
         <React.Fragment key={item.icon}>
-          <Link
-            to={item.link}
+          <a
+            href={item.link}
             target="_blank"
             style={{ marginRight: index !== items.length - 1 ? 5 : undefined }}
           >
             <i className={`fa fa-${item.icon}`} aria-hidden="true" />
-          </Link>
+          </a>
         </React.Fragment>
       ))}
     </>
