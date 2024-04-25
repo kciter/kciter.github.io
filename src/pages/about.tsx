@@ -106,7 +106,10 @@ const About = () => {
         <li>
           <strong>Cobalt. Inc.</strong> CTO, 2018. 07 ~ <br />
           Create proposals that impresses wow, streamline workflows, and gain actionable insights to
-          close deals faster. <a href="https://realizer.ai">REALIZER</a>
+          close deals faster.{' '}
+          <a href="https://realizer.ai" target="_blank">
+            REALIZER
+          </a>
         </li>
       </ul>
 
@@ -135,7 +138,13 @@ const About = () => {
 
       <h2>❤️ Open Source</h2>
       <ul>
-        <li>You can find open sources on my [GitHub profile](https://github.com/kciter)!</li>
+        <li>
+          You can find open sources on my{' '}
+          <a href="https://github.com/kciter" target="_blank">
+            GitHub profile
+          </a>
+          !
+        </li>
       </ul>
     </DefaultTemplate>
   );
