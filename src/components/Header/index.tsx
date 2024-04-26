@@ -41,8 +41,8 @@ const Header = () => {
           {/* <Link to="https://kciter.so/resume" target="_blank" className="item">
             Résumé
           </Link> */}
-          <Link to="/writing" className={`item ${updated ? 'updated' : ''}`}>
-            Writing
+          <Link to="/timeline" className={`item ${updated ? 'updated' : ''}`}>
+            Timeline
           </Link>
           <Link to="/bookshelf" className="item">
             Bookshelf

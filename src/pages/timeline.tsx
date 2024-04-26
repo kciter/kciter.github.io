@@ -42,7 +42,7 @@ const Index = () => {
 
   return (
     <DefaultTemplate>
-      <SEO title="Writing" />
+      <SEO title="Timeline" />
 
       {posts.map((post: any) => (
         <Post key={post.node.fields.slug}>

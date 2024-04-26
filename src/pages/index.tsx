@@ -49,7 +49,7 @@ const Index = () => {
       >
         <h3 style={{ letterSpacing: 2, margin: 0, fontSize: 18 }}>RECENT POSTS</h3>
         <Link
-          to="/writing"
+          to="/timeline"
           style={{
             fontSize: 14,
             fontWeight: 500,
