@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import DefaultTemplate from '@templates/default';
 import SEO from '@components/SEO';
 import RelatedPost from '@components/RelatedPost';
-import Bio from '@components/Bio';
-import { graphql, Link, PageProps, useStaticQuery } from 'gatsby';
+import { graphql, Link, useStaticQuery } from 'gatsby';
+import styled from '@emotion/styled';
 
 const Index = () => {
   const result = useStaticQuery(graphql`
@@ -38,34 +38,21 @@ const Index = () => {
     <DefaultTemplate>
       <SEO title="" />
 
-      <Bio />
+      <BioContainer>
+        <AvatarContainer>
+          <Avatar src="/images/about/avatar.jpg" />
+        </AvatarContainer>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginBottom: 8
-        }}
-      >
-        <h3 style={{ letterSpacing: 2, margin: 0, fontSize: 18 }}>RECENT POSTS</h3>
-        <Link
-          to="/timeline"
-          style={{
-            fontSize: 14,
-            fontWeight: 500,
-            textDecoration: 'none',
-            // backgroundSize: "100%",
-            // backgroundRepeat: "repeat",
-            // backgroundClip: "text",
-            // backgroundImage:
-            //   "linear-gradient(90deg, #80D0F2 0%, #5C82FF 50%, #C480FF 100%)",
-            cursor: 'pointer'
-            // WebkitTextFillColor: "transparent",
-          }}
-        >
-          All posts ▸
-        </Link>
-      </div>
+        <Introduction>
+          <ProfileName>Sunhyoup Lee</ProfileName>
+          <ProfileDescription>Just Developer</ProfileDescription>
+        </Introduction>
+      </BioContainer>
+
+      <RecentPostsContainer>
+        <RecentPostsHeader>RECENT POSTS</RecentPostsHeader>
+        <AllPosts to="/timeline">All posts ▸</AllPosts>
+      </RecentPostsContainer>
 
       {posts && <RelatedPost posts={posts} style={{ padding: 0, paddingTop: 10 }} />}
     </DefaultTemplate>
@@ -73,3 +60,70 @@ const Index = () => {
 };
 
 export default Index;
+
+const BioContainer = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  gap: 16px;
+  margin-bottom: 32px;
+`;
+
+const AvatarContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.2);
+`;
+
+const Avatar = styled.img`
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+`;
+
+const Introduction = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const ProfileName = styled.div`
+  font-size: 24px;
+  font-weight: bold;
+`;
+
+const ProfileDescription = styled.div`
+  font-size: 16px;
+  color: #666;
+`;
+
+const Description = styled.div`
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 300;
+`;
+
+const RecentPostsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+`;
+
+const RecentPostsHeader = styled.div`
+  letter-spacing: 2px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+`;
+
+const AllPosts = styled(Link)`
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+`;
