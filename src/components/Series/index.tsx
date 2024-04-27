@@ -1,3 +1,5 @@
+import styled from '@emotion/styled';
+import { Link } from 'gatsby';
 import React from 'react';
 import { useEffect } from 'react';
 import Sticky from 'sticky-js';
@@ -13,35 +15,57 @@ interface SeriesProps {
   currentItem: string;
 }
 
-const List = ({ items, currentItem }: { items: [Item]; currentItem: string }) => {
-  return (
-    <ul>
-      {items.map(item => {
-        return (
-          <li
-            key={item.url}
-            style={currentItem === item.title ? { color: 'red', fontWeight: 'bold' } : undefined}
-          >
-            <a href={item.url}>{item.title}</a>
-          </li>
-        );
-      })}
-    </ul>
-  );
-};
-
 const Series = ({ items, title, currentItem }: SeriesProps) => {
-  useEffect(() => {
-    if (typeof document === undefined) return;
-    new Sticky('.series');
-  }, [items]);
-
   return (
-    <div className="series" data-margin-top="50">
-      <h4>{title}</h4>
-      <List items={items} currentItem={currentItem} />
-    </div>
+    <SeriesContainer>
+      <SeriesTitle>{title}</SeriesTitle>
+      <SeriesList>
+        {items.map(item => {
+          return (
+            <SeriesItem
+              key={item.url}
+              style={currentItem === item.title ? { color: '#00a962' } : undefined}
+            >
+              <Link
+                to={item.url}
+                style={currentItem === item.title ? { fontWeight: 'bold' } : undefined}
+              >
+                {item.title}
+              </Link>
+            </SeriesItem>
+          );
+        })}
+      </SeriesList>
+    </SeriesContainer>
   );
 };
 
 export default Series;
+
+const SeriesContainer = styled.div`
+  width: 100%;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  box-sizing: border-box;
+`;
+
+const SeriesTitle = styled.div`
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
+`;
+
+const SeriesList = styled.ul`
+  /* list-style: none; */
+  padding: 0;
+  padding-left: 24px;
+  margin: 0;
+`;
+
+const SeriesItem = styled.li`
+  a {
+    text-decoration: none;
+    color: #333;
+  }
+`;

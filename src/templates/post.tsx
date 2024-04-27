@@ -102,14 +102,10 @@ const PostTemplate = ({ data, location, pageContext, children }: PageProps) => {
 
       {draft || (tableOfContents.items && <TableOfContents items={tableOfContents.items} />)}
 
-      {/* {draft ||
+      {draft ||
         (series?.items && (
-          <Series
-            title={series.title}
-            items={series.items}
-            currentItem={frontmatter.title}
-          />
-        ))} */}
+          <Series title={series.title} items={series.items} currentItem={frontmatter.title} />
+        ))}
 
       <div className="post-content">
         {draft ? <NotYetPublished>Not yet published</NotYetPublished> : children}
