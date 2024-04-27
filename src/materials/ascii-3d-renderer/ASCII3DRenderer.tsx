@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ASCII3DRenderer as Renderer } from './renderer';
 
 export const ASCII3DRenderer = () => {
@@ -8,13 +8,25 @@ export const ASCII3DRenderer = () => {
     const renderer = new Renderer(ref.current, 80, 40);
     renderer.loadFromString(mesh);
     renderer.run();
+  }, [ref.current]);
+
+  const [width, setWidth] = useState<number>(0);
+
+  const handleResize = () => {
+    setWidth(ref.current?.clientWidth || 0);
+  };
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
     <div
       ref={ref}
       style={{
-        fontSize: ((ref.current?.clientWidth || 0) / 700) * 14,
+        fontSize: (width / 700) * 14,
         lineHeight: 1,
         width: '100%',
         fontFamily: 'monospace'
