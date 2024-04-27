@@ -44,6 +44,7 @@ export default Series;
 
 const SeriesContainer = styled.div`
   width: 100%;
+  margin-top: 8px;
   padding: 16px;
   border-radius: 8px;
   background-color: #f8f9fa;

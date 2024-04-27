@@ -192,57 +192,6 @@ figcaption {
 }
 
 /*
-  Series
-*/
-.series {
-  position: absolute;
-  left: -20px;
-  transform: translateX(-100%);
-  max-width: 320px;
-  width: 100%;
-}
-.series h4 {
-  margin: 0;
-  padding: 0;
-}
-.series ul {
-  margin: 0 0 8px 0;
-  padding: 0;
-  max-width: 320px;
-  width: 100%;
-}
-.series li {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.series li ul {
-  margin-left: 16px;
-  border-left: 1px solid #dfe3e8;
-}
-.series a {
-  display: block;
-  margin-left: 6px;
-  padding: 8px 12px 8px 12px;
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: normal;
-  text-decoration: none;
-  color: #454f5b;
-  border-radius: 4px;
-  word-break: keep-all;
-}
-.series a:hover {
-  color: #212b36;
-  background-color: #f4f6f8;
-}
-@media (max-width: 1400px) {
-  .series {
-    display: none;
-  }
-}
-
-/*
   Footnotes
 */
 .footnotes {
