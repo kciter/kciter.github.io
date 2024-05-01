@@ -87,14 +87,6 @@ const Title = styled.div`
 
 const SponsorContainer = styled.div`
   display: flex;
-
-  .sponser-button {
-    width: 120px;
-    height: 32px;
-    border-radius: 7px;
-    background-color: white;
-    color-scheme: light;
-  }
 `;
 
 const Sponsors = styled.div`
@@ -124,7 +116,7 @@ const SponsorButton = styled.a`
   height: 32px;
   border-radius: 7px;
   text-decoration: none;
-  border: 1px solid #e1e4e8;
+  border: 1px solid #e1e4e8 !important;
   background-color: #fafbfc;
   font-size: 14px;
   transition: all 0.3s ease;
