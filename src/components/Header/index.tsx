@@ -81,6 +81,7 @@ const Container = styled.div`
     border-radius: 0;
     grid-template-columns: 1fr;
     background-color: transparent;
+    backdrop-filter: none;
   }
 `;
 

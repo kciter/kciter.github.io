@@ -1,12 +1,12 @@
 import React from 'react';
 import Header from '@components/Header';
 import Footer from '@components/Footer';
-import { Helmet } from 'react-helmet';
 import '../assets/styles/prismjs-theme.css';
 import '../assets/styles/main.css';
 
 import { Global, css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { Helmet } from 'react-helmet';
 
 interface DefaultTemplateProps {
   children: React.ReactNode;
@@ -43,8 +43,6 @@ const DefaultTemplate = ({ children }: DefaultTemplateProps) => {
 
         <Footer />
       </Container>
-
-      <Texture />
     </>
   );
 };
@@ -90,7 +88,7 @@ const globalStyles = css`
       }
 
       &::before {
-        display: none;
+        background-size: 800px;
       }
     }
   }
@@ -105,17 +103,4 @@ const Container = styled.div`
   @media (max-width: 768px) {
     width: 90vw;
   }
-`;
-
-const Texture = styled.div`
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  z-index: -99;
-  width: 100%;
-  height: calc(200px + 100vh);
-  opacity: 0.25;
-  pointer-events: none;
-  transform: translateY(0px);
-  filter: contrast(120%) brightness(120%);
 `;
