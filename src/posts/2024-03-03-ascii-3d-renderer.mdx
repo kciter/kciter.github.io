@@ -15,12 +15,9 @@ import { SpinningCube, ASCII3DRenderer } from '@materials/ascii-3d-renderer';
 
 필자는 쓸데없지만 재밌는 프로그램을 만들면서 공부하는 것을 좋아한다. 최근에 정신적으로 에너지가 바닥나고 있다는 것을 느껴 작년에 재미로 만들었던 [Jazzlang](https://kciter.so/posts/crafting-esolang/)과 같이 정신적 에너지를 채워줄만한 재미를 느끼고 싶었다. 그래서 무언가 할만한 것을 찾던 중 작년 이맘때 쯤 재밌는 [유튜브 영상](https://www.youtube.com/watch?v=p09i_hoFdd0)을 봤던 것이 생각났다. 영상에서는 **CLI 환경에서 큐브를 회전시키는 프로그램**을 처음부터 끝까지 조용히 코딩하는 것을 보여준다.
 
-<figure>
-  <Image src="/images/2024-03-03-ascii-3d-renderer/youtube.gif" width="80%" />
-  <figcaption>영상 중 일부 캡쳐</figcaption>
-</figure>
+<Image src="/images/2024-03-03-ascii-3d-renderer/youtube.gif" width="80%" caption="영상 중 일부 캡쳐" />
 
-필자는 이 아이디어가 굉장히 참신하다 생각했다. 마침 무언가를 만들고 싶었던 차에 `큐브가 됐다면 CLI 환경에서 다른 물체도 3D 렌더링 할 수 있지 않을까?`라는 생각을 하게되었고 실제로 구현했다. 이 글의 결과물은 [이곳](https://github.com/kciter/ascii-3d-renderer.js)에서 볼 수 있다.
+필자는 이 아이디어가 굉장히 참신하다 생각했다. 마침 무언가를 만들고 싶었던 차에 `큐브가 됐다면 CLI 환경에서 다른 물체도 3D 렌더링 할 수 있지 않을까?`라는 생각을 하게되었고 실제로 구현했다. 이 글의 결과물은 [GitHub 저장소](https://github.com/kciter/ascii-3d-renderer.js)와 [Chromatic](https://kciter.so/ascii-3d-renderer.js)에서 볼 수 있다.
 
 # 어떻게 ASCII를 3D처럼 보이게 할까?
 
@@ -144,15 +141,15 @@ import { SpinningCube, ASCII3DRenderer } from '@materials/ascii-3d-renderer';
 * 뷰포트 변환 (Viewport transform)
 * 스캔 변환 (Scan transform)
 
-클리핑은 투영 변환 후에 2D 공간 바깥에 놓인 폴리곤을 잘라내는 작업을 말한다. 
+클리핑은 투영 변환 후에 **카메라 시점 바깥에 놓인 폴리곤을 잘라내는 작업**을 말한다. 클리핑을 통해 불필요한 계산을 줄일 수 있다.
 
-원근 나누기는 투영 변환 후에 2D 공간 좌표를 픽셀 좌표로 변환하는 작업을 말한다. 이때 투영 변환을 통해 얻은 좌표는 4차원 좌표이기 때문에 4번째 값으로 나누어 3차원 좌표로 변환한다.
+원근 나누기는 투영 변환 후에 **2D 공간 좌표로 변환하는 작업**을 말한다. 이 과정에서 카메라 시점에서 관찰한 물체의 깊이에 따라 크기를 조절하여 원근감을 만들어 낸다. 이때 x, y, z 좌표를 투영 변환을 통해 얻은 좌표인 4차원 좌표의 z 값으로 나누어 좌표를 변환한다.
 
-후면 제거는 물체의 뒷면을 제거하는 작업을 말한다. 뒷면을 제거하지 않으면 물체가 뒤집혀 보이게 된다.
+후면 제거는 **카메라 시점에서 보이지 않는 물체의 뒷면을 제거하는 작업**을 말한다. 이 또한 클리핑 처럼 불필요한 계산을 줄일 수 있다.
 
-뷰포트 변환은 2D 공간 좌표를 픽셀 좌표로 변환하는 작업을 말한다. 이때 뷰포트 변환을 통해 2D 공간 좌표를 CLI에서 표현할 수 있는 좌표로 변환한다.
+뷰포트 변환은 **2D 공간 좌표를 픽셀 좌표로 변환하는 작업**을 말한다. 이 글에서는 뷰포트 변환을 통해 2D 공간 좌표를 CLI에서 표현할 수 있는 좌표로 변환한다.
 
-스캔 변환은 래스터화를 통해 픽셀 좌표로 변환한 후 픽셀을 채우는 작업을 말한다. 이때 명암을 계산하여 픽셀을 채우게 된다. 
+스캔 변환은 **픽셀 좌표로 변환한 후 좌표 사이를 채우는 작업**을 말한다.
 
 <Video src="/images/2024-03-03-ascii-3d-renderer/rasterize.mp4" width="80%" caption="한 짤 요약" autoPlay muted loop />
 
@@ -170,24 +167,18 @@ import { SpinningCube, ASCII3DRenderer } from '@materials/ascii-3d-renderer';
 
 # 구현하기
 
-## 사전 준비
-이제 렌더링 파이프라인에 대해 알았으니 ASCII로 3D 물체를 표현하기 위한 렌더링 파이프라인 구현을 해보자. 먼저 CLI 상에서 ASCII로 표현하는 것이기 때문에 몇 가지 제약이 있다.
+기본적인 렌더링 파이프라인 지식에 대해 알아보았으니 이제 이를 이용하여 ASCII로 3D 물체를 표현하는 렌더링 파이프라인을 구현해보자. 참고로 코드가 너무 길어 글에 다 담기 어렵기 때문에 필요한 부분만 설명하고 전체 코드는 [GitHub 저장소 링크](https://github.com/kciter/ascii-3d-renderer.js)를 남길 것이다.
+
+참고로 CLI 상에서 ASCII 만으로 표현하는 것이기 때문에 몇 가지 제약이 있다.
 
 1. 정확한 픽셀 좌표를 이용할 수 없다.
 2. 텍스처를 입힐 수 없다.
 
-정확한 픽셀 좌표를 알더라도 CLI에서 표현할 수 없기 때문에 문자열 공간에 표현할 수 있는 좌표로 변환해야 한다. 따라서 뷰포트 변환을 할 때 이를 고려해야 한다. 또한 텍스처를 입힐 수 없기 때문에 명암을 표현할 때 사용할 문자열을 미리 정의할 필요가 있다. 이를 고려하여 구현해야 한다.
+정확한 픽셀 좌표를 알더라도 CLI에서 표현할 수 없기 때문에 문자열 공간에 표현할 수 있는 좌표로 변환해야 한다. 여기서는 이차원 배열을 사용할 것이다. 또한 텍스처를 입힐 수 없기 때문에 명암을 표현할 때 사용할 문자열을 미리 정의할 필요가 있다. 이를 고려하여 구현해야 한다.
 
-우선 크게 로직의 순서는 다음과 같을 것이다.
+## 사전 준비
 
-* 광원과 카메라 위치를 정한다.
-* 3D 모델을 불러온다.
-* 모델의 버텍스에 월드 변환, 뷰 변환, 투영 변환을 한다.
-* 래스터화를 통해 CLI에서 표현할 수 있는 좌표로 변환한다.
-* 광원 위치를 기준으로 명암을 계산한다.
-* 명암에 따른 ASCII 문자를 출력한다.
-
-수학 계산이 필요하므로 이에 대한 객체를 먼저 만들어 보자.
+전반적으로 수학 계산이 필요하므로 이에 대한 객체를 먼저 만들어 보자.
 
 ```ts
 class Matrix44 { /* ... */ }
@@ -195,15 +186,11 @@ class Vector2 { /* ... */ }
 class Vector3 { /* ... */ }
 class Vector4 { /* ... */ }
 ```
+<figcaption style={{marginTop: -24}}>
+  [소스 코드 링크](https://github.com/kciter/ascii-3d-renderer.js/tree/main/src/math)
+</figcaption>
 
-여기서 자세한 코드는 적지 않지만 각 클래스는 기본적인 더하기 빼기 곱하기 나누기 연산을 포함하여 앞서 설명한 회전 변환, 크기 변환, 이동 변환 등을 처리할 수 있도록 구현한다. 이제 렌더러를 만들어보자. 다음으로 필요한 객체는 다음과 같다.
-
-```ts
-class Mesh { /* ... */ }
-class Camera { /* ... */ }
-```
-
-각각 월드에 배치할 객체와 카메라 객체는 월드 변환과 뷰 변환을 처리할 수 있도록 구현한다.
+여기서 자세한 코드는 적지 않지만 각 클래스는 기본적인 더하기 빼기 곱하기 나누기 연산을 포함하여 앞서 설명한 회전 변환, 크기 변환, 이동 변환 등을 처리할 수 있도록 구현해야 한다.
 
 ## 모델 로더 구현
 
@@ -233,7 +220,7 @@ f 1 3 4
 f 5 1 2
 ```
 
-`obj` 확장자는 위와 같이 작성되어 있다 `v`는 버텍스를 나타내고 `f`는 Face element로 버텍스 연결을 통해 나타나는 도형을 뜻한다. 이를 이용하여 모델 로더를 구현해보자.
+대부분의 `obj` 파일은 위와 같이 작성되어 있다 `v`는 버텍스를 나타내고 `f`는 Face element로 버텍스 연결을 통해 나타나는 도형을 뜻한다. 이를 이용하여 모델 로더를 구현해보자.
 
 ```ts
 class Loader {
@@ -276,12 +263,15 @@ class Loader {
   }
 }
 ```
+<figcaption style={{marginTop: -24}}>
+  [소스 코드 링크](https://github.com/kciter/ascii-3d-renderer.js/blob/main/src/loader.ts)
+</figcaption>
 
 위 코드는 `obj` 내용을 파싱하여 버텍스와 폴리곤을 추출하는 역할을 한다. 코드 내용은 어렵지 않다. 단순히 whitespace를 기준으로 문자열을 나누고 값을 넣어줬을 뿐이다. 그리고 폴리곤 구성은 이미 정리한 버텍스 정보를 이용하여 만들었다.
 
 ## 렌더러 구현
 
-이제 렌더러를 구현해보자. 렌더러는 앞서 설명한 것처럼 다음과 같은 로직으로 구성된다.
+이제 렌더러를 구현해보자. 렌더러는 다음과 같은 로직으로 구성된다.
 
 * 광원과 카메라 위치를 정한다.
 * 3D 모델을 불러온다.
@@ -290,144 +280,691 @@ class Loader {
 * 광원 위치를 기준으로 명암을 계산한다.
 * 명암에 따른 ASCII 문자를 출력한다.
 
-```ts
-class Renderer {
-  private el: HTMLElement;
-  private width: number;
-  private height: number;
-  private camera: Camera;
-  private frameBuffer: string[][];
-  private mesh: Mesh;
+광원과 카메라는 아직 구현하지 않았으므로 먼저 각 변환에 대한 것을 구현해보자. 구현하다보면 카메라가 자연스럽게 구현될 것이다. 먼저 렌더러에 대한 기본 틀을 만들어보자.
 
-  constructor(el: HTMLElement, width: number, height: number, objString: string) {
-    this.el = el;
+```ts
+export class ASCII3DRenderer {
+  el: HTMLElement;
+  width: number;
+  height: number;
+  frameBuffer: string[][];
+  depthBuffer: number[][];
+
+  private Shade = '.;ox%@';
+
+  constructor(_el: HTMLElement, width: number, height: number) {
+    this.el = _el;
     this.width = width;
     this.height = height;
-    this.mesh = Loader.loadFromString(objString);
-    this.camera = new Camera();
+    this.frameBuffer = new Array(height + 1).fill(null).map(() => new Array(width + 1).fill(' '));
+    this.depthBuffer = new Array(height + 1).fill(null).map(() => new Array(width + 1).fill(255));
   }
 
   run() {
-    const fps = 60;
-    const interval = 1000 / fps;
-    let then = Date.now();
-    let now;
-    let delta;
-
-    const renderFrame = () => {
-      now = Date.now();
-      delta = now - then;
-
-      if (delta > interval) {
-        then = now - (delta % interval);
-        this.render();
-        this.angle += 0.01;
-        if (this.angle >= 2 * 3.14) this.angle -= 2 * 3.14;
-      }
-
-      requestAnimationFrame(renderFrame);
-    };
-
-    requestAnimationFrame(renderFrame);
+    // FPS 계산 로직
   }
 
-  render() {
+  private render() {
     this.clearFrameBuffer();
     this.process();
     this.drawFrameBuffer();
   }
 
-  private clearFrameBuffer() {
-    this.frameBuffer = Array.from({ length: height }, () =>
-      Array.from({ length: width }, () => " ")
-    );
+  private update() {
+    // ...
   }
 
   private process() {
-    const polygons = this.mesh.polygons;
-    for (const polygon of polygons) {
-      const vertices = polygon.vertices.map((vertex) => {
-        let v = vertex;
-        v = this.mesh.transform(v);
-        v = this.camera.transform(v);
-        v = this.camera.project(v);
-        return v;
-      });
-      this.rasterize(vertices);
-    }
+    // ...
   }
 
-  private rasterize(vertices: Vector2[]) {
-    /* ... */
+  private clearFrameBuffer() {
+    // 버퍼 초기화
   }
 
   private drawFrameBuffer() {
-    const ascii = this.frameBuffer
-      .map((row) => row.join(""))
-      .join("<br />");
-    this.el.innerHTML = ascii;
+    // 화면에 출력
   }
 }
 ```
+<figcaption style={{marginTop: -24}}>
+  [소스 코드 링크](https://github.com/kciter/ascii-3d-renderer.js/blob/main/src/renderer.ts)
+</figcaption>
 
-위와 같이 구현 후 `run` 메서드를 호출하면 렌더링이 된다. `run` 메서드에선 60 프레임을 유지하도록 시간을 계산하여 렌더링한다. 이제 `rasterize` 메서드를 구현해보자.
+틀이라고 했지만 코드가 짧지는 않다. 클래스 내 각 필드는 렌더링에 필요한 정보를 담고 있다. `el`은 렌더링 결과를 출력할 엘리먼트, `width`와 `height`는 렌더링 결과의 크기, `frameBuffer`는 렌더링 결과를 담을 공간, `depthBuffer`는 깊이 버퍼로 렌더링 결과의 깊이를 담는다. 결과의 깊이라는 것은 카메라와의 거리를 말한다고 볼 수 있다.
+
+그리고 여기서 `Shade`는 명암을 표현할 문자열을 미리 정의한 값이다.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/shade.png" />
+
+이어서 각 메서드를 보면 `run` 메서드는 60 프레임으로 렌더링을 유지하도록 하며 `render` 메서드는 그려진 것을 지우고 파이프라인 결과를 그리면서 렌더링을 처리한다. `process` 메서드는 버텍스 처리, 래스터화 등 렌더링 파이프라인 작업을 수행한다. 이 부분을 채우면 사실상 완성이라 할 수 있다. `process` 메서드는 다음과 같이 진행될 것이다.
+
+1. 카메라의 위치와 방향을 정한다.
+2. 오브젝트에 월드 변환을 적용한다.
+3. 오브젝트에 뷰 변환을 적용한다.
+4. 오브젝트에 투영 변환을 적용한다.
+5. 래스터화를 통해 CLI에서 표현할 수 있는 좌표로 변환한다.
+6. 명암에 따른 ASCII 문자를 출력한다.
+
+### 오브젝트 설정
+
+카메라를 구현하기 전에 먼저 렌더러에 렌더링할 오브젝트를 추가해보자. 오브젝트는 다음과 같은 일을 할 수 있다.
+
+1. `obj` 파일을 통해 폴리곤 메시를 불러올 수 있다.
+2. 스스로 회전, 이동, 크기를 가진다 할 수 있다.
+3. 행렬 연산을 통해 버텍스를 변환할 수 있다.
+
+먼저 오브젝트 클래스를 만들어보자.
 
 ```ts
-private rasterize(V1: Vector3, V2: Vector3, V3: Vector3) {
-  const halfWidth = this.width / 2;
-  const halfHeight = this.height / 2;
+export class Object {
+  mesh: Polygon[];   // 폴리곤 메시
+  position: Vector3; // 위치
+  rotate: Vector3;   // 회전
+  scale: Vector3;    // 크기
 
-  const v1 = new Vector2(V1.x * halfWidth + halfWidth, -V1.y * halfHeight + halfHeight);
-  const v2 = new Vector2(V2.x * halfWidth + halfWidth, -V2.y * halfHeight + halfHeight);
-  const v3 = new Vector2(V3.x * halfWidth + halfWidth, -V3.y * halfHeight + halfHeight);
+  constructor() {
+    // 초기화
+    this.mesh = [];
+    this.position = new Vector3(0, 0, 0);
+    this.rotate = new Vector3(0, 0, 0);
+    this.scale = new Vector3(1, 1, 1);
+  }
 
-  const minX = Math.floor(Math.max(0, Math.min(v1.x, Math.min(v2.x, v3.x))));
-  const minY = Math.floor(Math.max(0, Math.min(v1.y, Math.min(v2.y, v3.y))));
+  // obj 파일로부터 폴리곤 메시를 불러온다
+  async loadFromFile(file: File) {
+    this.mesh = await Loader.loadFromFile(file);
+  }
 
-  const maxX = Math.floor(Math.min(this.width, Math.max(v1.x, Math.max(v2.x, v3.x)) + 1));
-  const maxY = Math.floor(Math.min(this.height, Math.max(v1.y, Math.max(v2.y, v3.y)) + 1));
+  // obj 문자열로부터 폴리곤 메시를 불러온다
+  async loadFromString(string: string) {
+    this.mesh = await Loader.loadFromString(string);
+  }
 
-  for (let i = minY; i < maxY; i++) {
-    for (let j = minX; j < maxX; j++) {
-      if (this.isPointInTriangle(j, i, v1, v2, v3)) {
-        this.frameBuffer[i][j] = '#';
+  // 프레임마다 오브젝트를 변화시킬 수 있는 메서드
+  update() {
+    // override this method
+  }
+
+  // 월드 변환
+  transform(v: Vector4) {
+    const matrix = Matrix44.identity()
+      .multiply(Matrix44.rotateX(this.rotate.x))
+      .multiply(Matrix44.rotateY(this.rotate.y))
+      .multiply(Matrix44.rotateZ(this.rotate.z))
+      .multiply(Matrix44.scale(this.scale))
+      .multiply(Matrix44.translate(this.position));
+
+    return v.transform(matrix);
+  }
+
+  /* Setter */
+
+  setTranslate(v: Vector3) {
+    this.position = v;
+  }
+
+  setScale(v: Vector3) {
+    this.scale = v;
+  }
+
+  setRotateX(angle: number) {
+    this.rotate.x = angle;
+  }
+
+  setRotateY(angle: number) {
+    this.rotate.y = angle;
+  }
+
+  setRotateZ(angle: number) {
+    this.rotate.z = angle;
+  }
+}
+```
+<figcaption style={{marginTop: -24}}>
+  [소스 코드 링크](https://github.com/kciter/ascii-3d-renderer.js/blob/main/src/object.ts)
+</figcaption>
+
+위 코드는 `Object` 클래스를 구현한 것이다. `Object`는 `mesh` 필드에 폴리곤 메시를 가지며 `position`, `rotate`, `scale` 필드에 각각 위치, 회전, 크기를 가진다. 또한 `loadFromFile`과 `loadFromString` 메서드를 통해 `obj` 파일을 불러와 폴리곤 메시를 설정할 수 있다. 그리고 `transform` 메서드를 통해 버텍스를 변환할 수 있다.
+
+참고로 버텍스를 변환하는 행렬은 단위 행렬에 [회전](https://github.com/kciter/ascii-3d-renderer.js/blob/main/src/math/matrix44.ts#L97), [크기](https://github.com/kciter/ascii-3d-renderer.js/blob/main/src/math/matrix44.ts#L79), [이동](https://github.com/kciter/ascii-3d-renderer.js/blob/main/src/math/matrix44.ts#L88) 변환 행렬을 곱한 행렬이다.
+
+이어서 `update` 메서드는 프레임마다 오브젝트를 변화시킬 수 있는 메서드이다. 이 메서드는 오버라이드하여 사용할 수 있다. 그리고 `setTranslate`, `setScale`, `setRotateX`, `setRotateY`, `setRotateZ` 메서드를 통해 각각 위치, 크기, 회전을 설정할 수 있다. `update` 메서드를 보면 알겠지만 기본적으로 `Object` 클래스는 상속해서 사용할 수 있다.
+
+이제 렌더러에도 오브젝트를 추가할 수 있도록 코드를 수정해보자.
+
+```ts
+export class ASCII3DRenderer {
+  objects: Object[] = [];
+
+  placeObject(object: Object) {
+    this.objects.push(object);
+  }
+
+  // ...
+}
+```
+
+이제 기본적인 오브젝트 구현과 렌더러에 오브젝트를 추가하는 것까지 구현했다. 이제 버텍스 처리 과정을 구현해보자.
+
+### 버텍스 처리
+
+버텍스 처리는 오브젝트의 버텍스에 대해 월드 변환, 뷰 변환, 투영 변환을 적용하는 것이다. 먼저 렌더러가 가진 오브젝트에 월드 변환을 적용해보자.
+
+```ts
+export class ASCII3DRenderer {
+  // ...
+
+  private process() {
+    for (const object of this.objects) {
+      for (const polygon of object.mesh) {
+        // 4x4 행렬 연산을 위해 Vector4로 변환
+        let v1 = new Vector4(polygon.vertices[0].x, polygon.vertices[0].y, polygon.vertices[0].z, 1);
+        let v2 = new Vector4(polygon.vertices[1].x, polygon.vertices[1].y, polygon.vertices[1].z, 1);
+        let v3 = new Vector4(polygon.vertices[2].x, polygon.vertices[2].y, polygon.vertices[2].z, 1);
+
+        // 월드 변환
+        v1 = object.transform(v1);
+        v2 = object.transform(v2);
+        v3 = object.transform(v3);
+
+        // ...
       }
     }
   }
 }
 ```
 
-위 코드를 통해 폴리곤 속 좌표를 래스터화하여 ASCII 문자열을 출력할 수 있다. 다음으로 월드 행렬을 회전시켜 3D라는 것을 인지할 수 있도록 만들어보자.
+먼저 4x4 행렬 연산을 해야하기 때문에 오브젝트의 폴리곤을 순회하며 각 버텍스를 4차원 좌표로 변환한다. 그리고 `object.transform` 메서드를 통해 각 버텍스에 월드 변환을 적용한다. 계산 함수는 앞서 구현을 마쳤기 때문에 간단하게 적용할 수 있다. 이제 뷰 변환을 적용해보자. 뷰 변환을 위해선 카메라를 먼저 구현해야 하므로 `Camera` 클래스를 만들어보자.
 
 ```ts
-class Renderer {
-  private angle: number;
+export class Camera {
+  eye: Vector3;       // 카메라의 위치
+  look: Vector3;      // 카메라가 바라보는 방향
+  up: Vector3;        // 카메라의 상단 방향
+  rotate: Vector3;    // 카메라의 회전 각도
 
   constructor() {
-    // ...
-    this.angle = 0;
+    // 카메라의 초기 위치, 방향, 상단 방향, 회전 각도를 설정
+    this.eye = new Vector3(0, 0, 0);
+    this.look = new Vector3(0, 0, 1);
+    this.up = new Vector3(0, 1, 0);
+    this.rotate = new Vector3(0, 0, 0);  // x, y, z 축을 중심으로 회전 각도를 나타낸다
   }
 
+  transform(v: Vector4) {
+    // 카메라의 전방, 오른쪽, 상단 벡터를 계산
+    const forward = this.look.subtract(this.eye).normalize();
+    const newUp = forward.cross(this.up).normalize();
+    const right = newUp.cross(forward);
+
+    const matrix = new Matrix44(
+      right.x, right.y, right.z, 0,
+      newUp.x, newUp.y, newUp.z, 0,
+      forward.x, forward.y, forward.z, 0,
+      this.eye.x, this.eye.y, this.eye.z, 1
+    );
+
+    return v.transform(matrix);
+  }
+}
+```
+<figcaption style={{marginTop: -24}}>
+  [소스 코드 링크](https://github.com/kciter/ascii-3d-renderer.js/blob/main/src/camera.ts)
+</figcaption>
+
+위 코드는 `Camera` 클래스를 구현한 것으로 `eye`, `look`, `up`, `rotate` 필드를 가진다. 각 필드는 카메라의 위치, 방향, 업 벡터, 회전을 나타낸다. 그리고 `transform` 메서드를 통해 뷰 변환을 적용할 수 있다. 구현을 살펴보면 월드 변환보다 복잡하다는 것을 알 수 있다. 하나씩 살펴보자.
+
+순서대로 나오는 `forward`, `newUp`, `right`는 전방 벡터, 오른쪽 벡터, 상단 벡터를 말하고 각 벡터는 카메라의 방향과 위치를 나타내는 데 사용된다.
+
+* 전방 벡터(Forward Vector): 카메라의 위치와 바라보는 방향을 뺀 벡터를 정규화한 것이다. 이 벡터는 카메라의 전방 방향을 나타내며, 물체의 깊이를 나타내는 데 사용된다.
+* 오른쪽 벡터(Right Vector): 전방 벡터와 상단 벡터의 외적을 정규화한 것이다. 이 벡터는 카메라의 오른쪽 방향을 나타내며, 물체의 좌우 이동이나 회전을 구현하는 데 사용된다.
+* 상단 벡터(Up Vector): 오른쪽 벡터와 전방 벡터의 외적을 정규화한 것이다. 이 벡터는 카메라의 상단 방향을 나타내며, 물체의 상하 이동을 구현하는 데 사용된다.
+
+여기서 벡터의 정규화란 벡터의 방향을 그대로 두고 벡터의 크기를 1로 만드는 것을 말한다. 이렇게 구한 벡터들을 이용하여 뷰 변환 행렬을 만들어 버텍스에 적용한다. 이제 렌더러에 카메라를 추가하고 뷰 변환을 적용해보자.
+
+```ts
+export class ASCII3DRenderer {
   // ...
 
-  render() {
-    this.angle += 0.01;
-    if (this.angle >= 2 * 3.14) this.angle -= 2 * 3.14; // 다 돌면 다시 0으로
-    // ...
-  }
+  camera: Camera = new Camera();
 
   private process() {
-    // 메쉬를 회전시킨다.
-    this.mesh.rotateX(this.angle);
-    this.mesh.rotateY(this.angle);
-    this.mesh.rotateZ(this.angle);
+    this.camera.eye = new Vector3(0, 0, -3);
 
-    // ...
+    for (const object of this.objects) {
+      for (const polygon of object.mesh) {
+        // 4x4 행렬 연산을 위해 Vector4로 변환
+        let v1 = new Vector4(polygon.vertices[0].x, polygon.vertices[0].y, polygon.vertices[0].z, 1);
+        let v2 = new Vector4(polygon.vertices[1].x, polygon.vertices[1].y, polygon.vertices[1].z, 1);
+        let v3 = new Vector4(polygon.vertices[2].x, polygon.vertices[2].y, polygon.vertices[2].z, 1);
+
+        // 월드 변환
+        v1 = object.transform(v1);
+        v2 = object.transform(v2);
+        v3 = object.transform(v3);
+
+        // 뷰 변환
+        v1 = this.camera.transform(v1);
+        v2 = this.camera.transform(v2);
+        v3 = this.camera.transform(v3);
+
+        // ...
+      }
+    }
   }
 }
 ```
 
-위와 같이 메쉬 객체를 회전시키면 3D 물체가 회전하는 것처럼 보인다. 마치 물체가 회전하는 것처럼 보인다.
+이제 투영 변환만 남았다. 투영 변환을 해줄 `Projection` 클래스를 만들어보자.
+
+```ts
+export class Projection {
+  fov: number;
+  aspect: number;
+  near: number;
+  far: number;
+
+  constructor(fov: number, aspect: number, near: number, far: number) {
+    this.fov = fov;
+    this.aspect = aspect;
+    this.near = near;
+    this.far = far;
+  }
+
+  transform(v: Vector4) {
+    const fovRad = this.fov * (Math.PI / 180);
+    const f = 1.0 / Math.tan(fovRad / 2);
+    const rangeInv = 1.0 / (this.near - this.far);
+
+    // prettier-ignore
+    const matrix = new Matrix44(
+      f / this.aspect, 0, 0, 0,
+      0, f, 0, 0,
+      0, 0, (this.near + this.far) * rangeInv, -1,
+      0, 0, this.near * this.far * rangeInv * 2, 0
+    );
+
+    const transformed = v.transform(matrix);
+
+    transformed.x /= transformed.w;
+    transformed.y /= transformed.w;
+    transformed.z /= transformed.w;
+
+    return transformed;
+  }
+}
+```
+
+위 코드는 `Projection` 클래스를 구현한 것으로 `fov`, `aspect`, `near`, `far` 필드를 가진다. 각 필드는 시야각, 종횡비, 가까운 면, 먼 면을 나타낸다. 그리고 `transform` 메서드를 통해 투영 변환을 적용할 수 있다. 공식에 대한 설명은 조금 복잡하므로 여기서는 생략한다. 이제 렌더러에 투영 변환을 적용해보자.
+
+```ts
+export class ASCII3DRenderer {
+  // ...
+  projection: Projection;
+
+  constructor(_el: HTMLElement, width: number, height: number) {
+    // ...
+    this.projection = new Projection(70, width / 2 / height, 0.1, 100);
+  }
+
+  private process() {
+    this.camera.eye = new Vector3(0, 0, -3);
+
+    for (const object of this.objects) {
+      for (const polygon of object.mesh) {
+        // 4x4 행렬 연산을 위해 Vector4로 변환
+        let v1 = new Vector4(polygon.vertices[0].x, polygon.vertices[0].y, polygon.vertices[0].z, 1);
+        let v2 = new Vector4(polygon.vertices[1].x, polygon.vertices[1].y, polygon.vertices[1].z, 1);
+        let v3 = new Vector4(polygon.vertices[2].x, polygon.vertices[2].y, polygon.vertices[2].z, 1);
+
+        // 월드 변환
+        v1 = object.transform(v1);
+        v2 = object.transform(v2);
+        v3 = object.transform(v3);
+
+        // 뷰 변환
+        v1 = this.camera.transform(v1);
+        v2 = this.camera.transform(v2);
+        v3 = this.camera.transform(v3);
+
+        // 투영 변환
+        v1 = this.projection.transform(v1);
+        v2 = this.projection.transform(v2);
+        v3 = this.projection.transform(v3);
+      }
+    }
+  }
+}
+```
+
+여기까지 왔다면 버텍스 처리 과정은 끝났다.
+
+### 래스터화
+
+지금까지 출력된 결과물을 보지 못했기 때문에 지겨울 수 있다. 지금부터 구현할 래스터화를 마치며 실제 결과물을 확인할 수 있게 될 것이다. 더 지겨워지기 전에 가볍게 버텍스가 가진 세 개의 좌표를 선으로 연결해보자.
+
+```ts
+export class ASCII3DRenderer {
+  private process() {
+    this.camera.eye = new Vector3(0, 0, -3);
+
+    for (const object of this.objects) {
+      for (const polygon of object.mesh) {
+        // ...
+
+        // 래스터화
+        this.rasterize(v1, v2, v3);
+      }
+    }
+  }
+
+  private rasterize(v1: Vector4, v2: Vector4, v3: Vector4) {
+    // 점들을 화면 좌표로 변환
+    const p1 = new Vector2(((v1.x + 1) * this.width) / 2, ((1 - v1.y) * this.height) / 2);
+    const p2 = new Vector2(((v2.x + 1) * this.width) / 2, ((1 - v2.y) * this.height) / 2);
+    const p3 = new Vector2(((v3.x + 1) * this.width) / 2, ((1 - v3.y) * this.height) / 2);
+
+    // 선 그리기
+    this.drawLine(p1, p2);
+    this.drawLine(p2, p3);
+    this.drawLine(p3, p1);
+  }
+
+  private drawLine(p1: Vector2, p2: Vector2) {
+    const result = p2.subtract(p1);
+    const len = result.length();
+    const normalized = result.normalize();
+
+    for (let i = 0; i < len; i++) {
+      const current = normalized.multiply(i);
+      const p = p1.add(current);
+      
+      // 화면을 벗어나는 좌표는 무시
+      if (p.x >= 0 && p.x < this.width && p.y >= 0 && p.y < this.height) {
+        this.frameBuffer[Math.floor(p.y)][Math.floor(p.x)] = '#';
+      }
+    }
+  }
+}
+```
+
+위 코드에서 `rasterize` 메서드는 버텍스를 화면 좌표로 변환하고 `drawLine` 메서드를 통해 선을 그려준다. `drawLine` 메서드는 두 점 사이의 거리를 구하고 해당하는 좌표에 '#'을 넣어준다. 이제 렌더러에 오브젝트를 추가하고 렌더링을 해보자. 여기서는 `Cube` 오브젝트를 만들어서 추가해볼 것이다.
+
+```ts
+import { Vector3 } from '../math';
+import { Object } from '../object';
+
+export class Cube extends Object {
+  angle = 0;
+
+  constructor() {
+    super();
+    this.loadFromString(mesh);
+  }
+
+  override update(): void {
+    this.setRotateX(-this.angle * 2);
+    this.setRotateY(-this.angle * 2);
+    this.setRotateZ(-this.angle);
+    this.setTranslate(new Vector3(0, 0, -5));
+    this.angle += 0.007;
+  }
+}
+
+export const mesh = /* obj 파일 내용 */;
+```
+
+위 코드를 보면 `angle`을 통해 프레임마다 오브젝트를 회전시키도록 만들었다는 것을 알 수 있다. 이제 렌더러에 추가하고 렌더링을 해보자. 코드가 꼭 다음과 같을 필요는 없다.
+
+```ts
+const renderer = new ASCII3DRenderer(document.getElementById('app'), 150, 50);
+const cube = new Cube();
+renderer.placeObject(cube);
+renderer.run();
+```
+
+위와 같이 구현했다면 브라우저에서 렌더링 결과를 확인할 수 있다. 렌더링 결과를 한 번 살펴보자.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/cube-line.gif" />
+
+조금 어색하지만 큐브가 회전하는 것처럼 보이긴한다. 이번에는 버텍스 사이를 채워보자.
+
+```ts
+export class ASCII3DRenderer {
+  private process() {
+    this.camera.eye = new Vector3(0, 0, -3);
+
+    for (const object of this.objects) {
+      for (const polygon of object.mesh) {
+        // ...
+
+        // 래스터화
+        this.rasterize(v1, v2, v3);
+      }
+    }
+  }
+
+  private rasterize(v1: Vector4, v2: Vector4, v3: Vector4) {
+    // 점들을 화면 좌표로 변환
+    const p1 = new Vector2(((v1.x + 1) * this.width) / 2, ((1 - v1.y) * this.height) / 2);
+    const p2 = new Vector2(((v2.x + 1) * this.width) / 2, ((1 - v2.y) * this.height) / 2);
+    const p3 = new Vector2(((v3.x + 1) * this.width) / 2, ((1 - v3.y) * this.height) / 2);
+
+    // 삼각형의 경계 박스 계산
+    const minX = Math.floor(Math.max(0, Math.min(p1.x, p2.x, p3.x)));
+    const minY = Math.floor(Math.max(0, Math.min(p1.y, p2.y, p3.y)));
+    const maxX = Math.floor(Math.min(this.width, Math.max(p1.x, p2.x, p3.x)));
+    const maxY = Math.floor(Math.min(this.height, Math.max(p1.y, p2.y, p3.y)));
+
+    for (let x = minX; x <= maxX; x++) {
+      for (let y = minY; y <= maxY; y++) {
+        const p = new Vector2(x, y);
+
+        // 삼각형 내부에 있다면
+        if (this.isPointInTriangle(p, p1, p2, p3)) {
+          this.setPixel(x, y);
+        }
+      }
+    }
+  }
+
+  private isPointInTriangle(p: Vector2, p1: Vector2, p2: Vector2, p3: Vector2): boolean {
+    // 세 개의 부분 삼각형의 부호 계산
+    const b1 = this.sign(p, p1, p2) < 0;
+    const b2 = this.sign(p, p2, p3) < 0;
+    const b3 = this.sign(p, p3, p1) < 0;
+
+    // 모든 부분 삼각형의 부호가 같으면 삼각형 내부에 있는 것으로 간주
+    return b1 === b2 && b2 === b3;
+  }
+
+  // ...
+}
+```
+
+삼각형 내부도 채워진 것을 확인할 수 있다. 이제 `drawLine` 메서드는 사용하지 않는다. 참고로 명암이 없는 큐브는 어색하게 보이기 때문에 대신 [소 오브젝트](https://github.com/kciter/ascii-3d-renderer.js/blob/main/src/objects/cow.ts)를 렌더링했다.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/cow.gif" />
+
+### 명암 계산
+
+마지막으로 명암을 계산해보자. 이를 위해선 광원을 추가해야 한다.
+
+```ts
+export class ASCII3DRenderer {
+  // ...
+
+  private process() {
+    this.camera.eye = new Vector3(0, 0, -2);
+
+    for (const object of this.objects) {
+      for (const polygon of object.mesh) {
+        // 4x4 행렬 연산을 위해 Vector4로 변환
+        let v1 = new Vector4(polygon.vertices[0].x, polygon.vertices[0].y, polygon.vertices[0].z, 1);
+        let v2 = new Vector4(polygon.vertices[1].x, polygon.vertices[1].y, polygon.vertices[1].z, 1);
+        let v3 = new Vector4(polygon.vertices[2].x, polygon.vertices[2].y, polygon.vertices[2].z, 1);
+
+        // 월드 변환
+        v1 = object.transform(v1);
+        v2 = object.transform(v2);
+        v3 = object.transform(v3);
+
+        // 뷰 변환
+        v1 = this.camera.transform(v1);
+        v2 = this.camera.transform(v2);
+        v3 = this.camera.transform(v3);
+
+        // 광원 계산
+        const brightness = this.calculateLight(v1, v2, v3);
+
+        // 투영 변환
+        v1 = this.projection.transform(v1);
+        v2 = this.projection.transform(v2);
+        v3 = this.projection.transform(v3);
+
+        // 래스터화
+        this.rasterize(v1, v2, v3, brightness);
+      }
+    }
+  }
+
+  private calculateLight(v1: Vector4, v2: Vector4, v3: Vector4): number {
+    // 광원의 방향 벡터
+    // 카메라가 바라보는 방향 (0, 0, 1)을 사용함
+    const lightDirection = new Vector3(0, 0, 1).normalize();
+
+    // 삼각형의 표면 법선 벡터 계산
+    const normal = this.calculateSurfaceNormal(
+      new Vector3(v1.x, v1.y, v1.z),
+      new Vector3(v2.x, v2.y, v2.z),
+      new Vector3(v3.x, v3.y, v3.z)
+    );
+
+    // 광원과 표면 법선 벡터 간의 각도 계산
+    const cosAngle = normal.dot(lightDirection);
+
+    // 광원 각도에 따라 픽셀의 밝기 결정
+    const brightness = Math.max(0, cosAngle);
+
+    return brightness;
+  }
+
+  private calculateSurfaceNormal(v1: Vector3, v2: Vector3, v3: Vector3): Vector3 {
+    // 두 변을 정의
+    const edge1 = v3.subtract(v2);
+    const edge2 = v1.subtract(v3);
+
+    // 외적을 계산하여 표면 법선 벡터 반환
+    return edge1.cross(edge2).normalize();
+  }
+  
+  // ...
+}
+```
+
+위 코드에서 `calculateLight` 메서드는 광원의 방향 벡터와 삼각형의 표면 법선 벡터를 이용하여 광원과 표면 법선 벡터 간의 각도를 계산한다. 참고로 법선 벡터란 평면의 방향을 나타내는 벡터이다. 이를 이용하여 광원의 각도에 따라 픽셀의 밝기를 결정한다.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/normal-vector.png" caption="법선 벡터란 이름은 쉽지 않다.." />
+
+이제 명암에 따라 ASCII 문자를 출력해보자.
+
+```ts
+export class ASCII3DRenderer {
+  // ...
+
+  private process() {
+    this.camera.eye = new Vector3(0, 0, -2);
+
+    for (const object of this.objects) {
+      for (const polygon of object.mesh) {
+        // 4x4 행렬 연산을 위해 Vector4로 변환
+        let v1 = new Vector4(polygon.vertices[0].x, polygon.vertices[0].y, polygon.vertices[0].z, 1);
+        let v2 = new Vector4(polygon.vertices[1].x, polygon.vertices[1].y, polygon.vertices[1].z, 1);
+        let v3 = new Vector4(polygon.vertices[2].x, polygon.vertices[2].y, polygon.vertices[2].z, 1);
+
+        // 월드 변환
+        v1 = object.transform(v1);
+        v2 = object.transform(v2);
+        v3 = object.transform(v3);
+
+        // 뷰 변환
+        v1 = this.camera.transform(v1);
+        v2 = this.camera.transform(v2);
+        v3 = this.camera.transform(v3);
+
+        // 광원 계산
+        const brightness = this.calculateLight(v1, v2, v3);
+
+        // 투영 변환
+        v1 = this.projection.transform(v1);
+        v2 = this.projection.transform(v2);
+        v3 = this.projection.transform(v3);
+
+        // 래스터화
+        this.rasterize(v1, v2, v3, brightness);
+      }
+    }
+  }
+
+  private rasterize(v1: Vector4, v2: Vector4, v3: Vector4, brightness: number) {
+    // 점들을 화면 좌표로 변환
+    const p1 = new Vector2(((v1.x + 1) * this.width) / 2, ((1 - v1.y) * this.height) / 2);
+    const p2 = new Vector2(((v2.x + 1) * this.width) / 2, ((1 - v2.y) * this.height) / 2);
+    const p3 = new Vector2(((v3.x + 1) * this.width) / 2, ((1 - v3.y) * this.height) / 2);
+
+    // 삼각형의 경계 박스 계산
+    const minX = Math.floor(Math.max(0, Math.min(p1.x, p2.x, p3.x)));
+    const minY = Math.floor(Math.max(0, Math.min(p1.y, p2.y, p3.y)));
+    const maxX = Math.floor(Math.min(this.width, Math.max(p1.x, p2.x, p3.x)));
+    const maxY = Math.floor(Math.min(this.height, Math.max(p1.y, p2.y, p3.y)));
+
+    // 박스 내부 순회
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        // 화면 밖이라면 무시
+        if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+          continue;
+        }
+
+        const p = new Vector2(x, y);
+
+        // 삼각형 내부에 있다면
+        if (this.isPointInTriangle(p, p1, p2, p3)) {
+          // 더 낮은 깊이라면 덮어쓴다
+          if ((v1.w + v2.w + v3.w) / 3.0 <= this.depthBuffer[y][x]) {
+            const shade = this.Shade[Math.round(brightness * (this.Shade.length - 1))];
+            this.frameBuffer[y][x] = shade;
+            this.depthBuffer[y][x] = (v1.w + v2.w + v3.w) / 3.0;
+          }
+        }
+      }
+    }
+  }
+
+  // ...
+}
+```
+
+명암은 `brightness` 값에 따라 `Shade` 단계를 선택한다. 그리고 여기서 `depthBuffer`가 처음으로 등장하는데, 이는 깊이 버퍼를 의미한다. 깊이 버퍼는 화면에 그려진 픽셀의 깊이를 저장하는 버퍼로, 더 낮은 깊이를 가진 픽셀이 더 앞에 있다는 것을 의미한다. 이를 통해 뒤에 있는 픽셀이 앞에 있는 픽셀을 덮어쓰지 않도록 한다.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/cow-shade.gif" caption="최종 결과물" />
+
+### 확장 아스키 사용
+
+여기까지 왔다면 완성했다고 볼 수 있다. 여기서 조금만 수정해서 명임아 더 대비되도록 만들어보자. 확장 아스키를 사용하면 구현할 수 있다.
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/shade2.png" caption="조금 더 명암이 확실하다" />
+
+어려울 것 없이 `Shade` 배열을 수정하면 된다.
+
+```ts
+private Shade = '·┼╬░▒▓█';
+```
+
+<Image src="/images/2024-03-03-ascii-3d-renderer/cow-shade2.gif" caption="볼만하다" />
+
+# 마치며
 
 JavaScript(TypeScript를 빌드)로 구현했기 때문에 웹에서 실행이 가능하다. 결과적으로 다음과 같은 결과물을 웹에서 볼 수 있다.
 
@@ -436,7 +973,7 @@ JavaScript(TypeScript를 빌드)로 구현했기 때문에 웹에서 실행이 �
 </div>
 <figcaption>명암도 잘 구분된다</figcaption>
 
-# 마치며
+별도로 배포한 [Chromatic](https://kciter.so/ascii-3d-renderer.js)에서 보면 더 다양한 예제를 볼 수 있다.
 
 반쯤 재미로 시작한 프로젝트지만 생각보다 구현이 쉽지는 않았다. 게임 개발이 하고 싶어 개발자의 길을 걸었지만 마지막으로 게임 개발과 관련된 공부를 한지도 벌써 10년이 지났다. 그럼에도 불구하고 오랜만에 작업을 하니 재미있었고 다시 머리가 깨어나는 느낌이었다. 역시 학습에서 중요한 것은 평소에 잘 하지 않는 것을 해보는 것, 그리고 그것을 익숙해질 때까지 반복하는 것이라는 것을 다시 한 번 깨달았다. 다음에 기회가 된다면 또 다시 이런 재미있는 프로젝트를 해보고 싶다.
 
@@ -444,21 +981,3 @@ JavaScript(TypeScript를 빌드)로 구현했기 때문에 웹에서 실행이 �
 [^2]: 3D 모델링 툴은 작업의 편의성을 위해 사각 폴리곤을 제공한다. 이는 후처리 과정에서 삼각 폴리곤으로 변환된다.
 [^3]: 이는 [동차좌표](https://ko.wikipedia.org/wiki/%EB%8F%99%EC%B0%A8%EC%A2%8C%ED%91%9C)를 사용했기 때문이다. 이를 이용한 동차좌표계는 3차원 좌표에서 방향성을 추가하여 4차원 좌표로 확장함으로서 3차원 좌표의 회전, 이동, 크기 조절을 한 번에 처리할 수 있다.
 [^4]: 따라서 보통 화면에 딱 붙어야하는 UI를 구현할 때 많이 사용한다.
-
-
-{/*
-
-앞서 설명한 것처럼 좌표 변환은 행렬을 이용하여 처리한다. 여기서부터 조금 머리 아픈 부분이 시작된다. 각 이동, 크기, 회전에 대한 행렬이 존재하며 이를 이용하여 변환을 처리하기 위해서는 행렬의 곱셈을 알아야 한다. 보통 교과 과정에서 배우는 내용이지만 잊었던 기억을 끄집어내기 위해 다시 살펴보자. 행렬의 곱셈은 다음과 같이 정의된다.
-
-```
-A = [a, b]  B = [e, f]
-    [c, d]      [g, h]
-```
-
-위와 같이 A와 B라는 2x2 행렬이 있다고 가정했을 때 A와 B의 곱셈은 다음과 같이 정의된다.
-
-```
-A * B = [a * e + b * g, a * f + b * h]
-        [c * e + d * g, c * f + d * h]
-``` -->
-*/}
