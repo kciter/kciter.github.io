@@ -10,6 +10,7 @@ interface ImageProps {
   controls?: boolean;
   muted?: boolean;
   loop?: boolean;
+  playsInline?: boolean;
 }
 
 const Video = ({
@@ -20,7 +21,8 @@ const Video = ({
   autoPlay,
   controls,
   muted,
-  loop
+  loop,
+  playsInline
 }: ImageProps) => {
   const [isExpanded, toggleExpanded] = useState(false);
 
@@ -35,6 +37,7 @@ const Video = ({
         controls={controls}
         muted={muted}
         loop={loop}
+        playsInline={playsInline}
       />
       {caption && <figcaption dangerouslySetInnerHTML={{ __html: caption }} />}
       {isExpanded &&
