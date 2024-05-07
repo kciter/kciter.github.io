@@ -67,7 +67,7 @@ export const createPages = async ({ graphql, actions }) => {
                   return edge.node.frontmatter.series === node.frontmatter.series;
                 })
                 .toSorted((a, b) => {
-                  return Date.pase(a.node.fields.date) < Date.parse(b.node.fields.date) ? -1 : 1;
+                  return Date.parse(a.node.fields.date) < Date.parse(b.node.fields.date) ? -1 : 1;
                 })
                 .map(edge => {
                   return {
