@@ -84,6 +84,7 @@ const Avatar = styled.img`
   width: 116px;
   height: 116px;
   border-radius: 50%;
+  object-fit: cover;
 `;
 
 const Introduction = styled.div`

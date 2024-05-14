@@ -34,8 +34,10 @@ const Avatar = styled.div`
   flex: 0 1 80px;
 
   img {
-    width: 100%;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
+    object-fit: cover;
   }
 `;
 
