@@ -98,10 +98,6 @@ const Post = styled.div`
   padding: 0;
   list-style: none;
   line-height: 26px;
-
-  @media (max-width: 768px) {
-    height: 440px;
-  }
 `;
 
 const PostMeta = styled.div`
@@ -145,18 +141,6 @@ const PostContent = styled.div<{ recent: boolean }>`
   border-left: 1px solid #ddd;
   min-width: 0%;
   padding-bottom: 80px;
-  /* 
-  &::before {
-    content: '';
-    position: absolute;
-    display: block;
-    width: 1px;
-    height: 100%;
-    left: -2px;
-    top: 0;
-    bottom: 0;
-    background-color: #ddd;
-  } */
 
   &::after {
     background: ${props => (props.recent ? '#00a962' : '#888')};
