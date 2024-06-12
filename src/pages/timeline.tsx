@@ -76,7 +76,9 @@ const Index = () => {
                   <Link to={post.node.fields.slug}>{post.node.frontmatter.title}</Link>
                 </PostTitle>
                 <PostDescription>{post.node.excerpt}</PostDescription>
-                <ThumbnailImage src={post.node.frontmatter.image} />
+                {post.node.frontmatter.image && (
+                  <ThumbnailImage src={post.node.frontmatter.image} />
+                )}
               </ContentInner>
             </Link>
           </PostContent>
@@ -91,7 +93,7 @@ export default Index;
 const Post = styled.div`
   display: flex;
   /* width: 90%; */
-  height: 500px;
+  height: auto;
   margin: 0 auto;
   padding: 0;
   list-style: none;
@@ -142,6 +144,19 @@ const PostContent = styled.div<{ recent: boolean }>`
   padding-left: 24px;
   border-left: 1px solid #ddd;
   min-width: 0%;
+  padding-bottom: 80px;
+  /* 
+  &::before {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 1px;
+    height: 100%;
+    left: -2px;
+    top: 0;
+    bottom: 0;
+    background-color: #ddd;
+  } */
 
   &::after {
     background: ${props => (props.recent ? '#00a962' : '#888')};
@@ -149,7 +164,7 @@ const PostContent = styled.div<{ recent: boolean }>`
     content: '';
     display: block;
     height: 10px;
-    left: -7px;
+    left: -6px;
     position: absolute;
     top: -4px;
     width: 10px;

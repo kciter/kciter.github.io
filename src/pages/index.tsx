@@ -13,7 +13,7 @@ const Index = () => {
         sort: { fields: { date: DESC } }
         filter: {
           fields: { type: { eq: "post" } }
-          frontmatter: { draft: { ne: true }, hide: { ne: true } }
+          frontmatter: { categories: { eq: "article" }, draft: { ne: true }, hide: { ne: true } }
         }
       ) {
         edges {
