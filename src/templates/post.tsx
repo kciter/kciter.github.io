@@ -98,7 +98,7 @@ const PostTemplate = ({ data, location, pageContext, children }: PageProps) => {
 
       <span className="post-date">Written on {dayjs(fields.date).locale('en').format('LL')}</span>
 
-      <img src={frontmatter.image} />
+      <img src={frontmatter.image} style={{ width: '100%' }} />
 
       {draft || (tableOfContents.items && <TableOfContents items={tableOfContents.items} />)}
 
