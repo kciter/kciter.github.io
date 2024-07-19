@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DefaultTemplate from '@templates/default';
 import SEO from '@components/SEO';
 import dayjs from 'dayjs';
@@ -8,8 +8,7 @@ import styled from '@emotion/styled';
 dayjs.extend(require('dayjs/plugin/localizedFormat'));
 
 const Index = ({ location }: PageProps) => {
-  const params = new URLSearchParams(location.search);
-  const category = params.get('category');
+  const [category, setCategory] = useState('article');
 
   const result = useStaticQuery(graphql`
     {
@@ -39,13 +38,16 @@ const Index = ({ location }: PageProps) => {
     }
   `);
 
-  const posts = result.allMdx.edges.filter((item: any) =>
-    category ? item.node.frontmatter.categories === category : true
-  );
+  const posts = result.allMdx.edges;
+  // .filter((item: any) =>
+  //   category ? item.node.frontmatter.categories === category : true
+  // );
 
   return (
     <DefaultTemplate>
       <SEO title="Timeline" />
+
+      {/* <SegmentGroup>Article</SegmentGroup> */}
 
       {posts.map((post: any) => (
         <Post key={post.node.fields.slug}>
@@ -279,3 +281,16 @@ const ContentInner = styled.div`
     }
   }
 `;
+
+// const SegmentGroup = styled.div`
+//   display: flex;
+//   width: 60%;
+//   margin: 0 auto;
+//   margin-bottom: 40px;
+//   gap: 16px;
+// `;
+
+// const SegmentItem = styled.div`
+//   flex: 1;
+
+// `;

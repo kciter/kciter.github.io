@@ -50,8 +50,8 @@ const Index = () => {
       </BioContainer>
 
       <RecentPostsContainer>
-        <RecentPostsHeader>RECENT POSTS</RecentPostsHeader>
-        <AllPosts to="/timeline">All posts ▸</AllPosts>
+        <RecentPostsHeader>RECENT ARTICLES</RecentPostsHeader>
+        <AllPosts to="/timeline">All articles ▸</AllPosts>
       </RecentPostsContainer>
 
       {posts && <RelatedPost posts={posts} style={{ padding: 0, paddingTop: 10 }} />}

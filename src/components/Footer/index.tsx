@@ -9,7 +9,7 @@ const Footer = () => {
       <Social />
 
       <Copyright>
-        <Link to="/about">kciter.so | devlog by Lee Sun-Hyoup</Link>
+        <Link to="/about">kciter.so | devlog by Sunhyoup Lee</Link>
       </Copyright>
     </FooterContainer>
   );
