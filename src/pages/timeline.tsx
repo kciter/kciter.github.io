@@ -2,20 +2,20 @@ import React from 'react';
 import DefaultTemplate from '@templates/default';
 import SEO from '@components/SEO';
 import dayjs from 'dayjs';
-import { graphql, Link, useStaticQuery } from 'gatsby';
+import { graphql, Link, PageProps, useStaticQuery } from 'gatsby';
 import styled from '@emotion/styled';
 
 dayjs.extend(require('dayjs/plugin/localizedFormat'));
 
-const Index = () => {
+const Index = ({ location }: PageProps) => {
+  const params = new URLSearchParams(location.search);
+  const category = params.get('category');
+
   const result = useStaticQuery(graphql`
     {
       allMdx(
         sort: { fields: { date: DESC } }
-        filter: {
-          fields: { type: { eq: "post" } }
-          frontmatter: { draft: { ne: true }, hide: { ne: true } }
-        }
+        filter: { frontmatter: { draft: { ne: true }, hide: { ne: true } } }
       ) {
         edges {
           node {
@@ -28,6 +28,7 @@ const Index = () => {
               slug
             }
             frontmatter {
+              categories
               tags
               title
               image
@@ -38,7 +39,9 @@ const Index = () => {
     }
   `);
 
-  const posts = result.allMdx.edges;
+  const posts = result.allMdx.edges.filter((item: any) =>
+    category ? item.node.frontmatter.categories === category : true
+  );
 
   return (
     <DefaultTemplate>
@@ -140,7 +143,7 @@ const PostContent = styled.div<{ recent: boolean }>`
   padding-left: 24px;
   border-left: 1px solid #ddd;
   min-width: 0%;
-  padding-bottom: 80px;
+  padding-bottom: 60px;
 
   &::after {
     background: ${props => (props.recent ? '#00a962' : '#888')};
