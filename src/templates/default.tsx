@@ -84,7 +84,9 @@ const globalStyles = css`
       }
 
       .post-content {
-        line-height: 1.8;
+        p {
+          line-height: 1.8;
+        }
       }
 
       &::before {

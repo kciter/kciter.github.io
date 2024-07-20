@@ -169,7 +169,7 @@ sup {
 }
 
 @media (max-width: 30rem) {
-  .posts h1 {
+  .posts > h1 {
     font-size: 1.5rem;
   }
 }
