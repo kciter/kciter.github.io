@@ -221,24 +221,22 @@ class User {
 }
 ```
 
-위와 같이 해결할 수도 있지만 타입을 풍부하게 사용하면 이를 좀 더 우아하게 해결할 수 있다. 다음 코드를 살펴보자.
+위와 같이 해결할 수도 있지만 타입을 이용하면 이를 좀 더 우아하게 해결할 수 있다. 다음 코드를 살펴보자.
 
 ```kotlin
-@JvmInline
+// 참고로 JVM 환경이라면 @JvmInline 어노테이션이 필요하다
 value class Name(val value: String) {
   init {
     require(value.isNotBlank()) { "이름은 공백일 수 없습니다." }
   }
 }
 
-@JvmInline
 value class Age(val value: Int) {
   init {
     require(value >= 0) { "나이는 0보다 작을 수 없습니다." }
   }
 }
 
-@JvmInline
 value class Email(val value: String) {
   init {
     require(value.contains("@")) { "이메일 형식이 올바르지 않습니다." }
@@ -260,7 +258,7 @@ class User {
 
 이런 방식으로 타입을 별도로 정의하여 사용하면 `User` 클래스가 가지고 있는 속성이 어떤 의미를 가지고 있는지 알 수 있으므로 가독성에 더 좋다. 또한 이러한 타입은 다양한 곳에서 재사용할 수 있으므로 코드의 중복을 줄일 수 있다.
 
-참고로 이 글에서는 코틀린의 `value class`를 사용헀지만 다른 언어에서도 클래스를 사용하여 똑같이 만들 수 있다. 마지막으로 정리하면 타입 시스템을 풍부하게 사용하는 것으로 다음과 같은 이점을 얻을 수 있다.
+참고로 이 글에서는 코틀린의 `value class`를 사용헀지만 다른 언어에서도 클래스를 사용하여 똑같이 만들 수 있다. 정리하자면 타입 시스템을 풍부하게 사용하는 것으로 다음과 같은 이점을 얻을 수 있다.
 
 * 컴파일 타임에 오류를 발견할 수 있다.
 * 타입을 통해 로직을 설계 할 수 있다.
@@ -269,17 +267,13 @@ class User {
 
 # 우아한 타입 활용
 
-타입을 잘 활용하기 위해서는 지식이 필요하다. 타입에 대한 여러 문법을 익히고 사용 사례와 패턴을 익힌다면 타입 시스템은 더이상 두려운 것이 아닌 든든한 친구가 될 수 있다. 이 글에서는 다양한 타입 사용 사례를 소개하면서 적절한 언어로 예제를 작성할 것이다. 다만, 타입 시스템의 동작은 프로그래밍 언어마다 다르기에 이 글에서 소개하는 문법이 모든 언어에서 지원되는 것은 아니다. 따라서 타입 시스템을 잘 이해하고싶다면 타입 시스템이 풍부한 다른 언어를 공부하는 것도 좋은 방법이다.
+타입 시스템을 잘 이해하고 있다면 타입에 기반하여 범위와 행동을 제한하는 설계가 가능하다. 만약 내 코드를 사용하는 다른 개발자가 조금 더 안전하게 코딩할 수 있게 돕고 싶다면 타입 시스템을 잘 활용하는 것이 좋다.
 
-참고로 **타입을 과하게 이용하면 반대로 가독성이 안좋아질 수 있다**. 이는 코드의 문제가 아닌 협업 환경의 문제기 때문에 생소한 문법을 사용할 때는 내가 아는 것을 다른 팀원도 잘 알고있는지 파악하여 사용할 필요가 있다.
+이번에는 앞서 소개한 사례 외에 타입 시스템을 활용한 다른 사례를 소개할 것이다. 다만, 타입 시스템의 동작은 프로그래밍 언어마다 다르기에 이 글에서 소개하는 문법이 모든 언어에서 지원되는 것은 아니다.
 
-## 추상화
+## 제네릭을 이용한 범용적인 타입
 
-**타입 시스템을 이용한 추상화를 통해 중복 코드를 제거할 수 있다**. 보통 타입 시스템에서 가장 많이 활용하는 방법이라 볼 수 있다. 구조체, 클래스 등을 정의하는 것도 일종의 추상화라고 볼 수 있다. 이를 통해 코드의 가독성을 높일 수 있으며 중복 코드를 제거할 수 있다.
-
-### 제네릭
-
-타입을 통한 추상화 중 가장 많이 사용하는 방법 중 하나가 제네릭(Generic)[^1]일 것이다. 제네릭은 대부분의 언어가 지원하므로 보편적으로 많이 사용하는 문법이다. 제네릭은 **포괄적인, 일반적인**이라는 뜻으로 프로그래밍 언어에서는 **다양한 타입을 포괄하는 타입**을 의미한다. 예를 들어 Kotlin에서 `List` 타입은 제네릭을 이용하여 `Int` 타입이나 `String` 타입을 모두 포함할 수 있다. 
+제네릭(Generic)[^1]은 타입을 일반화하는 방법으로 대부분의 언어가 지원하므로 대부분 잘 아는 문법일 것이다. 예를 들어 Kotlin에서 `List` 타입은 제네릭을 이용하여 `Int` 타입이나 `String` 타입을 모두 포함할 수 있다. 
 
 ```kotlin
 val numbers: List<Int> = listOf(1, 2, 3)
@@ -297,62 +291,284 @@ val numbers: IntList = listOf(1, 2, 3)
 val strings: StringList = listOf("a", "b", "c")
 ```
 
-따라서 제네릭을 잘 사용한다면 코드 중복을 많이 줄일 수 있다. 여기까지는 대부분 잘 아는 내용이므로 좀 더 복잡한 내용을 살펴보자.
+제네릭을 잘 사용한다면 코드 중복을 많이 줄일 수 있다. 여기까지는 대부분 잘 아는 내용이므로 좀 더 복잡한 내용을 살펴보자.
 
-### 공변성과 반공변성
+## 팬텀 타입을 이용한 범위 제한
 
-제네릭을 사용할 때 주의해야 할 점 중 하나가 **공변성(Covariance)**과 **반공변성(Contravariance)**이다. 이는 제네릭을 사용할 때 타입의 관계를 나타내는 것이다.
+팬텀 타입(Phantom Type)은 이름 그대로 실체가 없는 타입을 말한다. 예를 들어 다음 타입은 의미가 없는 타입이라 볼 수 있다.
 
-이를 이용하여 추상화를 더욱 풍부하게 할 수 있다. 예를 들어, `List` 타입은 `List<Int>` 타입을 포함하고 있지만 `List<Number>` 타입을 포함하고 있지 않다. 이는 `List<Int>` 타입은 `List<Number>` 타입의 하위 타입이 아니기 때문이다. 이를 해결하기 위해 공변성과 반공변성을 사용할 수 있다.
+```typescript
+// TypeScript
+type Phantom // 아무런 정의가 없는 타입
+```
+
+이처럼 우측에 정의가 되지 않은 타입을 팬텀 타입이라고 부른다. 별도로 타입을 정의할 수 없는 언어는 빈 클래스를 사용하는 방법도 있다.
 
 ```kotlin
-interface List<out T> {
-  fun get(index: Int): T
+// Kotlin
+class Phantom // 아무런 내용이 없는 클래스
+```
+
+얼핏 의미가 무의미한 코드로 보이지만 나름대로 사용처가 있다. 주로 **특정 타입에 대한 하위 타입으로 구분**할 때 많이 쓰인다. 예를 들어 다음 코드를 살펴보자.
+
+```kotlin
+class Meters
+class Kilometers
+
+class Distance<Unit>(val value: Double)
+
+fun Distance<Meters>.toKilometers(): Distance<Kilometers> {
+  return Distance(this.value / 1000)
 }
 
-interface List<in T> {
-  fun add(element: T)
+fun Distance<Kilometers>.toMeters(): Distance<Meters> {
+  return Distance(this.value * 1000)
+}
+
+val distanceInMeters = Distance<Meters>(5000.0)
+val distanceInKilometers = distanceInMeters.toKilometers()
+println("Distance in kilometers: ${distanceInKilometers.value}") // 5.0
+
+val distanceInKilometers2 = Distance<Kilometers>(3.0)
+val distanceInMeters2 = distanceInKilometers2.toMeters()
+println("Distance in meters: ${distanceInMeters2.value}") // 3000.0
+
+// 에러 발생
+val invalid = distanceInMeters.toMeters()
+```
+
+위 코드를 보면 `Distance` 클래스는 제네릭을 이용하여 `Meters` 타입과 `Kilometers` 타입을 구분하면서도 하나로 추상화하기 위한 방법으로 팬텀 타입을 사용하고 있다. 이를 통해 `Distance` 클래스는 `Meters` 타입과 `Kilometers` 타입을 구분하여 사용할 수 있다. 또한, 제네릭의 공변성으로 인해 두 타입은 서로 다른 타입으로 취급되기 때문에 컴파일러의 보호를 받을 수 있다.
+
+이를 이용하여 별도의 값 없이 객체에 상태를 부여하는 것도 가능하다. 다음 코드를 살펴보자.
+
+```kotlin
+class Draft
+class Published
+
+class Document<State>(val content: String)
+
+fun publish(draftDocument: Document<Draft>): Document<Published> {
+  println("Publishing document: $content")
+  return Document(draftDocument.content)
+}
+
+fun edit(publishedDocument: Document<Published>): Document<Draft> {
+  println("Start editing document: $content")
+  return Document(publishedDocument.content)
+}
+
+val draftDocument = Document<Draft>("Hello, world!")
+val publishedDocument = publish(draftDocument)
+val editingDocument = edit(publishedDocument)
+
+// 에러 발생
+val invalid = edit(editingDocument)
+```
+
+여기까지 정리하자면 즉, 팬텀 타입을 통해 **하나의 타입에서 파생되는 복수의 하위 타입을 만드는 것이 가능**하다. 앞서 [타입으로 가독성과 런타임 안정성 챙기기](#가독성과-런타임-안정성-챙기기)를 다룰 때 단순히 `String`으로 타입을 이용하지 않고 별도로 이름을 붙여서 사용했다. 다만, 비슷한 사례가 생기면 또 비슷한 타입을 만들어야 한다는 문제가 있다. 이를 해결하기 위해 팬텀 타입을 사용할 수 있다. 마지막으로 다음 예제 하나를 더 살펴보자.
+
+```kotlin
+value class Id<T>(val uuid: String) {
+  override fun toString(): String = uuid
+}
+
+data class User(
+  val id: Id<User>,
+  val name: String
+)
+
+data class Post(
+  val id: Id<Post>,
+  val userId: Id<User>,
+  val title: String,
+  val content: String
+)
+```
+
+위 코드를 보면 `UserId` 같은 타입을 만들지 않고 제네릭을 이용하여 `Id` 클래스를 정의한 것을 볼 수 있다. `Id` 클래스에서 `T`는 아무런 의미가 없는 팬텀 타입이다. 이를 통해 `Id` 클래스는 `User` 타입을 가리키는 `Id<User>` 타입과 `Post` 타입을 가리키는 `Id<Post>` 타입을 구분할 수 있다. 이를 통해 `Id` 클래스는 다양한 타입을 가리킬 수 있으며 이를 통해 코드 중복을 줄일 수 있다.
+
+## 유니온 타입을 이용한 행동 제한
+
+유니온 타입(Union Type)은 두 개 이상의 타입을 하나로 묶어서 사용하는 방법이다. 이를 이용하면 **두 개 이상의 타입을 하나로 묶어서 사용**할 수 있다. 예를 들어 다음 TypeScript 코드를 살펴보자.
+
+```typescript
+type Fruit = "Apple" | "Banana" | "Orange"
+```
+
+위 코드는 `Fruit` 타입을 선언하고 이 타입은 `Apple`, `Banana`, `Orange` 세 가지 타입 중 하나를 가질 수 있다는 것을 의미한다. 참고로 TypeScript에 익숙하지 않다면 값으로 보이는 `Apple`, `Banana`, `Orange`이 타입이 될 수 있다는 것이 이해하기 어려울 수 있다. 이는 TypeScript에서 리터럴 타입(Literal Type)이라고 불리는 타입으로 TypeScript에선 하나의 값을 타입으로 사용할 수 있다.
+
+이를 이용하여 행동을 제한하는 것이 가능하다. 다음 코드를 살펴보자.
+
+```typescript
+type State = { type: 'loading' } | 
+  { type: 'success', data: string } | 
+  { type: 'error', message: string };
+
+let state: State = { type: 'loading' };
+try {
+  const data = getData();
+  state = { type: 'success', data: data };
+} catch {
+  state = { type: 'error', message: 'Error!' };
+}
+
+if (state.type === 'success') {
+  console.log(state.data);
+  console.log(state.message); // 에러 발생
 }
 ```
 
-위 코드는 `List` 인터페이스를 정의한 코드이다. `List` 인터페이스는 `out` 키워드를 사용하여 공변성을 나타내고 있다. 이는 `List<Int>` 타입이 `List<Number>` 타입의 하위 타입이 될 수 있음을 의미한다. 반대로 `List` 인터페이스는 `in` 키워드를 사용하여 반공변성을 나타내고 있다. 이는 `List<Number>` 타입이 `List<Int>` 타입의 하위 타입이 될 수 있음을 의미한다.
+위 코드를 보면 `State` 타입은 세 타입 중 하나를 가질 수 있다. 이를 통해 `State` 타입은 `type` 속성에 `loading`, `success`, `error` 세 가지 리터럴 타입 중 하나를 가질 수 있으며 이를 통해 어떤 타입인지 확인 할 수 있다. 이를 통해 접근할 수 있는 속성을 제한하여 개발자의 행동을 통제하는 것이 가능하다. 참고로 엄밀히 따지면 위 코드에서 사용된 유니온 타입은 서로소 유니온 타입(Disjoint Union Type)이라고 불린다.
 
-이를 통해 코드의 중복을 줄이고 가독성을 높일 수 있다. 또한 타입 시스템을 통해 런타임 에러를 줄일 수 있다.
+아쉽게도 유니온 타입을 지원하지 않는 언어가 많다. 다만, 서로소 유니온 타입은 합 타입(Sum Type)을 지원하는 언어라면 구현할 수 있다. 예를 들어, 합 타입을 지원하는 언어인 Kotlin은 다음과 같이 구현할 수 있다.
 
-## 범위 조정하기
+```kotlin
+sealed interface State {
+  data object Loading: State
+  data class Success<T>(val data: T): State
+  data class Error(val message: String): State
+}
 
-앞서 말했 듯이 타입 시스템이 제공하는 가장 큰 이점 중 하나는 **범위를 조정할 수 있다**는 것이다. 이는 앞서 설명한 것처럼 타입은 집합이며 함수를 통해 집합의 범위를 늘리거나 좁힐 수 있다.
+var state: State = State.Loading
+try {
+  val data = getData()
+  state = State.Success(data)
+} catch {
+  state = State.Error("Error!")
+}
 
-범위를 조절하면 좋은 점으로 두 가지가 있다. 첫 번째는 **타입이 무엇을 의미하는지 명확하게 알 수 있다**는 것이다. 예를 들어 `String` 타입은 문자열을 나타내지만 그 범위가 너무 넓다. 반면 `Name`이라는 타입을 만든다면 이름을 나타낸다는 것을 타입만 봐도 바로 알 수 있다.
+if (state is State.Success<*>) {
+  println(state.data)
+  println(state.message) // 에러 발생
+}
+```
 
-두 번째는 타입을 통해 **컴파일 타임에 오류를 검출할 수 있다**는 것이다. 예를 들어, 특정 함수가 Name 타입을 매개변수로 받도록 하면 잘못된 문자열이 들어가는 것을 방지할 수 있다. 이는 프로그램의 안정성을 크게 향상시킨다.
+## 최소 타입을 이용한 TODO 처리
 
-<h2>Algebraic Data Type</h2>
+최소 타입(Bottom Type)[^2]은 모든 타입의 하위 타입이며 아무런 값도 가질 수 없는 타입이다. 이는 **실행할 수 없는 코드를 표현**하는 데 사용할 수 있다. 예를 들어 다음 코드를 살펴보자.
 
-대수적 데이터 타입이라 부르는 ADT데이터 타입을 더 작은 데이터 타입의 조합으로 정의하는 방법이다. 대표적으로 합타입<sup>Sum Type</sup>과 곱타입<sup>Product Type</sup>이 있다.
+```kotlin
+fun fail(message: String): Nothing {
+  throw IllegalArgumentException(message)
+}
+```
 
-<h2>Top Type, Bottom Type</h2>
+위 코드는 `fail` 함수를 정의하고 이 함수는 `IllegalArgumentException`을 던지는 함수이다. 이 함수는 `Nothing` 타입을 반환하며 이는 최소 타입으로 아무런 값도 가질 수 없는 타입이다. 이를 통해 `fail` 함수는 실행할 수 없는 코드를 표현하는 데 사용할 수 있다. 참고로 Kotlin에선 비슷한 역할을 하는 `TODO()` 함수를 제공한다.
 
-최대 타입<sup>Top Type</sup>과 최소 타입<sup>Bottom Type</sup>을 이용하여 범위를 조정할 수 있다. 
+최소 타입을 지원하는 다른 언어 중 하나로 TypeScript가 있다. TypeScript에선 `never` 타입을 제공하며 이는 최소 타입으로 아무런 값도 가질 수 없는 타입이다. 다음 코드를 살펴보자.
 
-<h2>Union Type</h2>
+```typescript
+function TODO(): never {
+  throw new Error("Not implemented yet");
+}
 
-<h2>Intersection Type</h2>
+class UserService {
+  getUser(id: number): User {
+    return TODO();
+  }
+}
+```
 
-<h2>Type Class</h2>
+앞서 Kotlin 예시처럼 `TODO` 함수를 통해 아직 구현되지 않은 코드를 표현할 수 있다. 이를 통해 개발자는 일단 필요한 함수를 선언하고 이후 구현할 수 있게 된다. 그런 일은 없어야겠지만 만약 구현을 하지 않은 채 배포했다면 바로 에러가 발생하므로 금방 알 수 있다.
 
+## 타입을 이용한 상태 머신 구현
 
-## 행동 제한하기
+상태 머신(State Machine)은 상태(State)와 이벤트(Event)를 통해 상태를 전이하는 것을 말한다. 이를 타입을 이용하면 **컴파일 시간에 상태 전이를 검증**할 수 있다. 다음 코드를 살펴보자.
 
-타입 시스템의 다른 이점은 **행동을 제한할 수 있다**는 것이다.
+```kotlin
+// 상태와 이벤트를 나타내는 인터페이스
+interface State
+interface Event<S: State, T: State> {
+  fun perform(state: S): T
+}
 
-<h2>Phantom Type</h2> 
+// 팬텀 타입을 이용한 상태 머신 클래스
+class StateMachine<S: State>(val state: S) {
+  fun <T : State> transition(event: Event<S, T>): StateMachine<T> {
+    return StateMachine(event.perform(state))
+  }
+}
 
-# 쓰기 어려운 타입 문법
+sealed class SimpleState: State {
+  data object Idle: SimpleState()
+  data object Running: SimpleState()
+  data object Finished: SimpleState()
+}
 
-<h2>Higher-kinded Type</h2>
+sealed class SimpleEvent: Event<SimpleState, SimpleState> {
+  object Start: Event<SimpleState.Idle, SimpleState.Running> {
+    override fun perform(state: SimpleState.Idle): SimpleState.Running {
+      println("Starting...")
+      return SimpleState.Running
+    }
+  }
 
-<h2>Dependent Type</h2>
+  object Stop: Event<SimpleState.Running, SimpleState.Finished> {
+    override fun perform(state: SimpleState.Running): SimpleState.Finished {
+      println("Stopping...")
+      return SimpleState.Finished
+    }
+  }
+}
+
+// 초기 상태
+val idleMachine = StateMachine(SimpleState.Idle)
+println("Initial state: ${idleMachine.state}")
+
+// Running 상태로 전이
+val runningMachine = idleMachine.transition(SimpleEvent.Start)
+println("After starting: ${runningMachine.state}")
+
+// Finished 상태로 전이
+val finishedMachine = runningMachine.transition(SimpleEvent.Stop)
+println("After stopping: ${finishedMachine.state}")
+
+// 에러 발생
+val invalidTransition = idleMachine.transition(SimpleEvent.Stop)
+```
+
+앞서 언급한 합타입과 팬텀 타입을 이용하여 상태 머신을 구현하면 컴파일 시간에 상태 전이를 검증할 수 있다. 이를 통해 상태 머신을 구현할 때 런타임에 발생할 수 있는 오류를 컴파일 시간에 미리 방지할 수 있다.
+
+## 의존 타입
+
+의존 타입(Dependent Type)은 대부분의 언어에선 보기 힘든 개념이다. 필자는 예전에 [Idris](https://www.idris-lang.org/)라는 언어를 통해 이 개념을 처음 접했고 이 글을 쓰며 [지원하는 언어](https://en.wikipedia.org/wiki/Dependent_type#Comparison_of_languages_with_dependent_types)를 찾아봤지만 대부분은 처음 들어보는 언어였다. 따라서 굳이 알아야하는 개념은 아니지만 타입 시스템을 고도로 활용하면 이런 개념까지도 가능하다라는 것을 알리기 위해 간단하게 소개해볼 것이다.
+
+의존 타입은 **타입이 다른 타입에 의존하는 타입**을 말한다. 예를 들어 다음 코드를 살펴보자.
+
+```idris
+data Vect : Nat -> Type -> Type where
+  Nil : Vect Z a
+  (::) : a -> Vect n a -> Vect (S n) a
+```
+
+위 코드는 Idris 언어로 작성된 코드이다. 이해하기 힘든 코드지만 간단히 설명하자면 `Nat`는 숫자를 의미하고 `Vect` 타입은 `Nat` 타입에 의존하며 길이를 나타내는 것으로 사용하고 있다. 따라서 다음과 같이 작성하면 최대 길이 10인 `Vect` 타입을 만들 수 있다.
+
+```idris
+vect : Vect 10 Nat
+```
+
+만약 합계를 해주는 프로그램을 만든다면 다음과 같이 작성할 수 있다.
+
+```idris
+-- Idris 2
+module Main
+
+data Vect : Nat -> Type -> Type where
+   Nil  : Vect Z a
+   (::) : a -> Vect k a -> Vect (S k) a
+
+vect : Vect 10 Nat
+vect = 1 :: 2 :: 3 :: 4 :: 5 :: 6 :: 7 :: 8 :: 9 :: 10 :: Nil
+
+sum_vect : Vect n Nat -> Nat
+sum_vect Nil = 0
+sum_vect (x :: xs) = x + sum_vect xs
+
+main : IO ()
+main = putStrLn $ show $ sum_vect vect -- 55
+```
+
+타입 시스템이 이정도로 강력하다면 보통 런타임에 검증할 것을 컴파일 시간에 검증하는 것까지도 가능하다. 아무래도 너무 과한 기능인 것은 사실이지만 타입 시스템이 어디까지 강력해질 수 있는지 보여주는 사례라고 볼 수 있다.
 
 # 타입 주도 개발
 
@@ -362,7 +578,7 @@ interface List<in T> {
 
 ## 타입을 먼저 정의하기
 
-프로그램은 일련의 절차를 통해 원하는 결과를 만들어 낸다. 이때 각 절차는 입력 데이터를 받아 특정 로직을 수행하고 결과를 반환한다. 다양한 패러다임으로 프로그램을 작성할 수 있지만 절차를 통해 원하는 결과를 만들어 낸다는 것 하나는 변하지 않는다. 따라서 타입 주도 개발은 원한다면 어디에도 적용할 수 있으며 각 절차에 대한 결과를 타입으로 정의하는 것으로 시작한다.[^2]
+프로그램은 일련의 절차를 통해 원하는 결과를 만들어 낸다. 이때 각 절차는 입력 데이터를 받아 특정 로직을 수행하고 결과를 반환한다. 다양한 패러다임으로 프로그램을 작성할 수 있지만 절차를 통해 원하는 결과를 만들어 낸다는 것 하나는 변하지 않는다. 따라서 타입 주도 개발은 원한다면 어디에도 적용할 수 있으며 각 절차에 대한 결과를 타입으로 정의하는 것으로 시작한다.[^3]
 
 타입을 먼저 정의한다는 것은 우리가 원하는 로직을 구체적으로 작성하기 전에 타입으로 추상화한다는 것과 같다. 연습을 위해 프로그래머스의 [문자열 계산하기](https://school.programmers.co.kr/learn/courses/30/lessons/120902) 문제를 풀어보자. 문제의 요구사항을 요약하면 다음과 같다.
 
@@ -385,12 +601,24 @@ interface List<in T> {
 먼저 각 키워드를 타입으로 추상화하면 다음과 같다.
 
 * 문자열 → `String`
-* 문자 → `Token`
-  * 숫자 → `Number`
-  * 연산자 → `Operator`
-  * 부호 → `Sign`
+* 문자 → `String` // 문자열과 문자가 구분된 언어에선 `Char`
+* 숫자 → `Int`
+* 연산자 → `String`
+* 부호 → `String`
+* 판단 결과 -> `Boolean`
+* 계산 결과 -> `Int`
 
-코드로 나타내면 다음과 같다.
+## 도메인 반영하기
+
+문제가 간단하여 도메인이라 부르기에 빈약하지만 엄밀히 따져 연산자와 부호는 같은 `String`이지만 의미가 다르다. 따라서 이를 구분하기 위해 다른 타입으로 정의하는 것이 좋다. 다시 한 번 각 키워드를 타입으로 추상화하면 다음과 같다.
+
+* 문자열 → `String`
+* 문자 → `Token`
+* 숫자 → `Number`
+* 연산자 → `Operator`
+* 부호 → `Sign`
+
+요구사항을 다시 확인하면 문자(Token)는 숫자(Number) 혹은 연산자(Operator) 둘 중 하나이므로 문자의 하위 타입으로 볼 수 있다. 그리고 숫자는 `Int` 타입으로 표현되고 연산자는 `Sign` 타입으로 표현된다. 이를 코드로 나타내면 다음과 같다.
 
 ```kotlin
 // 부호
@@ -408,6 +636,8 @@ sealed interface Token<T> {
   data class Operator(override val value: Sign): Token<Sign>
 }
 ```
+
+## 함수를 타입으로 추상화하기
 
 이번에는 각 로직을 타입으로 추상화해보자.
 
@@ -482,22 +712,52 @@ fun main() {
 
 참고로 함수 정의는 요구사항에 대한 해석이나 패러다임에 따라 다를 수 있다. 따라서 같은 로직을 작성하더라도 위 코드와 다른 로직이 나올 수 있으므로 틀렸다고 생각하지 말자.
 
-{/*
-
-<!--
-
-## 도메인 반영하기
-
-## 유한 상태 기계 정의하기
 
 ## 테스트 코드와 함께하기
 
-타입을 먼저 정의한다는 점에서 테스트 주도 개발과도 잘 어울린다. 이미 잘 알려져있는 테스트 주도 개발은 내가 만들어야 할 기능의 테스트를 먼저 작성하고 이를 통과하는 코드를 작성하는 방법론이다.
+타입을 먼저 정의한다는 점에서 테스트 주도 개발과도 잘 어울린다. 테스트 주도 개발은 이미 유명한 방법론이지만 설명하자면 **만들어야 할 기능의 테스트를 먼저 작성하고 이를 통과하는 코드를 작성하는 방법론**이다.
 
-입력과 출력 결과를 미리 정의하고 코드를 작성한다는 점에서 타입 주도 개발과 테스트 주도 개발은 비슷하다. 다만 타입만으로는 잡아낼 수 없는 오류나 예외 상황도 있기에 테스트 코드가 있다면 더욱 안전한 코드를 작성할 수 있다.
+입력과 출력 결과를 미리 정의하고 코드를 작성한다는 점에서 타입 주도 개발과 테스트 주도 개발은 유사하다. 그만큼 궁합도 좋은데 타입 주도 개발이 타입 시스템을 이용하여 컴파일 시간에 미리 안정성을 체크할 수 있다면 테스트 주도 개발은 타입만으로는 잡아낼 수 없는 오류나 예외 상황을 테스트 코드를 통해 잡아낼 수 있다.
 
--->
-*/}
+테스트 코드를 작성하는 시점은 [함수를 타입으로 추상화하기](#함수를-타입으로-추상화하기)까지 진행한 후가 좋다. 이를 통해 함수의 입력과 출력을 명확하게 정의할 수 있으며 이를 통해 테스트 코드를 작성할 수 있다. 다음은 위 코드에 대한 테스트 코드이다.
+
+```kotlin
+class CalculatorTest {
+  @Test
+  fun testIsNumber() {
+    assertTrue(isNumber("123"))
+    assertFalse(isNumber("+"))
+  }
+
+  @Test
+  fun testToNumber() {
+    assertEquals(123, toNumber("123"))
+  }
+
+  @Test
+  fun testToSign() {
+    assertEquals(Sign.PLUS, toSign("+"))
+  }
+
+  @Test
+  fun testTokenize() {
+    val input = "9 - 4"
+    val expected = listOf(
+      Token.Number(9),
+      Token.Operator(Sign.MINUS),
+      Token.Number(4)
+    )
+
+    assertEquals(expected, tokenize(input))
+  }
+
+  @Test
+  fun testCalculate() {
+    val input = "9 - 4 - 1 + 2 + 6"
+    assertEquals(12, calculate(input))
+  }
+}
+```
 
 # 마치며
 
@@ -505,22 +765,8 @@ fun main() {
 
 다만 일일히 타입의 정의하여 타입이 너무 많아지거나 타입의 정의가 복잡해지면 오히려 코드를 작성하기 힘들어지거나 가독성을 떨어뜨릴 수 있다. 따라서 항상 적절한 상태를 유지하는 것이 중요하다.
 
-설계자의 입장에선 타입 시스템을 활용한다는 것은 코드 규칙을 만드는 것과 같다. 설계자는 이를 적절하게 이용하여 안전하면서 편리한 코드를 작성할 수 있게 간접적으로 코드 규칙을 만들 수 있다. 어떻게보면 간이 프레임워크를 만든다고 볼 수 있다.
+설계자의 입장에 타입 시스템을 활용한다는 것은 다른 개발자를 위한 코드 규칙을 만드는 것과 같다. 설계자는 이를 적절하게 이용하여 안전하면서 편리한 코드를 작성할 수 있게 간접적으로 코드 규칙을 만들 수 있다. 이점을 고려하여 꼭 설계자가 아니더라도 다른 개발자가 안전한 코드를 작성할 수 있도록 타입을 이용한 규칙을 만들어보자.
 
-[^1]: 참고로 외래어 표기법으로는 지네릭이라 표기한다.
-[^2]: 다만 함수형 패러다임과 궁합이 좋다는 것은 부정할 수 없다.
-
-{/*
-
-<!-- 
-TypeScript에선 위와 같이 타입을 정의할 수 없지만 Union Type을 사용하여 값 혹은 다른 타입을 조합할 수 있다.
-
-```typescript
-type Result = 
-  | { status: "success", data: string } 
-  | { status: "failure", error: string };
-
-const result = { status: "failure", error: "something went wrong" };
-console.log(result.data); // compile error
-``` -->
-*/}
+[^1]: 참고로 외래어 표기법으로는 지네릭이라 표기하지만 한글 문서 대부분 제네릭이라 표현하므로 이 글에서도 제네릭이라 표기한다.
+[^2]: 최소 타입이라는 번역은 '타입으로 견고하게 다형성으로 유연하게'라는 책에서 사용한 번역이다.
+[^3]: 다만 함수형 패러다임과 궁합이 좋다는 것은 부정할 수 없다.
