@@ -208,7 +208,7 @@ const PostCategory = styled.div`
   border-radius: 50px;
   border: 1px solid #dfe3e8;
   /* cursor: pointer; */
-  background-color: #228822;
+  background-color: #00a962;
 `;
 
 const PostTag = styled.div`
