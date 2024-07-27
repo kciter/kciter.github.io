@@ -206,7 +206,7 @@ const PostCategory = styled.div`
   font-size: 9px;
   color: white;
   border-radius: 50px;
-  border: 1px solid #dfe3e8;
+  border: 1px solid rgb(51, 217, 178);
   /* cursor: pointer; */
   background-color: #00a962;
 `;
