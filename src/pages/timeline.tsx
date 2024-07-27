@@ -62,21 +62,16 @@ const Index = ({ location }: PageProps) => {
           </PostMeta>
           <PostContent recent={dayjs(post.node.fields.date).isAfter(dayjs().subtract(1, 'month'))}>
             <Link to={post.node.fields.slug} style={{ textDecoration: 'none' }}>
-              <ContentInner
-                style={{
-                  marginTop: post.node.frontmatter.tags.length > 0 ? -8 : -10
-                }}
-              >
+              <ContentInner>
                 <PostDateMobile>
                   {dayjs(post.node.fields.date).locale('en').format('ll')}
                 </PostDateMobile>
-                {post.node.frontmatter.tags.length > 0 && (
-                  <PostTags>
-                    {post.node.frontmatter.tags.map((tag: string) => (
-                      <PostTag key={tag}>{tag}</PostTag>
-                    ))}
-                  </PostTags>
-                )}
+                <PostTags>
+                  <PostCategory>{post.node.frontmatter.categories}</PostCategory>
+                  {post.node.frontmatter.tags.map((tag: string) => (
+                    <PostTag key={tag}>{tag}</PostTag>
+                  ))}
+                </PostTags>
                 <PostTitle>
                   <Link to={post.node.fields.slug}>{post.node.frontmatter.title}</Link>
                 </PostTitle>
@@ -200,6 +195,22 @@ const PostTags = styled.div`
   }
 `;
 
+const PostCategory = styled.div`
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 16px;
+  min-width: 0;
+  padding: 0 8px;
+  margin-right: 4px;
+  font-size: 9px;
+  color: white;
+  border-radius: 50px;
+  border: 1px solid #dfe3e8;
+  /* cursor: pointer; */
+  background-color: #228822;
+`;
+
 const PostTag = styled.div`
   display: inline-flex;
   justify-content: center;
@@ -248,6 +259,7 @@ const MetaInner = styled.div`
 
 const ContentInner = styled.div`
   display: block;
+  margin-top: -8px;
   transition: all 333ms ease 0s;
 
   @media (max-width: 768px) {
