@@ -178,11 +178,12 @@ const PostContent = styled.div<{ recent: boolean }>`
 const PostTags = styled.div`
   position: relative;
   display: flex;
-  max-width: 100%;
+  width: 100%;
   margin-bottom: 8px;
   overflow: hidden;
   flex-wrap: nowrap;
   white-space: nowrap;
+  gap: 4px;
 
   &::after {
     position: absolute;
@@ -200,13 +201,11 @@ const PostCategory = styled.div`
   justify-content: center;
   align-items: center;
   height: 16px;
-  min-width: 0;
   padding: 0 8px;
-  margin-right: 4px;
   font-size: 9px;
   color: white;
   border-radius: 50px;
-  border: 1px solid rgb(51, 217, 178);
+  border: 1px solid #00a962;
   /* cursor: pointer; */
   background-color: #00a962;
 `;
@@ -216,19 +215,13 @@ const PostTag = styled.div`
   justify-content: center;
   align-items: center;
   height: 16px;
-  min-width: 0;
   padding: 0 8px;
-  margin-right: 4px;
   font-size: 9px;
   color: #888;
   border-radius: 50px;
   border: 1px solid #dfe3e8;
   /* cursor: pointer; */
   background-color: white;
-
-  &:last-of-type {
-    margin-right: 0;
-  }
 `;
 
 const PostTitle = styled.h1`
