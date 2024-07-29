@@ -203,11 +203,11 @@ const PostCategory = styled.div`
   height: 16px;
   padding: 0 8px;
   font-size: 9px;
-  color: white;
+  color: #888;
   border-radius: 50px;
-  border: 1px solid #00a962;
+  border: 1px solid #888;
   /* cursor: pointer; */
-  background-color: #00a962;
+  background-color: white;
 `;
 
 const PostTag = styled.div`
