@@ -1,17 +1,17 @@
-import remarkGfm from "remark-gfm";
-import remarkExternalLinks from "remark-external-links";
-import rehypeSlug from "rehype-slug";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import { fileURLToPath } from "url";
+import remarkGfm from 'remark-gfm';
+import remarkExternalLinks from 'remark-external-links';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import { fileURLToPath } from 'url';
 
-const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 export default {
   siteMetadata: {
-    siteUrl: "https://kciter.so",
+    siteUrl: 'https://kciter.so',
     title: `kciter.so | devlog`,
     description: `devlog`,
-    author: `Lee Sun-Hyoup`,
+    author: `Lee Sun-Hyoup`
   },
   plugins: [
     `gatsby-plugin-emotion`,
@@ -26,36 +26,36 @@ export default {
         background_color: `#ffffff`,
         theme_color: `#ffffff`,
         display: `minimal-ui`,
-        icon: `src/assets/favicon.png`, // This path is relative to the root of the site.
-      },
+        icon: `src/assets/favicon.png` // This path is relative to the root of the site.
+      }
     },
     {
       resolve: `gatsby-source-filesystem`,
       options: {
         name: `pages`,
-        path: `${__dirname}/src/pages`,
-      },
+        path: `${__dirname}/src/pages`
+      }
     },
     {
       resolve: `gatsby-plugin-page-creator`,
       options: {
         name: `pages`,
-        path: `${__dirname}/src/pages`,
-      },
+        path: `${__dirname}/src/pages`
+      }
     },
     {
       resolve: `gatsby-source-filesystem`,
       options: {
         name: `posts`,
-        path: `${__dirname}/src/posts`,
-      },
+        path: `${__dirname}/src/posts`
+      }
     },
     {
       resolve: `gatsby-plugin-page-creator`,
       options: {
         name: `posts`,
-        path: `${__dirname}/src/posts`,
-      },
+        path: `${__dirname}/src/posts`
+      }
     },
     {
       resolve: `gatsby-plugin-mdx`,
@@ -67,31 +67,31 @@ export default {
             remarkGfm,
             // To pass options, use a 2-element array with the
             // configuration in an object in the second element
-            [remarkExternalLinks, { target: false }],
+            [remarkExternalLinks, { target: false }]
           ],
           rehypePlugins: [
             // Generate heading ids for rehype-autolink-headings
             rehypeSlug,
             // To pass options, use a 2-element array with the
             // configuration in an object in the second element
-            [rehypeAutolinkHeadings, { behavior: `wrap` }],
-          ],
+            [rehypeAutolinkHeadings, { behavior: `wrap` }]
+          ]
         },
         gatsbyRemarkPlugins: [
           {
-            resolve: "gatsby-remark-images",
-            options: { maxWidth: 1300, showCaptions: ["alt"] },
+            resolve: 'gatsby-remark-images',
+            options: { maxWidth: 1300, showCaptions: ['alt'] }
           },
-          `gatsby-remark-prismjs`,
-        ],
-      },
+          `gatsby-remark-prismjs`
+        ]
+      }
     },
     {
-      resolve: "gatsby-plugin-google-tagmanager",
+      resolve: 'gatsby-plugin-google-tagmanager',
       options: {
-        id: "G-7M8K7EBEDX",
-        includeInDevelopment: true,
-      },
+        id: 'G-7M8K7EBEDX',
+        includeInDevelopment: true
+      }
     },
     `gatsby-plugin-cname`,
     {
@@ -117,7 +117,7 @@ export default {
                   description: edge.node.excerpt,
                   date: edge.node.fields.date,
                   url: site.siteMetadata.siteUrl + edge.node.fields.slug,
-                  guid: site.siteMetadata.siteUrl + edge.node.fields.slug,
+                  guid: site.siteMetadata.siteUrl + edge.node.fields.slug
                 });
               });
             },
@@ -146,11 +146,11 @@ export default {
                 }
               }
             `,
-            output: "/feed.xml",
-            title: "kciter.so",
-          },
-        ],
-      },
-    },
-  ],
+            output: '/feed.xml',
+            title: 'kciter.so'
+          }
+        ]
+      }
+    }
+  ]
 };
