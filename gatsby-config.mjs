@@ -87,10 +87,9 @@ export default {
       }
     },
     {
-      resolve: 'gatsby-plugin-google-tagmanager',
+      resolve: 'gatsby-plugin-google-gtag',
       options: {
-        id: 'G-7M8K7EBEDX',
-        includeInDevelopment: true
+        trackingIds: ['G-7M8K7EBEDX']
       }
     },
     `gatsby-plugin-cname`,

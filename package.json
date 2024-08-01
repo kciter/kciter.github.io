@@ -14,6 +14,7 @@
     "gatsby-plugin-cname": "1.0.0",
     "gatsby-plugin-emotion": "^8.13.1",
     "gatsby-plugin-feed": "5.13.1",
+    "gatsby-plugin-google-gtag": "^5.13.1",
     "gatsby-plugin-google-tagmanager": "5.13.1",
     "gatsby-plugin-manifest": "^5.13.1",
     "gatsby-plugin-mdx": "5.13.1",
