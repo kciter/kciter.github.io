@@ -42,11 +42,11 @@ a {
   text-decoration: underline;
   color: #454f5b;
 }
-
+/* 
 a:hover {
   color: black;
   border-bottom: none;
-}
+} */
 
 img {
   max-width: 100%;
@@ -347,6 +347,16 @@ th, td {
 
 .fa-rss-square:hover {
 	color: #ff6600;
+}
+
+
+.fa-user {
+  padding: 5px;
+	transition: color .5s;
+}
+
+.fa-user:hover {
+	color: #00a962;
 }
 
 /*
