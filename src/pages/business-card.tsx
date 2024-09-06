@@ -43,6 +43,10 @@ const BusinessCardPage = () => {
           <ButtonIcon className={`fa fa-user`} aria-hidden="true" />
           Blog
         </Button>
+
+        <Button href="sms:01024646979&body=안녕하세요" target="_blank" rel="noopener noreferrer">
+          Send Message
+        </Button>
       </ButtonStack>
     </DefaultTemplate>
   );
