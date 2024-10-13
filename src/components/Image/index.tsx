@@ -5,10 +5,11 @@ interface ImageProps {
   src: string;
   caption?: string;
   width?: number;
+  maxWidth?: number;
   expandable?: boolean;
 }
 
-const Image = ({ src, caption, width, expandable }: ImageProps) => {
+const Image = ({ src, caption, width, maxWidth, expandable }: ImageProps) => {
   const [isExpanded, toggleExpanded] = useState(false);
 
   return (
@@ -16,7 +17,7 @@ const Image = ({ src, caption, width, expandable }: ImageProps) => {
       <img
         src={src}
         width={width}
-        style={{ cursor: expandable ? 'zoom-in' : 'default' }}
+        style={{ cursor: expandable ? 'zoom-in' : 'default', maxWidth }}
         onClick={expandable ? () => toggleExpanded(true) : undefined}
       />
       {caption && <figcaption dangerouslySetInnerHTML={{ __html: caption }} />}
