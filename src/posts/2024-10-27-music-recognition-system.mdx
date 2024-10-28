@@ -13,7 +13,7 @@ import Image from '@components/Image';
 
 미래 학자이자 SF 소설의 거장 아서 C. 클라크는 `충분히 발달한 과학 기술은 마법과 구별할 수 없다`라는 유명한 말을 남겼다. 이 말이 사실임을 증명하듯 현대 사회의 기술은 다양한 놀라움을 선사한다. 그 중에서도 [Shazam](https://www.shazam.com/ko)이나 [Soundhound](https://www.soundhound.com/)와 같은 음악 검색 앱을 사용할 때 필자는 항상 마법을 쓰는 것 같은 기분을 느낀다.
 
-<Image src="/images/2024-10-27-music-recognition-system/shazam.jpg" caption="터치 한 번이면 마법처럼 들리는 음악 정보를 알려준다" maxWidth="500px" />
+<Image src="/images/2024-10-27-music-recognition-system/shazam.jpg" caption="터치 한 번이면 마법처럼 들리는 음악 정보를 알려준다" width="500px" maxWidth="90%" />
 
 음악 검색 앱은 대체 어떤 원리로 우리에게 놀라움을 선사할까? 이런 궁금증이 멈추지 않아 이번 기회에 음악 검색 알고리즘에 대해 알아보았고 생각보다 복잡하지 않아 이를 구현해보기로 결심했다. 이번 글에서는 음악 검색 시스템을 만들기 위한 알고리즘과 구현 방법에 대해 알아보겠다.
 
@@ -63,7 +63,7 @@ ffmpeg -i input.mp3 -acodec pcm_s16le -ac 1 -ar 44100 output.wav
 
 스펙트로그램은 시간에 따른 진폭과 주파수 변화를 시각화한 그래프이다. 이 말이 조금 어렵게 느껴질 수 있는데 오디오 프로그램에서 간혹 볼 수 있는 그래프같은 그림이 이 스펙트로그램을 기반으로 파형만을 이용해 만들어진 것이다.
 
-<Image src="/images/2024-10-27-music-recognition-system/audio-wave.jpg" maxWidth="500px" caption="오디오 웨이브" />
+<Image src="/images/2024-10-27-music-recognition-system/audio-wave.jpg" width="500px" maxWidth="90%" caption="오디오 웨이브" />
 
 우선 파형은 시간과 진폭으로 이루어져 있다. 위 그림으로 치면 가로 축이 시간, 세로 축이 진폭이다. 이를 통해 시간에 따른 소리의 세기 변화를 알 수 있다. 하지만 스펙트로그램은 파형 뿐만 아니라 스펙트럼도 함께 표현한다.
 
