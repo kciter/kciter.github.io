@@ -18,6 +18,10 @@ const Link = ({ children, href }: LinkProps) => {
 const About = () => {
   const writings = [
     {
+      href: 'https://product.kyobobook.co.kr/detail/S000213641007',
+      text: '코딩 테스트 합격자 되기: 자바스크립트 편'
+    },
+    {
       href: 'https://product.kyobobook.co.kr/detail/S000212233308',
       text: '리액트 훅을 활용한 마이크로 상태 관리'
     },
@@ -29,8 +33,16 @@ const About = () => {
 
   const presentations = [
     {
-      href: 'https://www.slideshare.net/sunhyouplee/ss-243592335',
-      text: '웹 개발을 위해 꼭 알아야하는 보안 공격'
+      href: 'https://kciter.so/pt-destroying-software',
+      text: '소프트웨어 파괴의 미학 | Devcon 2024'
+    },
+    {
+      href: 'https://kciter.so/pt-kotlin-script',
+      text: 'Kotlin Script 활용하기'
+    },
+    {
+      href: 'https://www.youtube.com/watch?v=EgLxbFmPRoU',
+      text: '소프트웨어 설계를 위한 추상적, 구조적 사고 │ 인프콘2023'
     },
     {
       href: 'https://www.slideshare.net/sunhyouplee/mongodb-243592318',
@@ -50,7 +62,7 @@ const About = () => {
     },
     {
       href: 'https://www.slideshare.net/sunhyouplee/metal-uiux-letswift-2017',
-      text: 'Metal 기반 특별한 UI/UX 제공하기'
+      text: "Metal 기반 특별한 UI/UX 제공하기 | Let'Swift 2017"
     },
     {
       href: 'https://www.slideshare.net/sunhyouplee/vuejs-reactive-programming-vuetiful-korea-2nd',
@@ -63,10 +75,6 @@ const About = () => {
     {
       href: 'https://www.slideshare.net/sunhyouplee/functional-reactive-programming-with-rxswift-62123571',
       text: 'Functional Reactive Programming With Swift'
-    },
-    {
-      href: 'https://stonzeteam.github.io/How-Goroutines-Work/',
-      text: '고루틴은 어떻게 작동하는가?'
     },
     {
       href: 'https://www.slideshare.net/sunhyouplee/realm-60539221',
