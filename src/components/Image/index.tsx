@@ -16,7 +16,7 @@ const Image = ({ src, caption, width, maxWidth, expandable }: ImageProps) => {
     <figure>
       <img
         src={src}
-        width={width}
+        width={width || '100%'}
         style={{ cursor: expandable ? 'zoom-in' : 'default', maxWidth }}
         onClick={expandable ? () => toggleExpanded(true) : undefined}
       />
