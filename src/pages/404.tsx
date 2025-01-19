@@ -25,6 +25,6 @@ const NotFoundImage = styled.div`
   width: 100%;
   height: 400px;
   border-radius: 12px;
-  background: url(/not-found.gif) no-repeat center center;
+  background: url(/images/not-found.gif) no-repeat center center;
   background-size: contain;
 `;
