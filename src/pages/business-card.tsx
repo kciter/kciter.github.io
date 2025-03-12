@@ -15,7 +15,7 @@ const BusinessCardPage = () => {
 
         <Introduction>
           <ProfileName>Sunhyoup Lee</ProfileName>
-          <ProfileDescription>Just Developer</ProfileDescription>
+          <ProfileDescription>Just a Developer</ProfileDescription>
         </Introduction>
       </BioContainer>
 
