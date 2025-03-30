@@ -14,7 +14,7 @@ const PostBio = () => {
         <div>
           Written by <Name to="/about">@kciter</Name>
         </div>
-        <Description>가치있는 지식이 되기를 바랍니다 / CoBalt. CTO.</Description>
+        <Description>가치있는 지식이 되기를 바랍니다</Description>
         <SocialIcons>
           <Social />
         </SocialIcons>

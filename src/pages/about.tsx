@@ -109,7 +109,7 @@ const About = () => {
     <DefaultTemplate>
       <SEO title="About" />
 
-      <h2>💼 Currently working on</h2>
+      {/* <h2>💼 Currently working on</h2>
       <ul>
         <li>
           <strong>CoBalt</strong> CTO, 2018. 07 ~ <br />
@@ -119,7 +119,7 @@ const About = () => {
             REALIZER
           </a>
         </li>
-      </ul>
+      </ul> */}
 
       <h2>⌨️ My Keyboard</h2>
       <div style={{ maxWidth: 400 }}>
