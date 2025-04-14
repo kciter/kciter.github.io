@@ -12,6 +12,8 @@ interface ImageProps {
 const Image = ({ src, caption, width, maxWidth, expandable }: ImageProps) => {
   const [isExpanded, toggleExpanded] = useState(false);
 
+  console.log(isExpanded);
+
   return (
     <figure>
       <img
@@ -38,8 +40,8 @@ const Image = ({ src, caption, width, maxWidth, expandable }: ImageProps) => {
             <div
               style={{
                 borderRadius: 8,
-                maxWidth: 1200,
-                width: '80%',
+                maxWidth: 1440,
+                width: '100%',
                 position: 'fixed',
                 top: '50%',
                 left: '50%',
