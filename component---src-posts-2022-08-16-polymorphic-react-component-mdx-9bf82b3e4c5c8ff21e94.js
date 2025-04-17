@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkkciter_so=self.webpackChunkkciter_so||[]).push([[3974,9859,565,6296,6601,7087,8750,7283,8639,5513,7345,2449,7822,2764,5481,2897,2301,5128,483,2619,193,3211,5109,727],{9128:function(t,n,e){e.d(n,{R:function(){return r}});var u=e(9474);const c={},o=u.createContext(c);function r(t){const n=u.useContext(o);return u.useMemo((function(){return"function"==typeof t?t(n):{...n,...t}}),[n,t])}}}]);
+//# sourceMappingURL=component---src-posts-2022-08-16-polymorphic-react-component-mdx-9bf82b3e4c5c8ff21e94.js.map
