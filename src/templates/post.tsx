@@ -53,8 +53,6 @@ const PostTemplate = ({ data, location, pageContext, children }: PageProps) => {
     });
   }, []);
 
-  console.log(series.items);
-
   const [posts, setPosts] = useState();
   useEffect(() => {
     setPosts(

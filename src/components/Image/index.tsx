@@ -33,24 +33,28 @@ const Image = ({ src, caption, width, maxWidth, expandable }: ImageProps) => {
               width: '100%',
               height: '100%',
               cursor: 'zoom-out',
-              backgroundColor: 'rgba(0, 0, 0, 0.7)'
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              zIndex: 1000
             }}
             onClick={() => toggleExpanded(false)}
           >
-            <div
+            <img
+              src={src}
+              width="100%"
               style={{
+                display: 'block',
                 borderRadius: 8,
+                width: 'auto',
+                height: 'auto',
                 maxWidth: 1440,
-                width: '100%',
+                maxHeight: '80vh',
                 position: 'fixed',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
                 backgroundColor: 'white'
               }}
-            >
-              <img src={src} width="100%" />
-            </div>
+            />
           </div>,
           document.body
         )}
