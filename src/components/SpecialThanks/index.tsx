@@ -42,6 +42,11 @@ const sponsors: Sponsor[] = [
     avatar: 'https://avatars.githubusercontent.com/u/62709718?v=4',
     name: 'Wonse Shin',
     url: 'https://github.com/shinwonse'
+  },
+  {
+    avatar: 'https://avatars.githubusercontent.com/u/14256139?v=4',
+    name: 'Jeewhan',
+    url: 'https://github.com/Jeewhan'
   }
 ];
 
