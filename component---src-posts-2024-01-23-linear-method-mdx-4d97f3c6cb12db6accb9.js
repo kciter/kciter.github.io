@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkkciter_so=self.webpackChunkkciter_so||[]).push([[2764,9859,565,6296,6601,7087,3974,8750,7283,8639,5513,7345,2449,7822,5481,2897,2301,5128,483,2619,193,3211,5109,727,116,2412],{9128:function(t,n,e){e.d(n,{R:function(){return r}});var u=e(9474);const c={},o=u.createContext(c);function r(t){const n=u.useContext(o);return u.useMemo((function(){return"function"==typeof t?t(n):{...n,...t}}),[n,t])}}}]);
+//# sourceMappingURL=component---src-posts-2024-01-23-linear-method-mdx-4d97f3c6cb12db6accb9.js.map
