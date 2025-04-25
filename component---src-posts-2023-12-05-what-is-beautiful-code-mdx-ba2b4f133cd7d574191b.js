@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkkciter_so=self.webpackChunkkciter_so||[]).push([[7345,9859,565,6296,6601,7087,3974,8750,7283,8639,5513,2449,7822,2764,5481,2897,2301,5128,483,2619,193,3211,5109,727],{9128:function(t,n,e){e.d(n,{R:function(){return r}});var u=e(9474);const c={},o=u.createContext(c);function r(t){const n=u.useContext(o);return u.useMemo((function(){return"function"==typeof t?t(n):{...n,...t}}),[n,t])}}}]);
-//# sourceMappingURL=component---src-posts-2023-12-05-what-is-beautiful-code-mdx-ba2b4f133cd7d574191b.js.map
