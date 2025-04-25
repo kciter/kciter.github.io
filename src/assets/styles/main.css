@@ -373,6 +373,9 @@ th, td {
   left: 10px;
   display: none;
   padding: 8px 10px;
+  max-width: 400px;
+  width: max-content;
+  height: auto;
   font-size: 12px;
   line-height: 16px;
   color: #fff;
@@ -381,10 +384,10 @@ th, td {
   background-color: #212b36;
   box-shadow: 1px 2px 6px rgba(0,0,0,0.3);
   z-index: 1000;
-  white-space: nowrap;
+  /* white-space: nowrap;
   word-break: break-all;
   overflow-wrap: break-word;
-  word-wrap: break-word;
+  word-wrap: break-word; */
   pointer-events: none;
 }
 
