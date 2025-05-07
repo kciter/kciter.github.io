@@ -1,0 +1,847 @@
+---
+series: 모델링 시리즈
+title: "모델링 시리즈: 시간"
+categories: article
+tags: [modeling]
+image: /images/2025-05-06-modeling-series-temporal/thumbnail.png
+comments: true
+draft: false
+hide: false
+---
+
+import Image from '@components/Image';
+
+# 들어가며
+
+비즈니스에 있어 시간은 매우 중요한 요소다. 시간은 단순히 물리적 측정값이 아니라, 비즈니스의 흐름과 의사결정에 큰 영향을 미친다. 또한, 시간은 다양한 관점에서 해석될 수 있으며, 다양한 방법으로 사용될 수 있다.
+
+이번 글에서는 시간을 소프트웨어 관점에서 어떻게 바라보아야 하는지, 어떻게 모델링할 수 있는지에 대해 알아볼 것이다.
+
+# 시간이란 무엇인가?
+
+시간은 이미 추상화된 개념이다. 따라서 여러 가지 관점에서 바라볼 수 있다. 예를 들어, 시간을 물리적 측정값으로서 바라볼 수도 있고 역사적, 문화적 관점에서 바라볼 수도 있다. 보통 우리가 시간을 이야기할 때는 다음과 같은 관점을 고려한다.
+
+* **물리량**
+  * 시간은 물리학 관점에서 봤을 때 시각과 시각 사이의 간격을 표현하는 단위를 뜻한다.
+  * ex) 지금 이 순간(Instant)은 빅뱅(Epoch) 이후 시간이 얼마나 흘렀나?
+* **위치**
+  * 시간은 위치에 따라 다르게 표현될 수 있다.
+  * ex) 경도 0도(UTC)가 정오일 때 동경 135도의 시각은? (경도상 위치)
+  * ex) 런던이 정오일 때 프랑스의 시각은? (국가, 지역)
+* **천문 현상**
+  * 지구자전속도의 불규칙성, 지구의 자전주기와 공전주기 등 천문 현상으로 인해 시간은 보정이 필요하다.
+  * ex) 윤초, 윤달, 윤년
+* **문화**
+  * 문화에 따라 시간 표현이 다를 수 있다.
+  * ex) 태양력, 태음력, 이슬람력, 에티오피아력 등
+* **역사**
+  * 역사적 사건에 의해 시간은 다르게 표현될 수 있다.
+  * ex) 1582년 10월 4일의 다음 날은?
+* **사회**
+  * 사회적 제도에 의해 시간은 변할 수 있다.
+  * ex) 일광 시간 절약제(Summer Time)
+
+우리는 꽤 많은 조건을 고려하여 시간을 표현한다. 현실 세계에선 서로 같은 맥락을 공유하기 때문에 의사소통에 문제가 없지만 소프트웨어 세계에선 규칙을 제공해야 한다.
+
+물리량과 위치, 천문 현상을 수학식으로 계산하는 것이 가능하지만 역사적 사건이나 사회적 제도는 규칙이 존재하지 않기에 단순히 수학식으로 시간을 계산할 수 없다. 예를 들어, 1582년 10월 4일의 다음 날은 1582년 10월 15일이다. 이는 역사적 사건에 의해 결정된 것이며, 단순히 수학식으로 계산할 수 없다. 또한, 일광 시간 절약제와 같은 사회적 제도는 각 국가나 지역에 따라 다르게 적용되기 때문에 이를 고려해야 한다. 게다가 문화에 따라 시간을 표현하는 방법이 다를 수 있다는 점도 골치아프다.
+
+그렇기에 통일된 시간 표기법을 위한 [협정 세계시](https://ko.wikipedia.org/wiki/%ED%98%91%EC%A0%95_%EC%84%B8%EA%B3%84%EC%8B%9C)가 탄생했다. UTC는 [원자 시계](https://ko.wikipedia.org/wiki/%EA%B5%AD%EC%A0%9C%EC%9B%90%EC%9E%90%EC%8B%9C)와 윤초 보정을 기반으로 표준화한 시각으로 모든 시간대는 UTC+0을 기준으로 환산한다. 예를 들어, 대한민국의 시간은 UTC 시간에 +9를 더한 시간으로 영국 시간이 오전 1시라면 대한민국은 오전 10시[^1]가 된다. UTC는 [ISO 8601](https://ko.wikipedia.org/wiki/ISO_8601)을 따라 다음과 같은 표기법을 따른다.
+
+```
+// UTC+0 기준 2021년 3월 20일 9시
+2021-03-20T09:00:00.000Z
+
+// UTC+9 (한국 시간) 기준 2021년 3월 20일 9시
+2021-03-20T09:00:00.000+09:00
+```
+
+가운데 `T`는 Time을 뜻하고 시간 뒤 `Z`는 Zulu time[^2] 을 뜻한다.
+
+<Image src="/images/2021-03-20-deep-dive-into-datetime/utc.png" caption="국가마다 시간대가 다르다" />
+
+참고로 국가, 지역마다 경도상 시간과 국가 시간이 다를 수 있다. 아이슬란드의 경우 경도상 위치는 UTC-1이지만 UTC+0을 사용하고 있다.
+
+# 측도와 무엇이 다른가?
+
+이전 글에서 우리는 측도 개념을 통해 여러 물리적 수량을 모델링하는 방법을 알아보았다. 단순히 년, 월, 일과 같은 것을 표현한다면 시간을 측도 모델을 통해서 표현할 수 있지만, 시간은 단순한 측도와는 다른 특성을 갖고 있다. 따라서 시간 모델링은 일반적인 측도 모델링과는 다른 접근이 필요하다.
+
+1. 시간은 선형적인 변환이 불가능한 단위가 있다. 대부분의 측도는 단위 간 변환이 일정한 비율로 이루어진다. 예를 들어 1kg = 1000g, 1m = 100cm와 같이 명확한 변환 관계가 있다. 하지만 시간에서는 '월'과 같은 단위는 28일, 29일, 30일, 31일 등 상황에 따라 다른 길이를 갖는다.
+2. 시간은 다양한 캘린더 시스템과 타임존의 개념이 존재한다. 그레고리안 달력, 음력, 이슬람력 등 다양한 달력 시스템이 있으며, 각 지역별로 서로 다른 타임존이 적용된다. 이는 시간 계산을 복잡하게 만드는 요소다.
+3. 시간은 단순한 수량이 아닌 '시점'이라는 특별한 개념을 갖고 있다. "2023년 5월 1일 오전 10시"와 같은 시점은 단순한 측정값이 아니라, 시간의 흐름 속 특정 위치를 나타낸다.
+
+이러한 특성들 때문에 시간은 일반적인 측도 모델링으로는 부족하며, 더 정교한 모델링이 필요하다. 따라서 이번 글에서는 시간을 여러 관점에서 살펴보고, 각 관점에 맞는 모델링 방법을 알아볼 것이다.
+
+# 시간을 어떤 기준으로 사용해야 하는가?
+
+만약 소프트웨어가 글로벌에서 사용된다면 시간은 매우 중요한 요소다. 시간은 많은 비즈니스에서 중요한 역할을 하며, 시간에 따라 비즈니스의 흐름이 달라질 수 있다. 예를 들어, 주식 거래소는 시세가 변동하는 시간에 따라 거래가 이루어지기 때문에 시간을 정확히 기록해야 한다. 또한, 사용자가 상품을 결제할 때도 시간을 정확히 기록해야 한다. 이러한 이유로 시간은 매우 중요한 요소다.
+
+이러한 시간은 사용 사례에 따라 다르게 사용해야 한다. 예를 들어, 사용자가 상품을 결제할 때는 사용자의 시간대를 고려해야 하지만, 로그를 기록할 때는 UTC를 사용하는 것이 좋다. 이러한 이유로 시간은 사용 사례에 따라 다르게 사용해야 한다.
+
+## 순수한 시간
+
+필자의 생일은 1월 26일이다. 갑자기 생일 이야기를 한 것은 예시에 적합하기 때문이다. 보다시피 보통 생일은 시간대를 고려하지 않고 말한다. 만약 필자가 <strong>"내가 한국에서 1월 26일에 태어났지만 미국 시간으로 따지면 1월 25일에 태어났으니 미국 생일은 1월 25일이야"</strong>라고 말하고 다닌다면 많은 사람들이 정말 이상한 사람이라고 생각할 것이다.
+
+이처럼 시간대와 지역, 문화, 사회를 고려하지 않고 순수한 시간과 날짜를 사용해야하는 경우가 있다. 좀 더 예를 들어보자면 다음과 같은 사례에 쓰일 수 있다.
+
+* 생일
+* 기업 설립일
+* 기념일
+* 국경일
+
+혹은 기록을 위해 시간을 사용하지 않는 경우에도 순수한 시간을 사용할 때가 있다. 보통 벤치마킹을 하기 위해 시간을 사용하거나 유니크한 값을 만들어내기 위해 사용하기도 한다. 혹은 랜덤 값 SEED 용도로 사용될 수도 있다.
+
+## UTC
+
+역사, 사회, 문화에 대한 맥락 없이 <strong>'사건이 발생한 시각'</strong>만을 고려할 땐 UTC를 사용하여 시간을 기록하는 것이 좋다. 가장 대표적인 예시로 **로깅**을 들 수 있다. 로그는 분산되어 저장될 수 있기에 발생한 순서를 쉽게 알기 위해선 UTC처럼 기준이 되는 시간대를 정하는 것이 좋다. 만약 로그가 기록된 시간에 타임존이 적용되어 발생한 곳 마다 다르게 시간이 적용된다면 큰 혼란이 생길 수 있다. 마찬가지로 자주 사용하는 `createdAt`, `updatedAt`도 UTC로 기록하는 것이 좋다.
+
+<Image src="/images/2021-03-20-deep-dive-into-datetime/stock-chart.png" caption="주식 차트는 대표적인 시계열 데이터다" />
+
+또 다른 사용 예시로 시계열 데이터를 들 수 있다. 시계열 데이터의 경우 시간에 종속된 연속적인 데이터를 말하는데 UTC처럼 시간대가 정해진 상태로 기록된게 아니라면 언제 저장된 시간인지 알 수 없어 잘못된 분석으로 이어질 수 있다. 추가로 UTC는 다음과 같은 사례에 쓰일 수 있다.
+
+* 로그
+* 감사
+* 시계열 데이터
+* `createdAt`, `updatedAt`
+
+## Time Zone이 적용된 시간
+
+반면 사용자가 이용한 시각을 정확히 알기위해 Time Zone을 사용해야 할 떄도 있다. 예를 들면, 사용자가 상품을 결제했을 때 UTC 시간만 기록했다면 사용자가 정확히 몇시 몇분 몇초에 주문했는지 알 수가 없다. 이때 정확한 시각을 알기 위해선 데이터베이스에 Zone Id도 함께 기록해야 한다. 또한, UI에 표시되는 시간을 사용자 기준으로 보여주기 위해서도 Time Zone은 필요하다.
+
+<Image src="/images/2021-03-20-deep-dive-into-datetime/facebook.png" />
+
+예를 들어, 같은 페이스북 게시물을 보더라도 사는 나라가 다르다면 작성한 시간이 다를 수 있다. 필자가 3월 15일 오후 12시 31분에 작성한 게시물은 영국 사람이 보기엔 새벽 3시 31분에 작성한 것으로 보일 것이고 하와이에 사는 사람이 보기엔 3월 14일 오후 5시 31분에 작성한 것으로 보일 것이다.
+
+그렇기 때문에 글로벌 서비스를 준비한다면 사용자 혹은 사용자가 포함되는 그룹 데이터에 Zone Id 정보를 추가해야 한다. 추가로 Time Zone이 적용된 시간은 다음과 같은 사례에 쓰일 수 있다.
+
+* 결제 시각
+* 푸시 알림 시각
+* UI 시각 표시
+* 캘린더
+
+UI에 내려주는 JSON 데이터 예시는 다음과 같다.
+
+```js
+{
+  "userId": 1,
+  "name": "이선협",
+  "zoneId": "Asia/Seoul", // Time Zone을 위한 Zone Id
+  "birthdate": "1994-01-26", // 순수한 시간
+  "createdAt": "2021-03-20T04:59:25Z", // 기준 시간 UTC
+  "updatedAt": "2021-03-20T05:12:38Z",
+  "posts": [
+    {
+      "postId": 1,
+      "publishedAt": "2021-03-20T06:00:00Z", // 기준 시간 오전 6시에 발행됨
+      // publishedAt은 user의 zondId에 따라 다르게 보일 수 있다.
+    }
+  ]
+}
+```
+
+# 시간을 어떻게 모델링할 것인가?
+
+시간은 사용 사례에 따라 다르게 다른 모델링 접근법이 필요하다. 주요 사용 사례를 살펴보면 다음과 같다.
+
+* 시점(Point in Time)<br />시점은 시간의 흐름 속 특정 순간을 나타낸다. 예를 들어 "2023년 5월 1일 오전 10시"는 시점이다. 시점은 달력 날짜와 시계 시간의 조합으로 표현되며, 타임존 정보를 포함할 수 있다. 시점 모델링의 핵심은 특정 순간을 정확히 식별하는 것이다.
+* 기간(Duration)<br />기간은 시간의 양을 나타낸다. "3시간", "2일", "4주" 등이 기간의 예시다. 기간은 시작점이나 끝점에 관계없이 순수한 시간의 길이를 표현한다. 기간은 측도와 가장 유사한 특성을 갖지만, 다양한 단위 간 변환이 복잡하다는 차이점이 있다.
+* 시간 간격(Interval)<br />시간 간격은 시작 시점과 끝 시점 사이의 범위를 나타낸다. "2023년 5월 1일부터 2023년 5월 5일까지"와 같이 표현된다. 시간 간격은 시작점과 끝점을 명확히 정의하며, 그 사이의 기간을 계산할 수 있다.
+* 반복(Recurrence)<br />반복은 일정한 패턴으로 발생하는 시간 이벤트를 나타낸다. "매주 월요일 오전 10시", "매월 첫째 주 토요일", "2년마다 2월 29일" 등이 반복의 예시다. 반복은 복잡한 규칙을 포함할 수 있으며, 일정 관리나 스케줄링에서 중요한 개념이다.
+
+이제 각 관점에 따른 시간 모델링을 살펴보자.
+
+## 시점(Point in Time)
+
+시점을 모델링하기 위해서는 날짜, 시간, 타임존 정보를 모두 고려해야 한다. 먼저 시점을 나타내는 **TimePoint** 클래스를 정의해보자.
+
+```kotlin
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+
+/**
+ * 시간의 특정 시점을 표현하는 클래스
+ */
+class TimePoint private constructor(private val instant: Instant) {
+  companion object {
+    // 현재 시점 생성
+    fun now(): TimePoint = TimePoint(Instant.now())
+    
+    // Epoch 밀리초로부터 시점 생성
+    fun fromEpochMilli(epochMilli: Long): TimePoint = TimePoint(Instant.ofEpochMilli(epochMilli))
+    
+    // ISO 8601 문자열로부터 시점 생성
+    fun fromIsoString(isoString: String): TimePoint = TimePoint(Instant.parse(isoString))
+    
+    // 날짜/시간 컴포넌트로부터 시점 생성
+    fun of(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0, 
+            second: Int = 0, nanoOfSecond: Int = 0, zone: ZoneId = ZoneId.systemDefault()): TimePoint {
+      val zonedDateTime = ZonedDateTime.of(year, month, day, hour, minute, second, nanoOfSecond, zone)
+      return TimePoint(zonedDateTime.toInstant())
+    }
+  }
+  
+  // 다양한 포맷으로 시점 표현
+  fun toIsoString(): String = instant.toString()
+  
+  fun toEpochMilli(): Long = instant.toEpochMilli()
+  
+  fun format(pattern: String, zone: ZoneId = ZoneId.systemDefault()): String {
+    val formatter = DateTimeFormatter.ofPattern(pattern)
+    val zonedDateTime = ZonedDateTime.ofInstant(instant, zone)
+    return zonedDateTime.format(formatter)
+  }
+  
+  // 특정 타임존에서의 시간 정보 가져오기
+  fun inZone(zone: ZoneId): ZonedDateTime = ZonedDateTime.ofInstant(instant, zone)
+  
+  // 시점 비교
+  fun isBefore(other: TimePoint): Boolean = instant.isBefore(other.instant)
+  
+  fun isAfter(other: TimePoint): Boolean = instant.isAfter(other.instant)
+  
+  // 시점 연산
+  fun plus(duration: Duration): TimePoint = TimePoint(instant.plus(duration.toJavaDuration()))
+  
+  fun minus(duration: Duration): TimePoint = TimePoint(instant.minus(duration.toJavaDuration()))
+  
+  // 시점 간 기간 계산
+  fun until(other: TimePoint): Duration = Duration.between(this, other)
+  
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is TimePoint) return false
+    return instant == other.instant
+  }
+  
+  override fun hashCode(): Int = instant.hashCode()
+  
+  override fun toString(): String = toIsoString()
+}
+```
+
+이 클래스는 내부적으로 Java의 `Instant` 클래스를 사용하여 시점을 표현한다. `Instant`는 UTC 기준 에포크 시간(1970년 1월 1일 00:00:00 UTC)부터의 시간 경과를 나노초 정밀도로 표현한다. 이는 전 세계 어디서나 동일한 순간을 고유하게 식별할 수 있는 방법이다.
+
+## 기간(Duration)
+
+기간은 시간의 양을 나타내므로, 우리의 측도 모델과 유사하게 모델링할 수 있다. 다만, 시간 단위 간 변환이 복잡하다는 점을 고려해야 한다.
+
+```kotlin
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
+
+/**
+ * 시간의 양(기간)을 표현하는 클래스
+ */
+class Duration private constructor(
+  val value: Long,
+  val unit: TimeUnit
+) {
+  companion object {
+    // 기본 팩토리 메서드
+    fun of(value: Long, unit: TimeUnit): Duration = Duration(value, unit)
+    
+    // 편의 메서드
+    fun ofNanos(nanos: Long): Duration = of(nanos, TimeUnit.NANOSECONDS)
+    fun ofMicros(micros: Long): Duration = of(micros, TimeUnit.MICROSECONDS)
+    fun ofMillis(millis: Long): Duration = of(millis, TimeUnit.MILLISECONDS)
+    fun ofSeconds(seconds: Long): Duration = of(seconds, TimeUnit.SECONDS)
+    fun ofMinutes(minutes: Long): Duration = of(minutes, TimeUnit.MINUTES)
+    fun ofHours(hours: Long): Duration = of(hours, TimeUnit.HOURS)
+    fun ofDays(days: Long): Duration = of(days, TimeUnit.DAYS)
+    
+    // 두 시점 사이의 기간 계산
+    fun between(start: TimePoint, end: TimePoint): Duration {
+      val millis = end.toEpochMilli() - start.toEpochMilli()
+      return ofMillis(millis)
+    }
+    
+    val ZERO = ofMillis(0)
+  }
+  
+  // 단위 변환
+  fun to(targetUnit: TimeUnit): Duration {
+    val convertedValue = targetUnit.convert(value, unit)
+    return of(convertedValue, targetUnit)
+  }
+  
+  // 기간 연산
+  fun plus(other: Duration): Duration {
+    val thisNanos = unit.toNanos(value)
+    val otherNanos = other.unit.toNanos(other.value)
+    return ofNanos(thisNanos + otherNanos)
+  }
+  
+  fun minus(other: Duration): Duration {
+    val thisNanos = unit.toNanos(value)
+    val otherNanos = other.unit.toNanos(other.value)
+    return ofNanos(thisNanos - otherNanos)
+  }
+  
+  fun multipliedBy(factor: Long): Duration = of(value * factor, unit)
+  
+  fun dividedBy(divisor: Long): Duration = of(value / divisor, unit)
+  
+  // Java Duration으로 변환
+  fun toJavaDuration(): java.time.Duration = java.time.Duration.of(value, chronoUnit())
+  
+  // 시간 단위를 ChronoUnit으로 변환
+  private fun chronoUnit(): ChronoUnit = when (unit) {
+    TimeUnit.NANOSECONDS -> ChronoUnit.NANOS
+    TimeUnit.MICROSECONDS -> ChronoUnit.MICROS
+    TimeUnit.MILLISECONDS -> ChronoUnit.MILLIS
+    TimeUnit.SECONDS -> ChronoUnit.SECONDS
+    TimeUnit.MINUTES -> ChronoUnit.MINUTES
+    TimeUnit.HOURS -> ChronoUnit.HOURS
+    TimeUnit.DAYS -> ChronoUnit.DAYS
+    else -> throw IllegalArgumentException("Unsupported time unit: $unit")
+  }
+  
+  // 비교 연산
+  fun isZero(): Boolean = value == 0L
+  
+  fun isPositive(): Boolean = value > 0
+  
+  fun isNegative(): Boolean = value < 0
+  
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is Duration) return false
+    
+    // 같은 단위로 변환하여 비교
+    val thisNanos = unit.toNanos(value)
+    val otherNanos = other.unit.toNanos(other.value)
+    return thisNanos == otherNanos
+  }
+  
+  override fun hashCode(): Int {
+    val nanos = unit.toNanos(value)
+    return nanos.hashCode()
+  }
+  
+  override fun toString(): String {
+    return when (unit) {
+      TimeUnit.NANOSECONDS -> "${value}ns"
+      TimeUnit.MICROSECONDS -> "${value}µs"
+      TimeUnit.MILLISECONDS -> "${value}ms"
+      TimeUnit.SECONDS -> "${value}s"
+      TimeUnit.MINUTES -> "${value}m"
+      TimeUnit.HOURS -> "${value}h"
+      TimeUnit.DAYS -> "${value}d"
+      else -> "${value} ${unit.name.lowercase()}"
+    }
+  }
+}
+```
+
+이 클래스는 Java의 `TimeUnit`을 활용하여 다양한 시간 단위를 지원한다. 내부적으로는 가장 작은 단위(나노초)로 모든 계산을 수행하여 정확성을 보장한다.
+
+## 시간 간격(Interval)
+
+시간 간격은 시작 시점과 끝 시점으로 구성된다. 이를 모델링해보자.
+
+```kotlin
+/**
+ * 시작 시점과 끝 시점 사이의 시간 간격을 표현하는 클래스
+ */
+class TimeInterval private constructor(
+  val start: TimePoint,
+  val end: TimePoint
+) {
+  init {
+    require(!end.isBefore(start)) { "End time must not be before start time" }
+  }
+  
+  companion object {
+    fun of(start: TimePoint, end: TimePoint): TimeInterval = TimeInterval(start, end)
+    
+    // 특정 시점으로부터 기간을 더한 간격 생성
+    fun startingAt(start: TimePoint, duration: Duration): TimeInterval =
+      of(start, start.plus(duration))
+    
+    // 특정 시점으로부터 기간을 뺀 간격 생성
+    fun endingAt(end: TimePoint, duration: Duration): TimeInterval =
+      of(end.minus(duration), end)
+  }
+  
+  // 간격의 기간 계산
+  fun duration(): Duration = start.until(end)
+  
+  // 간격 연산
+  fun shift(duration: Duration): TimeInterval =
+    of(start.plus(duration), end.plus(duration))
+  
+  fun expand(duration: Duration): TimeInterval =
+    of(start.minus(duration), end.plus(duration))
+  
+  fun shrink(duration: Duration): TimeInterval {
+    val halfDuration = duration.dividedBy(2)
+    val newStart = start.plus(halfDuration)
+    val newEnd = end.minus(halfDuration)
+    
+    // 축소 후 유효한 간격인지 확인
+    return if (newEnd.isBefore(newStart)) {
+      // 간격이 너무 작아 유효하지 않은 경우, 중간 시점으로 축소
+      val midPoint = start.plus(duration().dividedBy(2))
+      of(midPoint, midPoint)
+    } else {
+      of(newStart, newEnd)
+    }
+  }
+  
+  // 간격 관계 확인
+  fun contains(point: TimePoint): Boolean =
+    !point.isBefore(start) && !point.isAfter(end)
+  
+  fun contains(other: TimeInterval): Boolean =
+    !other.start.isBefore(start) && !other.end.isAfter(end)
+  
+  fun overlaps(other: TimeInterval): Boolean =
+    !end.isBefore(other.start) && !start.isAfter(other.end)
+  
+  fun abuts(other: TimeInterval): Boolean =
+    start.equals(other.end) || end.equals(other.start)
+  
+  // 간격 병합 및 교차
+  fun union(other: TimeInterval): TimeInterval? {
+    return if (!overlaps(other) && !abuts(other)) {
+      null // 겹치거나 인접하지 않으면 병합 불가
+    } else {
+      of(
+        if (start.isBefore(other.start)) start else other.start,
+        if (end.isAfter(other.end)) end else other.end
+      )
+    }
+  }
+  
+  fun intersection(other: TimeInterval): TimeInterval? {
+    return if (!overlaps(other)) {
+      null // 겹치지 않으면 교집합 없음
+    } else {
+      of(
+        if (start.isAfter(other.start)) start else other.start,
+        if (end.isBefore(other.end)) end else other.end
+      )
+    }
+  }
+  
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is TimeInterval) return false
+    return start == other.start && end == other.end
+  }
+  
+  override fun hashCode(): Int {
+    var result = start.hashCode()
+    result = 31 * result + end.hashCode()
+    return result
+  }
+  
+  override fun toString(): String = "[$start, $end]"
+}
+```
+
+이 클래스는 시간 간격의 다양한 연산과 관계를 지원한다. 간격을 이동(shift), 확장(expand), 축소(shrink)할 수 있으며, 다른 간격과의 관계(포함, 겹침, 인접)를 확인할 수 있다. 또한 두 간격의 합집합(union)과 교집합(intersection)도 계산할 수 있다.
+
+## 반복(Recurrence)
+
+반복은 가장 복잡한 시간 개념 중 하나다. 다양한 패턴으로 발생하는 반복 이벤트를 표현하기 위해 강력한 모델이 필요하다.
+
+```kotlin
+import java.time.DayOfWeek
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.temporal.TemporalAdjusters
+import java.util.*
+
+/**
+ * 반복되는 시간 패턴을 표현하는 클래스
+ */
+abstract class TimeRecurrence {
+  // 특정 간격 내에서 발생하는 모든 시점 계산
+  abstract fun occurrencesIn(interval: TimeInterval): List<TimePoint>
+  
+  // 특정 시점 이후의 다음 발생 시점 계산
+  abstract fun nextOccurrenceAfter(point: TimePoint): TimePoint?
+}
+
+/**
+ * 매일 반복되는 패턴
+ */
+class DailyRecurrence(
+  private val timeOfDay: LocalTime,
+  private val zone: ZoneId = ZoneId.systemDefault()
+) : TimeRecurrence() {
+  
+  override fun occurrencesIn(interval: TimeInterval): List<TimePoint> {
+    val result = mutableListOf<TimePoint>()
+    var current = nextOccurrenceAfter(interval.start.minus(Duration.ofSeconds(1)))
+    
+    while (current != null && !current.isAfter(interval.end)) {
+      result.add(current)
+      current = nextOccurrenceAfter(current)
+    }
+    
+    return result
+  }
+  
+  override fun nextOccurrenceAfter(point: TimePoint): TimePoint {
+    val zonedDateTime = point.inZone(zone)
+    val today = zonedDateTime.toLocalDate()
+    val todayOccurrence = today.atTime(timeOfDay).atZone(zone).toInstant()
+    val todayPoint = TimePoint.fromEpochMilli(todayOccurrence.toEpochMilli())
+    
+    return if (point.isBefore(todayPoint)) {
+      todayPoint
+    } else {
+      val tomorrow = today.plusDays(1)
+      val tomorrowOccurrence = tomorrow.atTime(timeOfDay).atZone(zone).toInstant()
+      TimePoint.fromEpochMilli(tomorrowOccurrence.toEpochMilli())
+    }
+  }
+}
+
+/**
+ * 매주 특정 요일에 반복되는 패턴
+ */
+class WeeklyRecurrence(
+  private val daysOfWeek: Set<DayOfWeek>,
+  private val timeOfDay: LocalTime,
+  private val zone: ZoneId = ZoneId.systemDefault()
+) : TimeRecurrence() {
+    
+  override fun occurrencesIn(interval: TimeInterval): List<TimePoint> {
+    val result = mutableListOf<TimePoint>()
+    var current = nextOccurrenceAfter(interval.start.minus(Duration.ofSeconds(1)))
+    
+    while (current != null && !current.isAfter(interval.end)) {
+      result.add(current)
+      current = nextOccurrenceAfter(current)
+    }
+    
+    return result
+  }
+  
+  override fun nextOccurrenceAfter(point: TimePoint): TimePoint? {
+    if (daysOfWeek.isEmpty()) return null
+    
+    val zonedDateTime = point.inZone(zone)
+    val today = zonedDateTime.toLocalDate()
+    val currentDayOfWeek = today.dayOfWeek
+    
+    // 오늘의 발생 시점 확인
+    val todayOccurrence = today.atTime(timeOfDay).atZone(zone).toInstant()
+    val todayPoint = TimePoint.fromEpochMilli(todayOccurrence.toEpochMilli())
+    
+    if (daysOfWeek.contains(currentDayOfWeek) && point.isBefore(todayPoint)) {
+      return todayPoint
+    }
+    
+    // 다음 발생 요일 찾기
+    for (i in 1..7) {
+      val nextDay = today.plusDays(i.toLong())
+      if (daysOfWeek.contains(nextDay.dayOfWeek)) {
+        val nextOccurrence = nextDay.atTime(timeOfDay).atZone(zone).toInstant()
+        return TimePoint.fromEpochMilli(nextOccurrence.toEpochMilli())
+      }
+    }
+    
+    return null // 발생하지 않는 케이스 (daysOfWeek가 비어있는 경우)
+  }
+}
+
+/**
+ * 매월 특정 일에 반복되는 패턴
+ */
+class MonthlyRecurrence(
+  private val dayOfMonth: Int,
+  private val timeOfDay: LocalTime,
+  private val zone: ZoneId = ZoneId.systemDefault()
+) : TimeRecurrence() {
+    
+  init {
+    require(dayOfMonth in 1..31) { "Day of month must be between 1 and 31" }
+  }
+  
+  override fun occurrencesIn(interval: TimeInterval): List<TimePoint> {
+    val result = mutableListOf<TimePoint>()
+    var current = nextOccurrenceAfter(interval.start.minus(Duration.ofSeconds(1)))
+    
+    while (current != null && !current.isAfter(interval.end)) {
+      result.add(current)
+      current = nextOccurrenceAfter(current)
+    }
+    
+    return result
+  }
+  
+  override fun nextOccurrenceAfter(point: TimePoint): TimePoint {
+    val zonedDateTime = point.inZone(zone)
+    val today = zonedDateTime.toLocalDate()
+    
+    // 이번 달의 발생일 계산
+    val dayOfMonthAdjusted = Math.min(dayOfMonth, today.lengthOfMonth())
+    val thisMonth = today.withDayOfMonth(dayOfMonthAdjusted)
+    val thisMonthOccurrence = thisMonth.atTime(timeOfDay).atZone(zone).toInstant()
+    val thisMonthPoint = TimePoint.fromEpochMilli(thisMonthOccurrence.toEpochMilli())
+    
+    if (point.isBefore(thisMonthPoint)) {
+      return thisMonthPoint
+    }
+    
+    // 다음 달의 발생일 계산
+    val nextMonth = today.plusMonths(1)
+    val nextMonthDayAdjusted = Math.min(dayOfMonth, nextMonth.lengthOfMonth())
+    val nextMonthDate = nextMonth.withDayOfMonth(nextMonthDayAdjusted)
+    val nextMonthOccurrence = nextMonthDate.atTime(timeOfDay).atZone(zone).toInstant()
+    
+    return TimePoint.fromEpochMilli(nextMonthOccurrence.toEpochMilli())
+  }
+}
+```
+
+여기서는 세 가지 기본적인 반복 패턴을 구현했다: 일간 반복, 주간 반복, 월간 반복. 각 패턴은 특정 간격 내에서의 모든 발생 시점과 특정 시점 이후의 다음 발생 시점을 계산할 수 있다.
+
+# 시간 연산과 변환
+
+시간 모델링에서 가장 중요한 부분 중 하나는 다양한 연산과 변환이다. 시점, 기간, 간격, 반복 사이의 변환과 연산을 위한 유틸리티 메서드를 구현해보자.
+
+```kotlin
+/**
+ * 시간 관련 유틸리티 클래스
+ */
+object TimeUtils {
+  // 시점 비교 및 확인
+  fun isLeapYear(year: Int): Boolean {
+    return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+  }
+  
+  fun daysInMonth(year: Int, month: Int): Int {
+    return when (month) {
+      1, 3, 5, 7, 8, 10, 12 -> 31
+      4, 6, 9, 11 -> 30
+      2 -> if (isLeapYear(year)) 29 else 28
+      else -> throw IllegalArgumentException("Invalid month: $month")
+    }
+  }
+  
+  // 기간 표시 및 변환
+  fun formatDuration(duration: Duration): String {
+    val millis = duration.to(TimeUnit.MILLISECONDS).value
+    
+    val days = TimeUnit.MILLISECONDS.toDays(millis)
+    val hours = TimeUnit.MILLISECONDS.toHours(millis) % 24
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(millis) % 60
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(millis) % 60
+    
+    val parts = mutableListOf<String>()
+    if (days > 0) parts.add("${days}d")
+    if (hours > 0) parts.add("${hours}h")
+    if (minutes > 0) parts.add("${minutes}m")
+    if (seconds > 0 || parts.isEmpty()) parts.add("${seconds}s")
+    
+    return parts.joinToString(" ")
+  }
+  
+  // 시간 간격 조작
+  fun splitInterval(interval: TimeInterval, parts: Int): List<TimeInterval> {
+    require(parts > 0) { "Number of parts must be positive" }
+    
+    val result = mutableListOf<TimeInterval>()
+    val duration = interval.duration()
+    val partDuration = duration.dividedBy(parts.toLong())
+    
+    var current = interval.start
+    repeat(parts) {
+      val next = if (it == parts - 1) interval.end else current.plus(partDuration)
+      result.add(TimeInterval.of(current, next))
+      current = next
+    }
+    
+    return result
+  }
+  
+  // 반복 패턴 조합
+  fun combineRecurrences(recurrences: List<TimeRecurrence>): TimeRecurrence {
+    return object : TimeRecurrence() {
+      override fun occurrencesIn(interval: TimeInterval): List<TimePoint> {
+        return recurrences.flatMap { it.occurrencesIn(interval) }
+          .distinct()
+          .sortedBy { it.toEpochMilli() }
+      }
+      
+      override fun nextOccurrenceAfter(point: TimePoint): TimePoint? {
+        return recurrences.mapNotNull { it.nextOccurrenceAfter(point) }
+          .minByOrNull { it.toEpochMilli() }
+      }
+    }
+  }
+}
+```
+
+# 사용 사례
+
+실제 코드에서 이러한 시간 모델을 어떻게 활용할 수 있는지 몇 가지 예시를 살펴보자.
+
+## 이벤트 스케줄링
+
+회의나 약속과 같은 이벤트를 스케줄링하는 예시다.
+
+```kotlin
+// 회의 스케줄링
+val meetingStart = TimePoint.of(2023, 5, 10, 14, 0) // 2023년 5월 10일 오후 2시
+val meetingDuration = Duration.ofMinutes(60) // 1시간 회의
+val meetingInterval = TimeInterval.startingAt(meetingStart, meetingDuration)
+
+// 참석자의 가용 시간 확인
+val availabilityStart = TimePoint.of(2023, 5, 10, 13, 0) // 오후 1시부터
+val availabilityEnd = TimePoint.of(2023, 5, 10, 17, 0)   // 오후 5시까지
+val availabilityInterval = TimeInterval.of(availabilityStart, availabilityEnd)
+
+// 회의가 가용 시간 내에 있는지 확인
+val canAttend = availabilityInterval.contains(meetingInterval)
+println("Can attend meeting: $canAttend") // true
+
+// 다음 정기 회의 시간 계산 (매주 월요일 오전 10시)
+val weeklyMeeting = WeeklyRecurrence(
+    setOf(DayOfWeek.MONDAY),
+    LocalTime.of(10, 0)
+)
+
+val today = TimePoint.now()
+val nextMeeting = weeklyMeeting.nextOccurrenceAfter(today)
+println("Next meeting: ${nextMeeting?.format("yyyy-MM-dd HH:mm")}")
+```
+
+## 타임라인 분석
+
+일련의 이벤트를 시간 순서로 분석하는 예시다.
+
+```kotlin
+// 여러 이벤트의 타임라인 생성
+data class Event(val name: String, val interval: TimeInterval)
+
+val events = listOf(
+  Event("프로젝트 계획", TimeInterval.of(
+    TimePoint.of(2023, 5, 1, 9, 0),
+    TimePoint.of(2023, 5, 3, 17, 0)
+  )),
+  Event("디자인 단계", TimeInterval.of(
+    TimePoint.of(2023, 5, 4, 9, 0),
+    TimePoint.of(2023, 5, 10, 17, 0)
+  )),
+  Event("개발 단계", TimeInterval.of(
+    TimePoint.of(2023, 5, 8, 9, 0),
+    TimePoint.of(2023, 5, 20, 17, 0)
+  )),
+  Event("테스트", TimeInterval.of(
+    TimePoint.of(2023, 5, 18, 9, 0),
+    TimePoint.of(2023, 5, 25, 17, 0)
+  ))
+)
+
+// 전체 프로젝트 기간 계산
+val projectStart = events.minOf { it.interval.start }
+val projectEnd = events.maxOf { it.interval.end }
+val projectInterval = TimeInterval.of(projectStart, projectEnd)
+val projectDuration = projectInterval.duration()
+
+println("프로젝트 기간: ${projectStart.format("yyyy-MM-dd")} ~ ${projectEnd.format("yyyy-MM-dd")}")
+println("총 소요 시간: ${TimeUtils.formatDuration(projectDuration)}")
+
+// 단계 간 겹치는 부분 분석
+for (i in 0 until events.size - 1) {
+  for (j in i + 1 until events.size) {
+    val event1 = events[i]
+    val event2 = events[j]
+    
+    if (event1.interval.overlaps(event2.interval)) {
+      val overlap = event1.interval.intersection(event2.interval)
+      println("'${event1.name}'과 '${event2.name}'이 겹침: ${overlap?.start?.format("MM-dd")} ~ ${overlap?.end?.format("MM-dd")}")
+    }
+  }
+}
+```
+
+## 근무 시간 추적
+
+근무 시간을 추적하고 분석하는 예시다.
+
+```kotlin
+// 근무 시간 기록
+data class WorkSession(val start: TimePoint, val end: TimePoint) {
+  val duration: Duration
+    get() = start.until(end)
+  
+  val interval: TimeInterval
+    get() = TimeInterval.of(start, end)
+}
+
+// 일주일간의 근무 기록
+val workWeek = listOf(
+  WorkSession(
+    TimePoint.of(2023, 5, 8, 9, 0),
+    TimePoint.of(2023, 5, 8, 18, 0)
+  ),
+  WorkSession(
+    TimePoint.of(2023, 5, 9, 8, 30),
+    TimePoint.of(2023, 5, 9, 17, 45)
+  ),
+  WorkSession(
+    TimePoint.of(2023, 5, 10, 9, 15),
+    TimePoint.of(2023, 5, 10, 19, 30)
+  ),
+  WorkSession(
+    TimePoint.of(2023, 5, 11, 9, 0),
+    TimePoint.of(2023, 5, 11, 18, 15)
+  ),
+  WorkSession(
+    TimePoint.of(2023, 5, 12, 9, 30),
+    TimePoint.of(2023, 5, 12, 16, 0)
+  )
+)
+
+// 총 근무 시간 계산
+val totalWorkDuration = workWeek.fold(Duration.ZERO) { acc, session ->
+  acc.plus(session.duration)
+}
+
+println("총 근무 시간: ${TimeUtils.formatDuration(totalWorkDuration)}")
+
+// 일별 근무 시간 분석
+val workByDay = workWeek.groupBy { 
+  it.start.format("yyyy-MM-dd") 
+}.mapValues { (_, sessions) ->
+  sessions.fold(Duration.ZERO) { acc, session -> acc.plus(session.duration) }
+}
+
+workByDay.forEach { (day, duration) ->
+  println("$day: ${TimeUtils.formatDuration(duration)}")
+}
+
+// 초과 근무 시간 계산 (하루 8시간 기준)
+val standardWorkDay = Duration.ofHours(8)
+val overtime = workByDay.map { (day, duration) ->
+  val daily = duration.to(TimeUnit.HOURS).value
+  val over = Math.max(0, daily - 8)
+  day to Duration.ofHours(over)
+}.filter { (_, overtime) -> !overtime.isZero() }
+
+overtime.forEach { (day, duration) ->
+  println("$day 초과근무: ${TimeUtils.formatDuration(duration)}")
+}
+```
+
+# 마치며
+
+이 글에서는 시간이라는 복잡한 개념을 프로그래밍적으로 어떻게 모델링할 수 있는지 살펴보았다. 시간은 단순한 물리적 측도를 넘어서 다양한 관점(시점, 기간, 간격, 반복)으로 이해할 수 있으며, 각 관점에 맞는 모델링 접근법이 필요하다.
+
+시간 모델링에서 가장 중요한 점은 시간의 다양한 특성을 정확하게 반영하는 것이다. 단위 변환이 복잡하고, 타임존이 존재하며, 다양한 캘린더 시스템이 사용된다는 점을 고려해야 한다. 또한 시간은 연속적인 특성을 가지기 때문에 정밀도에 대한 고려도 필요하다.
+
+모델 설계에서는 각 개념을 명확히 분리하면서도 상호 작용을 자연스럽게 지원하는 것이 중요하다. `TimePoint`, `Duration`, `TimeInterval`, `TimeRecurrence`와 같은 핵심 클래스는 각각의 책임을 명확히 하면서도, 서로 변환되고 결합될 수 있어야 한다.
+
+이러한 시간 모델링은 일정 관리, 예약 시스템, 캘린더 시스템 등 다양한 비즈니스 도메인에서 활용될 수 있다. 특히 전자상거래, 물류, 금융과 같이 시간이 중요한 요소인 도메인에서는 정교한 시간 모델이 필수적이다.
+
+[^1]: 참고로 한국 표준 시간은 KST라고 부른다
+[^2]: UTC, GMT, Zulu time 모두 같은 시간대를 나타낸다
