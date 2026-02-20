@@ -139,7 +139,7 @@ export const PropertySplitTimelineDemo = () => {
       <div style={{ display: 'flex', justifyContent: 'center', padding: '18px 0' }}>
         <canvas
           ref={canvasRef}
-          style={{ width: CANVAS_W, height: CANVAS_H, display: 'block' }}
+          style={{ width: '100%', maxWidth: CANVAS_W, aspectRatio: `${CANVAS_W} / ${CANVAS_H}`, display: 'block' }}
         />
       </div>
     </div>

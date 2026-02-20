@@ -87,7 +87,7 @@ export const FireworkStateDiagram = () => {
       <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0' }}>
         <canvas
           ref={canvasRef}
-          style={{ width: CANVAS_W, maxWidth: '100%', height: 'auto', display: 'block' }}
+          style={{ width: '100%', maxWidth: CANVAS_W, aspectRatio: `${CANVAS_W} / ${CANVAS_H}`, display: 'block' }}
         />
       </div>
     </div>

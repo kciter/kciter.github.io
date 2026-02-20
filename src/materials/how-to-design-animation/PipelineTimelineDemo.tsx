@@ -131,7 +131,10 @@ export const PipelineTimelineDemo = () => {
   return (
     <div style={{ margin: '24px 0' }}>
       <div style={{ display: 'flex', justifyContent: 'center', padding: '18px 0' }}>
-        <canvas ref={canvasRef} style={{ width: CANVAS_W, height: CANVAS_H, display: 'block' }} />
+        <canvas
+          ref={canvasRef}
+          style={{ width: '100%', maxWidth: CANVAS_W, aspectRatio: `${CANVAS_W} / ${CANVAS_H}`, display: 'block' }}
+        />
       </div>
     </div>
   );

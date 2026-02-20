@@ -172,6 +172,7 @@ export const BounceGraphDemo = () => {
           alignItems: 'center',
           gap: 48,
           padding: '24px 0',
+          flexWrap: 'wrap',
         }}
       >
         {/* Pin */}
@@ -213,7 +214,7 @@ export const BounceGraphDemo = () => {
         {/* Graph */}
         <canvas
           ref={canvasRef}
-          style={{ width: GRAPH_W, height: GRAPH_H, display: 'block' }}
+          style={{ width: '100%', maxWidth: GRAPH_W, aspectRatio: `${GRAPH_W} / ${GRAPH_H}`, display: 'block' }}
         />
       </div>
       <div

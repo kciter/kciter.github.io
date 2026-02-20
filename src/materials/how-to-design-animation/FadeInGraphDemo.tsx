@@ -142,6 +142,7 @@ export const FadeInGraphDemo = () => {
           alignItems: 'center',
           gap: 48,
           padding: '24px 0',
+          flexWrap: 'wrap',
         }}
       >
         {/* Fade-in box */}
@@ -161,8 +162,9 @@ export const FadeInGraphDemo = () => {
         <canvas
           ref={canvasRef}
           style={{
-            width: GRAPH_W,
-            height: GRAPH_H,
+            width: '100%',
+            maxWidth: GRAPH_W,
+            aspectRatio: `${GRAPH_W} / ${GRAPH_H}`,
             display: 'block',
           }}
         />
