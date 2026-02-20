@@ -4,14 +4,7 @@ const GRAVITY = 0.15;
 const DRAG = 0.02;
 const COUNT = 80;
 
-const COLORS = [
-  '#228be6',
-  '#40c057',
-  '#fab005',
-  '#fa5252',
-  '#845ef7',
-  '#ff922b',
-];
+const COLORS = ['#228be6', '#40c057', '#fab005', '#fa5252', '#845ef7', '#ff922b'];
 
 interface Confetti {
   x: number;
@@ -40,7 +33,7 @@ function createBurst(cx: number, cy: number): Confetti[] {
       rotation: Math.random() * Math.PI * 2,
       rotationSpeed: (Math.random() - 0.5) * 0.3,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      opacity: 1,
+      opacity: 1
     };
   });
 }
@@ -122,7 +115,7 @@ export const ConfettiDemo = () => {
         borderRadius: 8,
         padding: 20,
         margin: '24px 0',
-        background: '#fff',
+        background: '#fff'
       }}
     >
       <div style={{ position: 'relative' }}>
@@ -133,7 +126,7 @@ export const ConfettiDemo = () => {
             height: 220,
             display: 'block',
             borderRadius: 8,
-            background: '#f8f9fa',
+            background: '#f8f9fa'
           }}
         />
         <div
@@ -142,7 +135,7 @@ export const ConfettiDemo = () => {
             bottom: 16,
             left: 0,
             right: 0,
-            textAlign: 'center',
+            textAlign: 'center'
           }}
         >
           <button
@@ -155,7 +148,7 @@ export const ConfettiDemo = () => {
               color: '#fff',
               fontSize: 14,
               fontWeight: 600,
-              cursor: 'pointer',
+              cursor: 'pointer'
             }}
           >
             발사
@@ -167,10 +160,10 @@ export const ConfettiDemo = () => {
           fontSize: 11,
           color: '#adb5bd',
           textAlign: 'center',
-          marginTop: 10,
+          marginTop: 10
         }}
       >
-        중력, 공기 저항, 회전 — 규칙만 정의하면 자연스러운 움직임이 만들어진다
+        규칙만 정의하면 자연스러운 움직임이 만들어진다
       </div>
     </div>
   );
