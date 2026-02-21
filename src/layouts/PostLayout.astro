@@ -80,7 +80,7 @@ const applicationLdJson = {
 
 // Random related posts (seeded by slug for consistency)
 const relatedPosts = allPosts
-  .filter(p => p.slug !== currentSlug)
+  .filter(p => p.slug !== currentSlug && p.image)
   .sort(() => Math.random() - 0.5)
   .slice(0, 6);
 

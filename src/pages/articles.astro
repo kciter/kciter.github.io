@@ -8,18 +8,19 @@ dayjs.extend(localizedFormat);
 
 const allPosts = await getPublishedPosts();
 const articles = allPosts.filter(p => p.data.categories === 'article');
-const [featured, second, third, ...rest] = articles;
+const [featured, ...rest] = articles;
 
 const featuredSlug = getSlugFromId(featured.id);
 const featuredDate = getDateFromId(featured.id);
 const featuredReadingTime = getReadingTime(featured.body || '');
-const featuredExcerpt = getExcerpt(featured.body || '');
+const featuredExcerpt = getExcerpt(featured.body || '', 160);
 
-const subFeatured = [second, third].filter(Boolean).map(post => ({
+const listPosts = rest.map(post => ({
   post,
   slug: getSlugFromId(post.id),
   date: getDateFromId(post.id),
   readingTime: getReadingTime(post.body || ''),
+  excerpt: getExcerpt(post.body || '', 80),
 }));
 ---
 
@@ -34,73 +35,49 @@ const subFeatured = [second, third].filter(Boolean).map(post => ({
     </div>
 
     {/* Featured */}
-    <a href={`/posts/${featuredSlug}/`} class="featured-post" style="text-decoration: none; display: block;">
+    <a href={`/posts/${featuredSlug}/`} class="featured-card">
       {featured.data.image && (
         <img
           src={featured.data.image}
           alt={featured.data.title}
-          class="w-full rounded-lg object-cover shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
-          style="aspect-ratio: 16/9;"
+          class="featured-image"
         />
       )}
-      <h2 class="mb-1 text-xl font-bold text-[#212b36]" style="border: none; padding: 0; margin-top: 16px;">{featured.data.title}</h2>
-      {featuredExcerpt && (
-        <p class="text-sm leading-[1.5] text-[#666]" style="margin: 6px 0 8px 0;">{featuredExcerpt}</p>
-      )}
-      <div class="text-sm text-[#999]">
-        {dayjs(featuredDate).locale('en').format('ll')} · {Math.round(featuredReadingTime.minutes)} min read
+      <div class="featured-body">
+        <div class="featured-tag">Latest</div>
+        <h2 class="featured-title">{featured.data.title}</h2>
+        {featuredExcerpt && (
+          <p class="featured-excerpt">{featuredExcerpt}</p>
+        )}
+        <div class="article-meta">
+          {dayjs(featuredDate).locale('en').format('ll')} &middot; {Math.round(featuredReadingTime.minutes)} min read
+        </div>
       </div>
     </a>
 
-    {/* Sub-featured (2nd & 3rd) */}
-    {subFeatured.length > 0 && (
-      <div class="sub-featured-row">
-        {subFeatured.map(({ post, slug, date, readingTime }) => (
-          <a href={`/posts/${slug}/`} class="sub-featured-post" style="text-decoration: none;">
-            {post.data.image && (
-              <img
-                src={post.data.image}
-                alt={post.data.title}
-                loading="lazy"
-                class="w-full rounded-lg object-cover shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
-                style="aspect-ratio: 16/9;"
-              />
+    {/* Article list */}
+    <div class="article-list">
+      {listPosts.map(({ post, slug, date, readingTime, excerpt }) => (
+        <a href={`/posts/${slug}/`} class="article-card">
+          {post.data.image && (
+            <img
+              src={post.data.image}
+              alt={post.data.title}
+              loading="lazy"
+              class="article-image"
+            />
+          )}
+          <div class="article-body">
+            <div class="article-title">{post.data.title}</div>
+            {excerpt && (
+              <p class="article-excerpt">{excerpt}</p>
             )}
-            <div class="sub-featured-title" style="margin-top: 10px;">{post.data.title}</div>
-            <div class="mt-0.5 text-sm text-[#999]">
-              {dayjs(date).locale('en').format('ll')} · {Math.round(readingTime.minutes)} min read
+            <div class="article-meta">
+              {dayjs(date).locale('en').format('ll')} &middot; {Math.round(readingTime.minutes)} min read
             </div>
-          </a>
-        ))}
-      </div>
-    )}
-
-    {/* List */}
-    <div class="mt-8">
-      {rest.map(post => {
-        const slug = getSlugFromId(post.id);
-        const date = getDateFromId(post.id);
-        const readingTime = getReadingTime(post.body || '');
-
-        return (
-          <a href={`/posts/${slug}/`} class="article-item" style="text-decoration: none;">
-            {post.data.image && (
-              <img
-                src={post.data.image}
-                alt={post.data.title}
-                loading="lazy"
-                class="h-16 w-24 shrink-0 rounded-md object-cover"
-              />
-            )}
-            <div class="min-w-0 flex-1">
-              <div class="article-title">{post.data.title}</div>
-              <div class="mt-0.5 text-sm text-[#999]">
-                {dayjs(date).locale('en').format('ll')} · {Math.round(readingTime.minutes)} min read
-              </div>
-            </div>
-          </a>
-        );
-      })}
+          </div>
+        </a>
+      ))}
     </div>
   </div>
 </BaseLayout>
@@ -138,48 +115,151 @@ const subFeatured = [second, third].filter(Boolean).map(post => ({
     white-space: nowrap;
   }
 
-  .sub-featured-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-top: 32px;
+  /* Featured card */
+  .featured-card {
+    display: block;
+    text-decoration: none;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #eee;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-bottom: 24px;
   }
 
-  .sub-featured-title {
-    font-size: 0.95rem;
-    font-weight: 600;
+  .featured-card:hover {
+    border-color: #ccc;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
+
+  .featured-image {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+  }
+
+  .featured-body {
+    padding: 18px 20px 20px;
+  }
+
+  .featured-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #00a962;
+    background: rgba(0, 169, 98, 0.08);
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  .featured-title {
+    border: none;
+    padding: 0;
+    margin: 0 0 8px 0;
+    font-size: 1.3rem;
+    font-weight: 700;
     color: #212b36;
+    line-height: 1.35;
   }
 
-  .sub-featured-post:hover .sub-featured-title {
+  .featured-card:hover .featured-title {
     color: #00a962;
     transition: color 0.2s;
   }
 
-  .featured-post:hover h2 {
-    color: #00a962;
-    transition: color 0.2s;
+  .featured-excerpt {
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.5;
+    margin: 0 0 10px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
-  .article-item {
+  .article-meta {
+    font-size: 0.75rem;
+    color: #aaa;
+  }
+
+  /* Article list */
+  .article-list {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 16px;
-    padding: 12px 0;
-    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .article-card {
+    display: flex;
+    text-decoration: none;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #eee;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .article-card:hover {
+    border-color: #ccc;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
+
+  .article-image {
+    width: 200px;
+    flex-shrink: 0;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+  }
+
+  .article-body {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
   }
 
   .article-title {
     font-size: 1rem;
     font-weight: 600;
     color: #212b36;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    margin-bottom: 6px;
   }
 
-  .article-item:hover .article-title {
+  .article-card:hover .article-title {
     color: #00a962;
     transition: color 0.2s;
+  }
+
+  .article-excerpt {
+    font-size: 0.8rem;
+    color: #666;
+    line-height: 1.5;
+    margin: 0 0 8px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .article-card {
+      flex-direction: column;
+    }
+
+    .article-image {
+      width: 100%;
+      aspect-ratio: 16/9;
+    }
   }
 </style>

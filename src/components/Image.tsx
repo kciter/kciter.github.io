@@ -19,7 +19,7 @@ const Image = ({ src, caption, width, maxWidth, expandable }: ImageProps) => {
         alt={caption || ''}
         loading="lazy"
         width={width || '100%'}
-        style={{ cursor: expandable ? 'zoom-in' : 'default', maxWidth: maxWidth as any }}
+        style={{ cursor: expandable ? 'zoom-in' : 'default', maxWidth: maxWidth as any, margin: '0 auto', display: 'block' }}
         onClick={expandable ? () => setExpanded(true) : undefined}
       />
       {caption && <figcaption dangerouslySetInnerHTML={{ __html: caption }} />}
