@@ -28,13 +28,13 @@ const updated = recentPosts.some(post => {
         Timeline
       </a>
       <div class="dropdown">
-        <span class="menu-item dropdown-trigger">
+        <span class="menu-item dropdown-trigger" id="posts-trigger">
           Posts <span class="chevron">&#9662;</span>
         </span>
         <div class="dropdown-menu">
           <a href="/articles/" class="dropdown-item">Articles</a>
           <a href="/bookshelf/" class="dropdown-item">Bookshelf</a>
-          <a href="/thought/" class="dropdown-item">Thought</a>
+          <a href="/thought/" class="dropdown-item">Thoughts</a>
         </div>
       </div>
       <a href="https://kciter.so/talks/" class="menu-item">Talks</a>
@@ -53,6 +53,13 @@ const updated = recentPosts.some(post => {
       </div>
     </div>
   </nav>
+
+  <!-- Mobile sub-tab (hidden by default) -->
+  <div class="mobile-tabs" id="mobile-tabs">
+    <a href="/articles/" class="mobile-tab">Articles</a>
+    <a href="/bookshelf/" class="mobile-tab">Bookshelf</a>
+    <a href="/thought/" class="mobile-tab">Thoughts</a>
+  </div>
 </div>
 
 <!-- Search Modal -->
@@ -337,9 +344,80 @@ const updated = recentPosts.some(post => {
     box-shadow: rgb(51, 217, 178) 0px 0px 0px 0px;
     animation: 2s ease 0s infinite normal none running pulse-dot;
   }
+
+  /* Mobile tabs */
+  .mobile-tabs {
+    display: none;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.25s ease, padding 0.25s ease;
+    padding: 0;
+  }
+
+  .mobile-tabs.open {
+    max-height: 60px;
+    padding: 8px 0 4px;
+  }
+
+  .mobile-tab {
+    display: inline-block;
+    font-size: 0.85rem;
+    color: #999;
+    text-decoration: none;
+    margin-right: 16px;
+    padding: 6px 0;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .mobile-tab:hover,
+  .mobile-tab.active {
+    color: #00a962;
+    border-bottom-color: #00a962;
+  }
+
+  @media (max-width: 768px) {
+    .dropdown-menu {
+      display: none !important;
+    }
+
+    .mobile-tabs {
+      display: block;
+    }
+
+    .dropdown:hover .chevron {
+      transform: none;
+    }
+
+    .chevron.open {
+      transform: rotate(180deg);
+    }
+  }
 </style>
 
 <script>
+  // Mobile tabs toggle
+  const postsTrigger = document.getElementById('posts-trigger');
+  const mobileTabs = document.getElementById('mobile-tabs');
+  if (postsTrigger && mobileTabs) {
+    const chevron = postsTrigger.querySelector('.chevron');
+    postsTrigger.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768) {
+        e.preventDefault();
+        mobileTabs.classList.toggle('open');
+        chevron?.classList.toggle('open');
+      }
+    });
+
+    // Highlight current page tab
+    const path = window.location.pathname;
+    mobileTabs.querySelectorAll('.mobile-tab').forEach(tab => {
+      if (path.startsWith(tab.getAttribute('href') || '')) {
+        tab.classList.add('active');
+      }
+    });
+  }
+
   let pagefind: any = null;
 
   async function loadPagefind() {

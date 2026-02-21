@@ -6,12 +6,12 @@ const allPosts = await getPublishedPosts();
 const thoughts = allPosts.filter(p => p.data.categories === 'thought');
 ---
 
-<BaseLayout title="Thought">
+<BaseLayout title="Thoughts">
   <div class="page">
     <div class="section-header">
       <span class="section-line" />
       <span class="section-diamond">&#x25C6;</span>
-      <span class="section-title">THOUGHT</span>
+      <span class="section-title">THOUGHTS</span>
       <span class="section-diamond">&#x25C6;</span>
       <span class="section-line" />
     </div>
@@ -68,10 +68,9 @@ const thoughts = allPosts.filter(p => p.data.categories === 'thought');
 
   .paper {
     background: #fdfbf7;
-    border: 1px solid #e8e4dc;
-    border-radius: 4px;
+    border: 1px solid #eee;
+    border-radius: 12px;
     padding: 24px 32px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   }
 
   .entry {
