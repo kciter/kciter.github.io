@@ -370,6 +370,12 @@ pre::before {
   color: #888;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  background-image:
+    radial-gradient(circle 5px at 18px 50%, #ff5f57 5px, transparent 6px),
+    radial-gradient(circle 5px at 34px 50%, #febc2e 5px, transparent 6px),
+    radial-gradient(circle 5px at 50px 50%, #28c840 5px, transparent 6px);
+  background-repeat: no-repeat;
+  padding-left: 68px;
 }
 
 /* Filename mode: no uppercase */
@@ -377,13 +383,6 @@ pre.has-filename::before {
   text-transform: none;
   letter-spacing: 0;
   font-size: 12px;
-}
-  background-image:
-    radial-gradient(circle 5px at 18px 50%, #ff5f57 5px, transparent 6px),
-    radial-gradient(circle 5px at 34px 50%, #febc2e 5px, transparent 6px),
-    radial-gradient(circle 5px at 50px 50%, #28c840 5px, transparent 6px);
-  background-repeat: no-repeat;
-  padding-left: 68px;
 }
 
 /* Code area wrapper */
@@ -395,10 +394,11 @@ pre > code {
   counter-reset: line;
   padding: 0.8em 0;
   overflow-x: auto;
-  background-image: linear-gradient(to right, transparent 46px, #e8e8e8 46px, #e8e8e8 47px, transparent 47px);
+  background-image: linear-gradient(to right, transparent 48px, #e8e8e8 48px, #e8e8e8 49px, transparent 49px);
 }
 
 pre code .line {
+  position: relative;
   display: inline-block;
   width: 100%;
   padding-right: 1em;
@@ -414,9 +414,24 @@ pre code .line::before {
   text-align: right;
   color: #b0b0b0;
   font-size: 12px;
-  margin-right: 0.8em;
+  margin-right: 1.2em;
   -webkit-user-select: none;
   user-select: none;
+}
+
+/* Line highlight — // [!code highlight] */
+pre code .line.highlighted {
+  background-color: rgba(253, 224, 71, 0.2);
+}
+
+/* Diff — // [!code ++] and // [!code --] */
+pre code .line.diff.add {
+  background-color: rgba(34, 197, 94, 0.12);
+}
+
+pre code .line.diff.remove {
+  background-color: rgba(239, 68, 68, 0.12);
+  opacity: 0.7;
 }
 
 @media (max-width: 30em) {
@@ -516,13 +531,14 @@ pre code .line::before {
 :not(pre) > code {
   position: relative;
   top: -1px;
-  padding: 0.25em 0.5em;
-  border-radius: 3px;
-  color: #db4c69;
-  background: #f9f2f4;
+  padding: 0.2em 0.45em;
+  border-radius: 4px;
+  color: #e45649;
+  background: #f4f4f4;
+  border: 1px solid #e8e8e8;
   white-space: normal;
   font-family: 'Source Code Pro', monospace;
-  font-size: 13px;
+  font-size: 0.85em;
 }
 
 /*

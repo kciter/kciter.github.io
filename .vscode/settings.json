@@ -1,0 +1,14 @@
+{
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.astro": true,
+    "**/public": true,
+    "**/pnpm-lock.yaml": true
+  },
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/public": true,
+    "**/.astro": true
+  }
+}

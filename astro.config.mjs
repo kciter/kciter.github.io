@@ -7,6 +7,10 @@ import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeExternalLinks from 'rehype-external-links';
 import remarkGfm from 'remark-gfm';
+import {
+  transformerNotationDiff,
+  transformerNotationHighlight,
+} from '@shikijs/transformers';
 
 export default defineConfig({
   site: 'https://kciter.so',
@@ -15,7 +19,11 @@ export default defineConfig({
   integrations: [react(), mdx(), sitemap()],
   markdown: {
     shikiConfig: {
-      theme: 'github-light'
+      theme: 'github-light',
+      transformers: [
+        transformerNotationDiff(),
+        transformerNotationHighlight(),
+      ]
     },
     remarkPlugins: [remarkGfm],
     rehypePlugins: [

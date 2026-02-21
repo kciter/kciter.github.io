@@ -2,12 +2,12 @@
 <div class="code-tabs" data-labels="src/app.js,src/app.ts">
 
 ```js
-const greeting = "Hello";
-console.log(greeting);
+const greeting = "Hello"; // [!code --]
+console.log(greeting); // [!code ++]
 ```
 
 ```ts
-const greeting: string = "Hello";
+const greeting: string = "Hello"; // [!code highlight]
 console.log(greeting);
 ```
 
