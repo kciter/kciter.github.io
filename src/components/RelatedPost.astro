@@ -1,0 +1,72 @@
+---
+interface Post {
+  slug: string;
+  title: string;
+  image?: string;
+  date: string;
+}
+
+interface Props {
+  posts: Post[];
+  current?: string;
+  style?: string;
+}
+
+const { posts, current, style } = Astro.props;
+---
+
+<div class="pt-8 pb-8" style={style}>
+  <div class="grid grid-cols-3 gap-5 max-[30rem]:grid-cols-1">
+    {
+      posts
+        .filter(post => post.slug !== current)
+        .map(post => (
+          <a href={`/posts/${post.slug}/`} class="related-post block scale-100 no-underline transition-all duration-[333ms] ease-[ease]" style="text-decoration: none;">
+            {post.image && (
+              <img
+                src={post.image}
+                alt={post.title}
+                loading="lazy"
+                class="block w-full object-cover shadow-[0_0_10px_2px_rgba(0,0,0,0.05)]"
+                style="aspect-ratio: 16/9;"
+              />
+            )}
+            <div class="mt-3 text-xl leading-6 font-thin">{post.title}</div>
+            <small>{post.date}</small>
+          </a>
+        ))
+    }
+  </div>
+</div>
+
+<style>
+  .related-post {
+    position: relative;
+    transform: scale3d(1, 1, 1);
+  }
+
+  .related-post::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    transform: scale(1.06);
+    transition: opacity 2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow:
+      0 8px 17px 0 rgba(0, 0, 0, 0.2),
+      0 6px 20px 0 rgba(0, 0, 0, 0.15);
+    content: '';
+    opacity: 0;
+    z-index: -1;
+  }
+
+  .related-post:hover {
+    transform: scale3d(1.006, 1.006, 1);
+  }
+
+  .related-post:hover::after {
+    opacity: 1;
+  }
+</style>

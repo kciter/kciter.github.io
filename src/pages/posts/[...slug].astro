@@ -1,0 +1,75 @@
+---
+import { getCollection, render } from 'astro:content';
+import PostLayout from '@layouts/PostLayout.astro';
+import {
+  getSlugFromId,
+  getDateFromId,
+  getReadingTime,
+  getExcerpt,
+  getSeriesPosts,
+  getPublishedPosts
+} from '@utils/posts';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+
+  const paths = await Promise.all(
+    posts.map(async post => {
+      const slug = getSlugFromId(post.id);
+      const date = getDateFromId(post.id);
+
+      // Build series context
+      let series = undefined;
+      if (post.data.series) {
+        const seriesPosts = await getSeriesPosts(post.data.series);
+        series = {
+          title: post.data.series,
+          items: seriesPosts.map(sp => ({
+            title: sp.data.title,
+            url: `/posts/${getSlugFromId(sp.id)}`
+          }))
+        };
+      }
+
+      return {
+        params: { slug },
+        props: { post, date, series }
+      };
+    })
+  );
+
+  return paths;
+}
+
+const { post, date, series } = Astro.props;
+const { Content, headings } = await render(post);
+const readingTime = getReadingTime(post.body || '');
+const excerpt = getExcerpt(post.body || '');
+const slug = getSlugFromId(post.id);
+
+// Get all published posts for related posts
+const publishedPosts = await getPublishedPosts();
+const allPosts = publishedPosts.map(p => ({
+  slug: getSlugFromId(p.id),
+  title: p.data.title,
+  image: p.data.image,
+  date: getDateFromId(p.id)
+}));
+---
+
+<PostLayout
+  title={post.data.title}
+  description={excerpt}
+  date={date}
+  image={post.data.image}
+  tags={post.data.tags}
+  comments={post.data.comments}
+  draft={post.data.draft}
+  series={series}
+  headings={headings}
+  readingTime={readingTime}
+  allPosts={allPosts}
+  currentSlug={slug}
+>
+  <Content />
+</PostLayout>

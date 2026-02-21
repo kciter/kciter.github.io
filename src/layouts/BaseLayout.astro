@@ -1,0 +1,89 @@
+---
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  meta?: Array<{ name?: string; property?: string; content: string }>;
+}
+
+const { title, description, image, meta = [] } = Astro.props;
+const siteTitle = 'kciter.so | devlog';
+const pageTitle = title ? `${title} | kciter.so` : siteTitle;
+const metaDescription = description || 'devlog';
+const ogImage =
+  meta.find(m => m.property === 'og:image')?.content ||
+  image ||
+  'https://kciter.so/images/og.png';
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="index,follow" />
+    <meta name="googlebot" content="index,follow" />
+    <meta name="color-scheme" content="light" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={metaDescription} />
+    <meta name="author" content="Lee Sun-Hyoup" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="kciter.so" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:url" content={Astro.url.href} />
+    <link rel="canonical" href={Astro.url.href} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="Sunhyoup Lee" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Additional meta from props -->
+    {meta.map(m => <meta {...m} />)}
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=PT+Sans:wght@400&family=Source+Code+Pro&family=Quattrocento+Sans&display=swap"
+    />
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7M8K7EBEDX"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-7M8K7EBEDX');
+    </script>
+
+    <slot name="head" />
+  </head>
+  <body>
+    <div class="mx-auto w-[715px] pt-4 max-md:w-[90vw]">
+      <Header />
+      <div class="post-container">
+        <slot />
+      </div>
+      <Footer />
+    </div>
+  </body>
+</html>

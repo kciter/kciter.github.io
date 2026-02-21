@@ -1,0 +1,64 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+
+const buttons = [
+  {
+    icon: '<path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45C23.2 24 24 23.23 24 22.28V1.72C24 .77 23.2 0 22.22 0z"/>',
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/kciter'
+  },
+  {
+    icon: '<path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.12.83-.26.83-.57v-2.2c-3.34.73-4.04-1.44-4.04-1.44-.55-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6.02 0c2.28-1.55 3.28-1.23 3.28-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .31.22.7.83.57C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/>',
+    label: 'GitHub',
+    href: 'https://github.com/kciter'
+  },
+  {
+    icon: '<path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07c0 6.02 4.39 11.02 10.13 11.93v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.79-4.68 4.53-4.68 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.33l-.53 3.49h-2.8v8.44C19.61 23.09 24 18.09 24 12.07z"/>',
+    label: 'Facebook',
+    href: 'https://www.facebook.com/sunhyoup.lee'
+  },
+  {
+    icon: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>',
+    label: 'Blog',
+    href: 'https://kciter.so'
+  }
+];
+---
+
+<BaseLayout title="Business Card">
+  <div class="mb-8 flex flex-col items-center gap-4 text-center">
+    <div
+      class="flex h-[120px] w-[120px] items-center justify-center rounded-full shadow-[1px_2px_6px_rgba(0,0,0,0.2)]"
+    >
+      <img
+        src="/images/about/avatar.jpg"
+        class="h-[116px] w-[116px] rounded-full object-cover"
+      />
+    </div>
+    <div class="flex flex-col justify-center">
+      <div class="text-2xl font-bold">Sunhyoup Lee</div>
+      <div class="text-base text-[#666]">Just a Developer</div>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    {
+      buttons.map(btn => (
+        <a
+          href={btn.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="relative flex w-full items-center justify-center gap-2 rounded-full border border-[#e0e0e0] bg-[#f9f9f9] p-4 text-base font-medium no-underline"
+        >
+          <svg
+            class="absolute top-1/2 left-6 h-6 w-6 -translate-y-1/2"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            set:html={btn.icon}
+          />
+          {btn.label}
+        </a>
+      ))
+    }
+  </div>
+</BaseLayout>

@@ -196,7 +196,7 @@ import { TableExample } from '@materials/modeling-series-view-model';
 
 위 스펙에 기반하여 모델을 도식화하면 다음과 같다.
 
-<Image src="/images/2025-04-18-modeling-series-view-model/diagram.png" caption="테이블 뷰모델 도식화 (클릭하여 크게보기)" expandable />
+<Image client:load src="/images/2025-04-18-modeling-series-view-model/diagram.png" caption="테이블 뷰모델 도식화 (클릭하여 크게보기)" expandable />
 
 모델을 코드로 옮기면 다음과 같이 구현할 수 있다. 여기서는 Kotlin을 사용해서 구현했다.
 
@@ -286,7 +286,7 @@ data class TableViewModel<T>(
 
 이제 만들어진 뷰모델을 기반으로 화면에서 자동으로 처리해줄 렌더러를 구현하면 마무리된다. 필자가 Claude를 이용해 구현한 렌더러는 다음과 같다. (모바일에선 보기 흉할 수 있다)
 
-<TableExample />
+<TableExample client:visible />
 
 지금은 스타일이 없지만 적절한 스타일을 적용하면 필터링, 정렬, 페이지네이션까지 가능한 꽤 괜찮은 테이블 뷰를 만들 수 있다. 만약 렌더러 코드가 궁금하다면 [GitHub](https://github.com/kciter/kciter.github.io/tree/develop/src/materials/modeling-series-view-model/TableRenderer.tsx)에서 볼 수 있다.
 

@@ -1,0 +1,32 @@
+---
+interface Item {
+  url: string;
+  title: string;
+}
+
+interface Props {
+  items: Item[];
+  title: string;
+  currentItem: string;
+}
+
+const { items, title, currentItem } = Astro.props;
+---
+
+<div class="mt-2 box-border w-full rounded-lg bg-[#f8f9fa] p-4">
+  <div class="mb-2 text-xl font-bold">{title}</div>
+  <ul style="margin: 0; padding: 0; padding-left: 24px;">
+    {
+      items.map(item => (
+        <li style={currentItem === item.title ? 'color: #00a962;' : ''}>
+          <a
+            href={item.url + '/'}
+            style={`text-decoration: none; color: #333;${currentItem === item.title ? ' font-weight: bold;' : ''}`}
+          >
+            {item.title}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>

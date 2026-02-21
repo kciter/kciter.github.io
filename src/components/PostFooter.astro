@@ -1,0 +1,37 @@
+---
+import PostBio from './PostBio.astro';
+import SpecialThanks from './SpecialThanks.astro';
+import Giscus from './Giscus';
+
+interface Props {
+  tags?: string[];
+  comment?: boolean;
+}
+
+const { tags, comment } = Astro.props;
+---
+
+<div>
+  {
+    tags && tags.length > 0 && (
+      <div class="mt-1 w-full">
+        {tags.map(tag => (
+          <div class="mr-1 mb-1 inline-flex items-center rounded-[50px] border border-[#dfe3e8] px-2 text-[10px] text-[#888]" style="height: 20px;">
+            {tag}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  <PostBio />
+  <SpecialThanks />
+
+  {
+    comment && (
+      <div id="comments">
+        <Giscus client:visible repo="kciter/kciter.github.io" theme="light" />
+      </div>
+    )
+  }
+</div>

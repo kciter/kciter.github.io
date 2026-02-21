@@ -1,0 +1,44 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import RelatedPost from '@components/RelatedPost.astro';
+import { getPublishedPosts, getSlugFromId, getDateFromId } from '@utils/posts';
+
+const allPosts = await getPublishedPosts();
+const articlePosts = allPosts
+  .filter(p => p.data.categories === 'article')
+  .slice(0, 9)
+  .map(p => ({
+    slug: getSlugFromId(p.id),
+    title: p.data.title,
+    image: p.data.image,
+    date: getDateFromId(p.id)
+  }));
+---
+
+<BaseLayout>
+  <div class="mb-8 flex flex-col items-center gap-4 text-center">
+    <div
+      class="flex h-[120px] w-[120px] items-center justify-center rounded-full shadow-[1px_2px_6px_rgba(0,0,0,0.2)]"
+    >
+      <img
+        src="/images/about/avatar.jpg"
+        class="h-[116px] w-[116px] object-cover"
+        style="border-radius: 50%;"
+      />
+    </div>
+
+    <div class="flex flex-col justify-center">
+      <div class="text-2xl font-bold">Sunhyoup Lee</div>
+      <div class="text-base text-[#666]">Just a Developer</div>
+    </div>
+  </div>
+
+  <div class="mb-2 flex items-baseline justify-between">
+    <div style="font-size: 18px; font-weight: bold; letter-spacing: 2px; margin: 0;">RECENT ARTICLES</div>
+    <a href="/timeline/" style="font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer;">
+      All articles &#x25B8;
+    </a>
+  </div>
+
+  <RelatedPost posts={articlePosts} style="padding: 0; padding-top: 10px;" />
+</BaseLayout>

@@ -1,0 +1,45 @@
+---
+import Social from './Social.astro';
+---
+
+<div class="flex items-center py-6">
+  <div class="shrink-0 basis-[80px]">
+    <img class="h-[80px] w-[80px] object-cover" style="border-radius: 50%;" src="/images/about/avatar.jpg" />
+  </div>
+
+  <div class="ml-8 flex-1 text-base">
+    <div>
+      Written by <a
+        href="/about/"
+        class="name-gradient font-bold no-underline"
+      >
+        @kciter
+      </a>
+    </div>
+    <div class="text-sm font-light leading-snug">가치있는 지식이 되기를 바랍니다</div>
+    <div class="-ml-1 [&_a]:text-sm [&_a]:text-[#888]">
+      <Social />
+    </div>
+  </div>
+</div>
+
+<style>
+  .name-gradient {
+    background: linear-gradient(
+      to right,
+      #191335,
+      #191335 33.33333%,
+      #00ab6c 66.66666%,
+      #00cb8c
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.3s ease;
+    background-size: 300% 100%;
+    background-position: top left;
+  }
+
+  .name-gradient:hover {
+    background-position: top left 100%;
+  }
+</style>

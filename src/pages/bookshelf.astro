@@ -1,0 +1,69 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { getPublishedPosts, getSlugFromId } from '@utils/posts';
+
+const allPosts = await getPublishedPosts();
+const books = allPosts.filter(p => p.data.categories === 'book-report');
+---
+
+<BaseLayout title="Bookshelf">
+  <div class="relative mx-auto grid w-[90%] grid-cols-3 gap-x-3 p-1 max-md:w-full max-md:grid-cols-2">
+    {
+      books.map(book => {
+        const slug = getSlugFromId(book.id);
+        return (
+          <div class="relative cursor-default p-4">
+            <div class="relative">
+              <div class="relative">
+                <div class="book-inner absolute top-[1%] left-4 h-[96%] w-[90%] rounded-[2px_6px_6px_2px] border border-gray-500 bg-white" />
+                <a href={`/posts/${slug}/`} class="book-cover relative block leading-[0]" style="text-decoration: none; border-radius: 2px 6px 6px 2px;">
+                  <img
+                    src={book.data.cover}
+                    alt={book.data.title}
+                    loading="lazy"
+                    class="w-full"
+                    style="border-radius: 2px 6px 6px 2px; grid-row: 1 / -1; grid-column: 1;"
+                  />
+                  <div class="book-effect absolute top-0 z-[5] ml-2 h-full w-5 border-l-2 border-black/[0.04] bg-gradient-to-r from-white/20 to-transparent transition-all duration-500 hover:ml-3.5" />
+                  <div class="book-light absolute top-0 right-0 z-[4] h-full w-[95%] rounded-[3px] bg-gradient-to-r from-transparent to-white/20 opacity-10 transition-all duration-500" />
+                </a>
+              </div>
+            </div>
+          </div>
+        );
+      })
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .book-inner {
+    box-shadow:
+      10px 40px 40px -10px #00000030,
+      inset -2px 0 0 grey,
+      inset -3px 0 0 #dbdbdb,
+      inset -4px 0 0 white,
+      inset -5px 0 0 #dbdbdb,
+      inset -6px 0 0 white,
+      inset -7px 0 0 #dbdbdb,
+      inset -8px 0 0 white,
+      inset -9px 0 0 #dbdbdb;
+  }
+
+  .book-cover {
+    box-shadow:
+      6px 6px 18px -2px rgba(0, 0, 0, 0.2),
+      24px 28px 40px -6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    transform: perspective(2000px) rotateY(-15deg) translateX(-10px) scaleX(0.94);
+    cursor: pointer;
+  }
+
+  .book-cover:hover {
+    transform: perspective(2000px) rotateY(0deg) translateX(0px) scaleX(1);
+    transform-style: preserve-3d;
+    box-shadow:
+      6px 6px 12px -1px rgba(0, 0, 0, 0.1),
+      20px 14px 16px -6px rgba(0, 0, 0, 0.1);
+  }
+</style>

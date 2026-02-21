@@ -1,0 +1,138 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import TableOfContents from '@components/TableOfContents.astro';
+import Series from '@components/Series.astro';
+import PostFooter from '@components/PostFooter.astro';
+import RelatedPost from '@components/RelatedPost.astro';
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat.js';
+import { getSlugFromId, getDateFromId } from '@utils/posts';
+
+dayjs.extend(localizedFormat);
+
+interface SeriesItem {
+  title: string;
+  url: string;
+}
+
+interface SeriesInfo {
+  title: string;
+  items: SeriesItem[];
+}
+
+interface PostInfo {
+  slug: string;
+  title: string;
+  image?: string;
+  date: string;
+}
+
+interface Props {
+  title: string;
+  description?: string;
+  date: string;
+  image?: string;
+  tags?: string[];
+  comments?: boolean;
+  draft?: boolean;
+  series?: SeriesInfo;
+  headings: { depth: number; slug: string; text: string }[];
+  readingTime: { text: string; minutes: number };
+  allPosts: PostInfo[];
+  currentSlug: string;
+}
+
+const {
+  title,
+  description,
+  date,
+  image,
+  tags,
+  comments,
+  draft,
+  series,
+  headings,
+  readingTime,
+  allPosts,
+  currentSlug
+} = Astro.props;
+
+const author = 'Lee Sun-Hyoup';
+const formattedDate = dayjs(date).locale('ko').format();
+const displayDate = dayjs(date).locale('en').format('LL');
+const pageUrl = Astro.url.href;
+
+const applicationLdJson = {
+  headline: title,
+  dateModified: formattedDate,
+  datePublished: formattedDate,
+  image: image ? `https://kciter.so${image}` : undefined,
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': pageUrl
+  },
+  author: { '@type': 'Person', name: author },
+  description: description || title,
+  url: pageUrl,
+  '@type': 'BlogPosting',
+  '@context': 'https://schema.org'
+};
+
+// Random related posts (seeded by slug for consistency)
+const relatedPosts = allPosts
+  .filter(p => p.slug !== currentSlug)
+  .sort(() => Math.random() - 0.5)
+  .slice(0, 6);
+
+const isDraft = draft && import.meta.env.PROD;
+
+const meta = [
+  { name: 'article:published_time', content: formattedDate },
+  ...(image
+    ? [
+        { name: 'image', content: `https://kciter.so${image}` },
+        { property: 'og:image', content: `https://kciter.so${image}` },
+        { property: 'og:image:secure_url', content: `https://kciter.so${image}` }
+      ]
+    : [])
+];
+---
+
+<BaseLayout title={title} description={description || title} meta={meta}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(applicationLdJson)} />
+  </Fragment>
+
+  <h1 class="post-title">{title}</h1>
+  <span class="post-date">Written on {displayDate}</span>
+
+  {image && <img src={image} alt={title} style="width: 100%;" />}
+
+  {!isDraft && headings.length > 0 && <TableOfContents headings={headings} />}
+
+  {
+    !isDraft && series?.items && (
+      <Series title={series.title} items={series.items} currentItem={title} />
+    )
+  }
+
+  <div class="post-content">
+    {isDraft ? <div class="my-4 text-center text-xl font-bold">Not yet published</div> : <slot />}
+  </div>
+
+  <PostFooter tags={tags} comment={comments} />
+
+  {relatedPosts.length > 0 && <RelatedPost posts={relatedPosts} current={currentSlug} />}
+</BaseLayout>
+
+<script>
+  // Vanilla JS replacing jQuery footnote tooltip
+  document.querySelectorAll('.post-container a[data-footnote-ref]').forEach(item => {
+    const href = item.getAttribute('href')?.slice(1);
+    if (!href) return;
+    const footnoteEl = document.getElementById(href);
+    if (!footnoteEl) return;
+    const text = footnoteEl.textContent?.replace('↩', '').trim() || '';
+    item.setAttribute('data-tooltip', text);
+  });
+</script>

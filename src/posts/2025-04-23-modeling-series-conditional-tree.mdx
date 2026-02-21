@@ -78,7 +78,7 @@ import Image from '@components/Image';
 
 먼저 조건 트리에 대한 도식을 그려보자.
 
-<Image src="/images/2025-04-23-modeling-series-conditional-tree/conditional-tree-uml.png" caption="조건 트리 도식" expandable />
+<Image client:load src="/images/2025-04-23-modeling-series-conditional-tree/conditional-tree-uml.png" caption="조건 트리 도식" expandable />
 
 위 도식은 조건 트리의 기본 구조를 나타낸다. 각 모델이 어떤 역할을 하는지 살펴보자.
 
@@ -88,7 +88,7 @@ import Image from '@components/Image';
 
 위와 같이 조건 트리 모델을 설계할 수 있다. 하지만 해당 모델은 데이터베이스 환경이 고려되지 않았다. 만약 RDB를 사용한다면 [객체-관계 불일치](https://en.wikipedia.org/wiki/Object%E2%80%93relational_impedance_mismatch)[^1]로 인해 별도로 엔티티 모델을 설계해야 한다.[^2] 다음은 조건 트리 모델을 데이터베이스에 저장하기 위한 엔티티 모델이다.
 
-<Image src="/images/2025-04-23-modeling-series-conditional-tree/conditional-tree-entity-uml.png" caption="조건 트리 엔티티 도식" expandable />
+<Image client:load src="/images/2025-04-23-modeling-series-conditional-tree/conditional-tree-entity-uml.png" caption="조건 트리 엔티티 도식" expandable />
 
 조건 트리 자체가 크게 복잡하지 않으므로 `ConditionNodeEntity` 하나로 모든 노드를 표현할 수 있다. Leaf 노드와 Composite 노드를 구분하기 위해 `NodeType`을 추가했고 `parent_id`를 통해 부모 노드를 참조할 수 있도록 했다. 이를 통해 트리 구조를 표현할 수 있다.
 

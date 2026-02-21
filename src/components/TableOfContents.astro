@@ -1,0 +1,61 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface TocItem {
+  url: string;
+  title: string;
+  items?: TocItem[];
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+
+// Build nested tree from flat headings (mirrors Gatsby's tableOfContents structure)
+function buildTree(headings: Heading[]): TocItem[] {
+  const root: TocItem[] = [];
+  const stack: { item: TocItem; depth: number }[] = [];
+
+  for (const h of headings) {
+    if (h.depth > 4) continue;
+    const item: TocItem = { url: `#${h.slug}`, title: h.text };
+
+    // Pop items from stack that are at same or deeper level
+    while (stack.length > 0 && stack[stack.length - 1].depth >= h.depth) {
+      stack.pop();
+    }
+
+    if (stack.length === 0) {
+      root.push(item);
+    } else {
+      const parent = stack[stack.length - 1].item;
+      if (!parent.items) parent.items = [];
+      parent.items.push(item);
+    }
+
+    stack.push({ item, depth: h.depth });
+  }
+
+  return root;
+}
+
+// Recursive HTML renderer (needed because Astro templates can't recurse)
+function renderItems(items: TocItem[]): string {
+  return `<ul class="toc-list">${items
+    .map(
+      item =>
+        `<li><a href="${item.url}">${item.title}</a>${item.items ? renderItems(item.items) : ''}</li>`
+    )
+    .join('')}</ul>`;
+}
+
+const items = buildTree(headings);
+---
+
+{items.length > 0 && <div class="toc" data-margin-top="50" set:html={renderItems(items)} />}

@@ -1,0 +1,90 @@
+---
+import Social from './Social.astro';
+import { getPublishedPosts, getDateFromId } from '@utils/posts';
+import dayjs from 'dayjs';
+
+const posts = await getPublishedPosts();
+const recentPosts = posts.slice(0, 3);
+const updated = recentPosts.some(post => {
+  const date = getDateFromId(post.id);
+  return dayjs(date).isAfter(dayjs().subtract(1, 'month'));
+});
+---
+
+<div
+  class="mb-10 -mx-4 rounded-xl bg-white/40 px-4 py-2.5 font-['Quattrocento_Sans',sans-serif] backdrop-blur-[44px] max-md:-mx-4 max-md:-mt-4 max-md:mb-8 max-md:rounded-none max-md:bg-transparent max-md:backdrop-blur-none"
+>
+  <div class="mt-2 w-full">
+    <a href="/" class="site-title text-[32px] font-black" style="line-height: 1.15; text-decoration: none; margin-right: 5px;">kciter.so</a>
+    <small class="text-[#999]">devlog</small>
+  </div>
+
+  <nav class="flex w-full justify-between pt-2">
+    <div class="flex items-center">
+      <a
+        href="/timeline/"
+        class:list={['menu-item', { updated: updated }]}
+      >
+        Timeline
+      </a>
+      <a href="/bookshelf/" class="menu-item">Bookshelf</a>
+      <a href="/talks" class="menu-item">Talks</a>
+      <a href="/about/" class="menu-item">About</a>
+    </div>
+
+    <div class="flex items-center max-md:hidden">
+      <Social />
+    </div>
+  </nav>
+</div>
+
+<style>
+  .site-title {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-size: 300% 100%;
+    background-position: top left;
+    background-image: linear-gradient(
+      to right,
+      #505050,
+      #505050 33.33333%,
+      #00ab6c 66.66666%,
+      #00cb8c
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .site-title:hover {
+    background-position: top left 100%;
+    font-weight: 700;
+  }
+
+  .menu-item {
+    position: relative;
+    color: black;
+    font-size: 1rem;
+    margin-right: 15px;
+    text-decoration: none;
+  }
+
+  .menu-item:last-of-type {
+    margin-right: 0;
+  }
+
+  .menu-item.updated::before {
+    box-sizing: content-box;
+    background: #00a962;
+    border: 1px solid #eee;
+    content: '';
+    display: block;
+    height: 6px;
+    right: -6px;
+    position: absolute;
+    top: -2px;
+    width: 6px;
+    border-radius: 12px;
+    box-shadow: rgb(51, 217, 178) 0px 0px 0px 0px;
+    animation: 2s ease 0s infinite normal none running pulse-dot;
+  }
+</style>
