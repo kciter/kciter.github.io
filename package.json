@@ -40,7 +40,7 @@
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "clean": "rm -rf dist .astro",
-    "deploy": "astro build && pagefind --site dist && gh-pages -d dist -b main",
+    "deploy": "astro build && pagefind --site dist && gh-pages -d dist -b main --dotfiles",
     "prettier:write": "prettier --write \"**/*.{js,jsx,ts,tsx,json,astro}\"",
     "prettier:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,astro}\""
   },
