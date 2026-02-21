@@ -16,99 +16,232 @@ const writings = [
   }
 ];
 
-const presentations = [
-  {
-    href: 'https://kciter.so/pt-destroying-software',
-    text: '소프트웨어 파괴의 미학 | Devcon 2024'
-  },
-  { href: 'https://kciter.so/pt-kotlin-script', text: 'Kotlin Script 활용하기' },
-  {
-    href: 'https://www.youtube.com/watch?v=EgLxbFmPRoU',
-    text: '소프트웨어 설계를 위한 추상적, 구조적 사고 │ 인프콘2023'
-  },
-  {
-    href: 'https://www.slideshare.net/sunhyouplee/mongodb-243592318',
-    text: 'MongoDB 이해하기'
-  },
-  {
-    href: 'https://www.slideshare.net/sunhyouplee/deep-dive-into-vuejs',
-    text: 'Deep dive into Vue.js'
-  },
-  {
-    href: 'https://www.slideshare.net/sunhyouplee/ss-122400504',
-    text: '오픈소스를 여행하는 히치하이커를 위한 안내서'
-  },
-  { href: 'https://www.youtube.com/watch?v=EOo844GSSDY', text: 'Vue.js 길라잡이' },
-  {
-    href: 'https://www.slideshare.net/sunhyouplee/metal-uiux-letswift-2017',
-    text: "Metal 기반 특별한 UI/UX 제공하기 | Let'Swift 2017"
-  },
-  {
-    href: 'https://www.slideshare.net/sunhyouplee/vuejs-reactive-programming-vuetiful-korea-2nd',
-    text: 'Vue.js와 Reactive Programming'
-  },
-  {
-    href: 'https://www.slideshare.net/sunhyouplee/tour-of-vuejs-70654520',
-    text: 'Tour of Vue.js'
-  },
-  {
-    href: 'https://www.slideshare.net/sunhyouplee/functional-reactive-programming-with-rxswift-62123571',
-    text: 'Functional Reactive Programming With Swift'
-  },
-  { href: 'https://www.slideshare.net/sunhyouplee/realm-60539221', text: '파크히어 Realm 사용 사례' },
-  {
-    href: 'https://www.slideshare.net/sunhyouplee/c-33426459',
-    text: 'C++ 코드 품질 관리 비법'
+interface PinnedRepo {
+  name: string;
+  description: string;
+  url: string;
+  stars: number;
+  language: string;
+  languageColor: string;
+}
+
+let pinnedRepos: PinnedRepo[] = [];
+
+const token = import.meta.env.GITHUB_TOKEN;
+if (token) {
+  try {
+    const res = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: {
+        Authorization: `bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `{
+          user(login: "kciter") {
+            pinnedItems(first: 6, types: REPOSITORY) {
+              nodes {
+                ... on Repository {
+                  name description url stargazerCount
+                  primaryLanguage { name color }
+                }
+              }
+            }
+          }
+        }`,
+      }),
+    });
+    const json = await res.json();
+    const nodes = json?.data?.user?.pinnedItems?.nodes ?? [];
+    pinnedRepos = nodes.map((n: any) => ({
+      name: n.name,
+      description: n.description || '',
+      url: n.url,
+      stars: n.stargazerCount,
+      language: n.primaryLanguage?.name || '',
+      languageColor: n.primaryLanguage?.color || '#999',
+    }));
+  } catch (e) {
+    console.warn('Failed to fetch pinned repos from GitHub API');
   }
-];
+}
 ---
 
 <BaseLayout title="About">
-  <h2>⌨️ My Keyboard</h2>
-  <div style="max-width: 400px;">
-    <img src="/images/about/keyboard.jpg" />
-  </div>
+  <section class="about-section">
+    <h2 class="section-title">My Keyboard</h2>
+    <div class="keyboard-img">
+      <img src="/images/about/keyboard.jpg" />
+    </div>
+  </section>
 
-  <h2>📘 Writing</h2>
-  <ul>
-    {
-      writings.map(item => (
+  <section class="about-section">
+    <h2 class="section-title">Writing</h2>
+    <ul class="writing-list">
+      {writings.map(item => (
         <li>
-          <a
-            href={item.href}
-            style="text-decoration: none; color: #5c6ac4;"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {item.text}
-          </a>
+          <a href={item.href} target="_blank" rel="noopener noreferrer">{item.text}</a>
         </li>
-      ))
-    }
-  </ul>
+      ))}
+    </ul>
+  </section>
 
-  <h2>📺 Presentation</h2>
-  <ul>
-    {
-      presentations.map(item => (
-        <li>
-          <a
-            href={item.href}
-            style="text-decoration: none; color: #5c6ac4;"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {item.text}
+  <section class="about-section">
+    <h2 class="section-title">Open Source</h2>
+    {pinnedRepos.length > 0 ? (
+      <div class="repo-grid">
+        {pinnedRepos.map(repo => (
+          <a href={repo.url} target="_blank" rel="noopener noreferrer" class="repo-card">
+            <div class="repo-name">{repo.name}</div>
+            <div class="repo-desc">{repo.description}</div>
+            <div class="repo-meta">
+              {repo.language && (
+                <span class="repo-lang">
+                  <span class="lang-dot" style={`background: ${repo.languageColor};`} />
+                  {repo.language}
+                </span>
+              )}
+              <span class="repo-stars">
+                <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+                  <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z" />
+                </svg>
+                {repo.stars.toLocaleString()}
+              </span>
+            </div>
           </a>
-        </li>
-      ))
-    }
-  </ul>
-
-  <h2>❤️ Open Source</h2>
-  <div>
-    You can find open sources on my <a href="https://github.com/kciter" target="_blank" rel="noopener noreferrer"
-      >GitHub profile</a
-    >!
-  </div>
+        ))}
+      </div>
+    ) : (
+      <div class="paper">
+        <a href="https://github.com/kciter" target="_blank" rel="noopener noreferrer" class="entry">
+          GitHub Profile
+        </a>
+      </div>
+    )}
+  </section>
 </BaseLayout>
+
+<style>
+  .about-section {
+    margin-bottom: 36px;
+  }
+
+  .section-title {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #454f5b;
+    margin-bottom: 16px;
+    padding-bottom: 0;
+    border-bottom: none;
+    margin-top: 0;
+  }
+
+  .keyboard-img img {
+    max-width: 400px;
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid #eee;
+  }
+
+  .writing-list {
+    padding-left: 20px;
+    margin: 0;
+  }
+
+  .writing-list li {
+    padding: 2px 0;
+    font-size: 15px;
+  }
+
+  .writing-list a {
+    color: #454f5b;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .writing-list a:hover {
+    color: #00a962;
+  }
+
+  /* Repo grid */
+  .repo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .repo-card {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .repo-card:hover {
+    border-color: #ccc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .repo-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #212b36;
+    margin-bottom: 6px;
+  }
+
+  .repo-card:hover .repo-name {
+    color: #00a962;
+  }
+
+  .repo-desc {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+    flex: 1;
+    margin-bottom: 12px;
+  }
+
+  .repo-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    color: #999;
+  }
+
+  .repo-lang {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .lang-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .repo-stars {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .repo-stars svg {
+    color: #e3b341;
+  }
+
+  @media (max-width: 640px) {
+    .repo-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .keyboard-img img {
+      max-width: 100%;
+    }
+  }
+</style>
