@@ -341,27 +341,53 @@ sup {
 }
 
 /*
-  Code blocks (Shiki / Astro)
+  Code blocks (Shiki / Astro) — IDE style
 */
 pre {
-  border-radius: 0.3em;
+  position: relative;
+  border-radius: 8px;
   margin: 32px auto;
   padding: 0;
-  overflow: auto;
+  overflow: hidden;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
   background-color: white;
-  background-image: linear-gradient(to right, transparent 46px, #e8e8e8 46px, #e8e8e8 47px, transparent 47px);
   width: 95%;
   box-sizing: border-box;
+  border: 1px solid #e5e5e5;
 }
 
-pre code {
+/* Title bar */
+pre::before {
+  content: attr(data-language);
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 12px;
+  background: #f6f8fa;
+  border-bottom: 1px solid #e5e5e5;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-image:
+    radial-gradient(circle 5px at 18px 50%, #ff5f57 5px, transparent 6px),
+    radial-gradient(circle 5px at 34px 50%, #febc2e 5px, transparent 6px),
+    radial-gradient(circle 5px at 50px 50%, #28c840 5px, transparent 6px);
+  background-repeat: no-repeat;
+  padding-left: 68px;
+}
+
+/* Code area wrapper */
+pre > code {
   display: block;
   font-family: 'Source Code Pro', monospace;
   font-size: 13px;
   line-height: 1.5;
   counter-reset: line;
   padding: 0.8em 0;
+  overflow-x: auto;
+  background-image: linear-gradient(to right, transparent 46px, #e8e8e8 46px, #e8e8e8 47px, transparent 47px);
 }
 
 pre code .line {
@@ -388,6 +414,7 @@ pre code .line::before {
 @media (max-width: 30em) {
   pre {
     width: 100%;
+    border-radius: 0;
   }
 }
 
