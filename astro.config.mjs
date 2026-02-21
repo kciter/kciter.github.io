@@ -12,6 +12,24 @@ import {
   transformerNotationHighlight,
 } from '@shikijs/transformers';
 
+/** Shiki transformer: ```js title="app.js" → pre[data-language="app.js"].has-filename */
+function transformerTitle() {
+  return {
+    name: 'transformer-title',
+    pre(node) {
+      const raw = this.options.meta?.__raw;
+      if (!raw) return;
+      const match = raw.match(/title\s*=\s*"([^"]+)"/);
+      if (!match) return;
+      node.properties['data-language'] = match[1];
+      node.properties.class = [
+        ...(Array.isArray(node.properties.class) ? node.properties.class : []),
+        'has-filename'
+      ];
+    }
+  };
+}
+
 export default defineConfig({
   site: 'https://kciter.so',
   output: 'static',
@@ -23,6 +41,7 @@ export default defineConfig({
       transformers: [
         transformerNotationDiff(),
         transformerNotationHighlight(),
+        transformerTitle(),
       ]
     },
     remarkPlugins: [remarkGfm],

@@ -546,11 +546,6 @@ pre code .line.diff.remove {
   }
 }
 
-/* Filename wrapper — remove default pre spacing */
-[data-filename] > pre {
-  margin: 0 !important;
-}
-
 /* Inline code */
 :not(pre) > code {
   position: relative;

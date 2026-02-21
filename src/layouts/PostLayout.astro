@@ -62,11 +62,15 @@ const formattedDate = dayjs(date).locale('ko').format();
 const displayDate = dayjs(date).locale('en').format('LL');
 const pageUrl = Astro.url.href;
 
+const ogImage = image
+  ? `https://kciter.so${image}`
+  : `https://kciter.so/og/${currentSlug}.png`;
+
 const applicationLdJson = {
   headline: title,
   dateModified: formattedDate,
   datePublished: formattedDate,
-  image: image ? `https://kciter.so${image}` : undefined,
+  image: ogImage,
   mainEntityOfPage: {
     '@type': 'WebPage',
     '@id': pageUrl
@@ -88,13 +92,9 @@ const isDraft = draft && import.meta.env.PROD;
 
 const meta = [
   { name: 'article:published_time', content: formattedDate },
-  ...(image
-    ? [
-        { name: 'image', content: `https://kciter.so${image}` },
-        { property: 'og:image', content: `https://kciter.so${image}` },
-        { property: 'og:image:secure_url', content: `https://kciter.so${image}` }
-      ]
-    : [])
+  { name: 'image', content: ogImage },
+  { property: 'og:image', content: ogImage },
+  { property: 'og:image:secure_url', content: ogImage },
 ];
 ---
 
@@ -163,12 +163,6 @@ const meta = [
 
     pres[0].classList.add('active');
     container.prepend(tabBar);
-  });
-
-  // Single code block with filename
-  document.querySelectorAll('[data-filename] > pre').forEach(pre => {
-    pre.setAttribute('data-language', pre.parentElement?.getAttribute('data-filename') || '');
-    pre.classList.add('has-filename');
   });
 
   // TOC active heading highlight

@@ -18,16 +18,7 @@ print(greeting)
 
 </div>
 
-<div data-filename="src/app.js">
-
-```js
-const greeting = "Hello";
-console.log(greeting);
-```
-
-</div>
-
-```js
+```js title="src/app.js"
 const greeting = "Hello";
 console.log(greeting);
 ```
