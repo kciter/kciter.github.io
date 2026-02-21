@@ -12,7 +12,7 @@ const updated = recentPosts.some(post => {
 ---
 
 <div
-  class="mb-10 -mx-4 rounded-xl bg-white/40 px-4 py-2.5 font-['Quattrocento_Sans',sans-serif] backdrop-blur-[44px] max-md:-mx-4 max-md:-mt-4 max-md:mb-8 max-md:rounded-none max-md:bg-transparent max-md:backdrop-blur-none"
+  class="relative z-10 mb-10 -mx-4 rounded-xl bg-white/40 px-4 py-2.5 font-['Quattrocento_Sans',sans-serif] backdrop-blur-[44px] max-md:-mx-4 max-md:-mt-4 max-md:mb-8 max-md:rounded-none max-md:bg-transparent max-md:backdrop-blur-none"
 >
   <div class="mt-2 w-full">
     <a href="/" class="site-title text-[32px] font-black" style="line-height: 1.15; text-decoration: none; margin-right: 5px;">kciter.so</a>
@@ -27,7 +27,16 @@ const updated = recentPosts.some(post => {
       >
         Timeline
       </a>
-      <a href="/bookshelf/" class="menu-item">Bookshelf</a>
+      <div class="dropdown">
+        <span class="menu-item dropdown-trigger">
+          Posts <span class="chevron">&#9662;</span>
+        </span>
+        <div class="dropdown-menu">
+          <a href="/articles/" class="dropdown-item">Articles</a>
+          <a href="/bookshelf/" class="dropdown-item">Bookshelf</a>
+          <a href="/thought/" class="dropdown-item">Thought</a>
+        </div>
+      </div>
       <a href="https://kciter.so/talks/" class="menu-item">Talks</a>
       <a href="/about/" class="menu-item">About</a>
     </div>
@@ -72,6 +81,66 @@ const updated = recentPosts.some(post => {
     margin-right: 0;
   }
 
+  /* Dropdown */
+  .dropdown {
+    position: relative;
+    margin-right: 15px;
+  }
+
+  .dropdown-trigger {
+    cursor: pointer;
+    user-select: none;
+    margin-right: 0;
+  }
+
+  .chevron {
+    font-size: 0.7em;
+    opacity: 0.5;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+
+  .dropdown:hover .chevron {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: -12px;
+    margin-top: 8px;
+    padding: 6px 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    min-width: 130px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.15s, visibility 0.15s, transform 0.15s;
+    z-index: 100;
+  }
+
+  .dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .dropdown-item {
+    display: block;
+    padding: 6px 16px;
+    font-size: 0.9rem;
+    color: #454f5b;
+    text-decoration: none;
+    transition: background-color 0.15s;
+  }
+
+  .dropdown-item:hover {
+    background-color: #f4f6f8;
+  }
+
+  /* Updated indicator on Timeline */
   .menu-item.updated::before {
     box-sizing: content-box;
     background: #00a962;

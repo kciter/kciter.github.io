@@ -7,6 +7,14 @@ const books = allPosts.filter(p => p.data.categories === 'book-report');
 ---
 
 <BaseLayout title="Bookshelf">
+  <div class="section-header">
+    <span class="section-line" />
+    <span class="section-diamond">&#x25C6;</span>
+    <span class="section-title">BOOKSHELF</span>
+    <span class="section-diamond">&#x25C6;</span>
+    <span class="section-line" />
+  </div>
+
   <div class="relative mx-auto grid w-[90%] grid-cols-3 gap-x-3 p-1 max-md:w-full max-md:grid-cols-2">
     {
       books.map(book => {
@@ -37,6 +45,38 @@ const books = allPosts.filter(p => p.data.categories === 'book-report');
 </BaseLayout>
 
 <style>
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .section-line {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #b0b0b0);
+  }
+
+  .section-line:last-child {
+    background: linear-gradient(to left, transparent, #b0b0b0);
+  }
+
+  .section-diamond {
+    color: #b0b0b0;
+    font-size: 8px;
+    line-height: 1;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #777;
+    letter-spacing: 5px;
+    white-space: nowrap;
+  }
+
   .book-inner {
     box-shadow:
       10px 40px 40px -10px #00000030,

@@ -1,0 +1,185 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { getPublishedPosts, getSlugFromId, getDateFromId, getReadingTime, getExcerpt } from '@utils/posts';
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat.js';
+
+dayjs.extend(localizedFormat);
+
+const allPosts = await getPublishedPosts();
+const articles = allPosts.filter(p => p.data.categories === 'article');
+const [featured, second, third, ...rest] = articles;
+
+const featuredSlug = getSlugFromId(featured.id);
+const featuredDate = getDateFromId(featured.id);
+const featuredReadingTime = getReadingTime(featured.body || '');
+const featuredExcerpt = getExcerpt(featured.body || '');
+
+const subFeatured = [second, third].filter(Boolean).map(post => ({
+  post,
+  slug: getSlugFromId(post.id),
+  date: getDateFromId(post.id),
+  readingTime: getReadingTime(post.body || ''),
+}));
+---
+
+<BaseLayout title="Articles">
+  <div class="page">
+    <div class="section-header">
+      <span class="section-line" />
+      <span class="section-diamond">&#x25C6;</span>
+      <span class="section-title">ARTICLES</span>
+      <span class="section-diamond">&#x25C6;</span>
+      <span class="section-line" />
+    </div>
+
+    {/* Featured */}
+    <a href={`/posts/${featuredSlug}/`} class="featured-post" style="text-decoration: none; display: block;">
+      {featured.data.image && (
+        <img
+          src={featured.data.image}
+          alt={featured.data.title}
+          class="w-full rounded-lg object-cover shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
+          style="aspect-ratio: 16/9;"
+        />
+      )}
+      <h2 class="mb-1 text-xl font-bold text-[#212b36]" style="border: none; padding: 0; margin-top: 16px;">{featured.data.title}</h2>
+      {featuredExcerpt && (
+        <p class="text-sm leading-[1.5] text-[#666]" style="margin: 6px 0 8px 0;">{featuredExcerpt}</p>
+      )}
+      <div class="text-sm text-[#999]">
+        {dayjs(featuredDate).locale('en').format('ll')} · {Math.round(featuredReadingTime.minutes)} min read
+      </div>
+    </a>
+
+    {/* Sub-featured (2nd & 3rd) */}
+    {subFeatured.length > 0 && (
+      <div class="sub-featured-row">
+        {subFeatured.map(({ post, slug, date, readingTime }) => (
+          <a href={`/posts/${slug}/`} class="sub-featured-post" style="text-decoration: none;">
+            {post.data.image && (
+              <img
+                src={post.data.image}
+                alt={post.data.title}
+                loading="lazy"
+                class="w-full rounded-lg object-cover shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
+                style="aspect-ratio: 16/9;"
+              />
+            )}
+            <div class="sub-featured-title" style="margin-top: 10px;">{post.data.title}</div>
+            <div class="mt-0.5 text-sm text-[#999]">
+              {dayjs(date).locale('en').format('ll')} · {Math.round(readingTime.minutes)} min read
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+
+    {/* List */}
+    <div class="mt-8">
+      {rest.map(post => {
+        const slug = getSlugFromId(post.id);
+        const date = getDateFromId(post.id);
+        const readingTime = getReadingTime(post.body || '');
+
+        return (
+          <a href={`/posts/${slug}/`} class="article-item" style="text-decoration: none;">
+            {post.data.image && (
+              <img
+                src={post.data.image}
+                alt={post.data.title}
+                loading="lazy"
+                class="h-16 w-24 shrink-0 rounded-md object-cover"
+              />
+            )}
+            <div class="min-w-0 flex-1">
+              <div class="article-title">{post.data.title}</div>
+              <div class="mt-0.5 text-sm text-[#999]">
+                {dayjs(date).locale('en').format('ll')} · {Math.round(readingTime.minutes)} min read
+              </div>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .section-line {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #b0b0b0);
+  }
+
+  .section-line:last-child {
+    background: linear-gradient(to left, transparent, #b0b0b0);
+  }
+
+  .section-diamond {
+    color: #b0b0b0;
+    font-size: 8px;
+    line-height: 1;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #777;
+    letter-spacing: 5px;
+    white-space: nowrap;
+  }
+
+  .sub-featured-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 32px;
+  }
+
+  .sub-featured-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #212b36;
+  }
+
+  .sub-featured-post:hover .sub-featured-title {
+    color: #00a962;
+    transition: color 0.2s;
+  }
+
+  .featured-post:hover h2 {
+    color: #00a962;
+    transition: color 0.2s;
+  }
+
+  .article-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .article-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #212b36;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .article-item:hover .article-title {
+    color: #00a962;
+    transition: color 0.2s;
+  }
+</style>

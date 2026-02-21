@@ -1,0 +1,138 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { getPublishedPosts, getSlugFromId, getDateFromId } from '@utils/posts';
+
+const allPosts = await getPublishedPosts();
+const thoughts = allPosts.filter(p => p.data.categories === 'thought');
+---
+
+<BaseLayout title="Thought">
+  <div class="page">
+    <div class="section-header">
+      <span class="section-line" />
+      <span class="section-diamond">&#x25C6;</span>
+      <span class="section-title">THOUGHT</span>
+      <span class="section-diamond">&#x25C6;</span>
+      <span class="section-line" />
+    </div>
+
+    <div class="paper">
+      {thoughts.map(post => {
+        const slug = getSlugFromId(post.id);
+        const date = getDateFromId(post.id);
+
+        return (
+          <a href={`/posts/${slug}/`} class="entry" style="text-decoration: none;">
+            <span class="entry-date">{date}</span>
+            <span class="entry-dash">—</span>
+            <span class="entry-title">{post.data.title}</span>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .section-line {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #b0b0b0);
+  }
+
+  .section-line:last-child {
+    background: linear-gradient(to left, transparent, #b0b0b0);
+  }
+
+  .section-diamond {
+    color: #b0b0b0;
+    font-size: 8px;
+    line-height: 1;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #777;
+    letter-spacing: 5px;
+    white-space: nowrap;
+  }
+
+  .paper {
+    background: #fdfbf7;
+    border: 1px solid #e8e4dc;
+    border-radius: 4px;
+    padding: 24px 32px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  }
+
+  .entry {
+    display: flex;
+    align-items: baseline;
+    padding: 10px 0;
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 15px;
+    border-bottom: 1px solid #efe9df;
+    transition: background-color 0.15s;
+  }
+
+  .entry:last-child {
+    border-bottom: none;
+  }
+
+  .entry:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+
+  .entry-date {
+    color: #999;
+    flex-shrink: 0;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+  }
+
+  .entry-dash {
+    color: #ccc;
+    margin: 0 12px;
+    flex-shrink: 0;
+  }
+
+  .entry-title {
+    color: #454f5b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .entry:hover .entry-title {
+    color: #00a962;
+    transition: color 0.2s;
+  }
+
+  @media (max-width: 30em) {
+    .paper {
+      padding: 16px 20px;
+    }
+
+    .entry {
+      font-size: 13px;
+      padding: 8px 0;
+    }
+
+    .entry-date {
+      font-size: 11px;
+    }
+
+    .entry-dash {
+      margin: 0 8px;
+    }
+  }
+</style>

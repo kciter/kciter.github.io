@@ -107,31 +107,22 @@ const posts = await getPublishedPosts();
 
   .content-inner {
     position: relative;
-    transform: scale3d(1, 1, 1);
   }
 
-  .content-inner::after {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 8px;
-    transform: scale(1.04);
-    transition: opacity 2s cubic-bezier(0.165, 0.84, 0.44, 1);
-    box-shadow:
-      0 8px 17px 0 rgba(0, 0, 0, 0.2),
-      0 6px 20px 0 rgba(0, 0, 0, 0.15);
-    content: '';
-    opacity: 0;
-    z-index: -1;
+  .content-inner h1 {
+    transition: color 0.2s;
   }
 
-  .content-inner:hover {
-    transform: scale3d(1.006, 1.006, 1);
+  .content-inner:hover h1 {
+    color: #00a962 !important;
   }
 
-  .content-inner:hover::after {
-    opacity: 1;
+  .timeline-content {
+    border-image: linear-gradient(to bottom, #ddd, #ddd) 1;
+    transition: border-image 0.3s;
+  }
+
+  .timeline-content:hover {
+    border-image: linear-gradient(to bottom, #00a962, #ddd) 1;
   }
 </style>
