@@ -41,10 +41,34 @@ const updated = recentPosts.some(post => {
       <a href="/about/" class="menu-item">About</a>
     </div>
 
-    <div class="flex items-center max-md:hidden">
-      <Social />
+    <div class="flex items-center gap-3">
+      <button id="search-btn" class="search-btn" aria-label="Search">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      </button>
+      <div class="max-md:hidden">
+        <Social />
+      </div>
     </div>
   </nav>
+</div>
+
+<!-- Search Modal -->
+<div id="search-modal" class="search-modal">
+  <div class="search-backdrop" />
+  <div class="search-container">
+    <div class="search-input-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      <input id="search-input" type="text" placeholder="Search posts..." autocomplete="off" />
+      <kbd class="search-kbd">ESC</kbd>
+    </div>
+    <div id="search-results" class="search-results" />
+  </div>
 </div>
 
 <style>
@@ -140,6 +164,163 @@ const updated = recentPosts.some(post => {
     background-color: #f4f6f8;
   }
 
+  /* Search button */
+  .search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+  }
+
+  .search-btn:hover {
+    color: #00a962;
+  }
+
+  /* Search modal */
+  .search-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+  }
+
+  .search-modal.open {
+    display: block;
+  }
+
+  .search-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+  }
+
+  .search-container {
+    position: relative;
+    max-width: 560px;
+    margin: 12vh auto 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: search-slide-in 0.15s ease-out;
+  }
+
+  @keyframes search-slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .search-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .search-input-wrap input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #212b36;
+    background: transparent;
+  }
+
+  .search-input-wrap input::placeholder {
+    color: #bbb;
+  }
+
+  .search-kbd {
+    font-family: inherit;
+    font-size: 11px;
+    padding: 2px 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #999;
+    background: #f8f8f8;
+  }
+
+  .search-results {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+
+  .search-results:empty {
+    display: none;
+  }
+
+  .search-results :global(.search-result-item) {
+    display: block;
+    padding: 12px 20px;
+    text-decoration: none;
+    transition: background-color 0.1s;
+  }
+
+  .search-results :global(.search-result-item:hover) {
+    background-color: #f4f6f8;
+  }
+
+  .search-results :global(.search-result-title) {
+    font-size: 15px;
+    font-weight: 600;
+    color: #212b36;
+    margin-bottom: 2px;
+  }
+
+  .search-results :global(.search-result-excerpt) {
+    font-size: 13px;
+    color: #888;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .search-results :global(.search-result-excerpt mark) {
+    background: rgba(0, 169, 98, 0.15);
+    color: #00a962;
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  .search-results :global(.search-no-results) {
+    padding: 24px 20px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+  }
+
+  @media (max-width: 640px) {
+    .search-container {
+      margin: 0;
+      border-radius: 0;
+      height: 100%;
+      max-width: 100%;
+    }
+
+    .search-results {
+      max-height: calc(100vh - 60px);
+    }
+  }
+
   /* Updated indicator on Timeline */
   .menu-item.updated::before {
     box-sizing: content-box;
@@ -157,3 +338,86 @@ const updated = recentPosts.some(post => {
     animation: 2s ease 0s infinite normal none running pulse-dot;
   }
 </style>
+
+<script>
+  let pagefind: any = null;
+
+  async function loadPagefind() {
+    if (pagefind) return pagefind;
+    try {
+      // Dynamic import to avoid Vite bundling
+      pagefind = await import(
+        /* @vite-ignore */
+        new URL('/pagefind/pagefind.js', window.location.origin).href
+      );
+      await pagefind.init();
+    } catch {
+      console.warn('Pagefind not available (run build first)');
+    }
+    return pagefind;
+  }
+
+  const modal = document.getElementById('search-modal')!;
+  const input = document.getElementById('search-input') as HTMLInputElement;
+  const results = document.getElementById('search-results')!;
+  const btn = document.getElementById('search-btn')!;
+  const backdrop = modal.querySelector('.search-backdrop')!;
+
+  function openSearch() {
+    modal.classList.add('open');
+    input.value = '';
+    results.innerHTML = '';
+    setTimeout(() => input.focus(), 50);
+    loadPagefind();
+  }
+
+  function closeSearch() {
+    modal.classList.remove('open');
+  }
+
+  btn.addEventListener('click', openSearch);
+  backdrop.addEventListener('click', closeSearch);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      modal.classList.contains('open') ? closeSearch() : openSearch();
+    }
+    if (e.key === 'Escape') closeSearch();
+  });
+
+  let debounceTimer: ReturnType<typeof setTimeout>;
+  input.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => doSearch(input.value), 200);
+  });
+
+  async function doSearch(query: string) {
+    if (!query.trim()) {
+      results.innerHTML = '';
+      return;
+    }
+
+    const pf = await loadPagefind();
+    if (!pf) {
+      results.innerHTML = '<div class="search-no-results">Search is not available in dev mode.</div>';
+      return;
+    }
+
+    const search = await pf.search(query);
+    if (search.results.length === 0) {
+      results.innerHTML = '<div class="search-no-results">No results found.</div>';
+      return;
+    }
+
+    const items = await Promise.all(search.results.slice(0, 10).map((r: any) => r.data()));
+    results.innerHTML = items
+      .map((item: any) => `
+        <a href="${item.url}" class="search-result-item">
+          <div class="search-result-title">${item.meta?.title || item.url}</div>
+          <div class="search-result-excerpt">${item.excerpt}</div>
+        </a>
+      `)
+      .join('');
+  }
+</script>
