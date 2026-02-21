@@ -126,7 +126,7 @@ const meta = [
 </BaseLayout>
 
 <script>
-  // Vanilla JS replacing jQuery footnote tooltip
+  // Footnote tooltips
   document.querySelectorAll('.post-container a[data-footnote-ref]').forEach(item => {
     const href = item.getAttribute('href')?.slice(1);
     if (!href) return;
@@ -134,5 +134,40 @@ const meta = [
     if (!footnoteEl) return;
     const text = footnoteEl.textContent?.replace('↩', '').trim() || '';
     item.setAttribute('data-tooltip', text);
+  });
+
+  // Code tabs
+  document.querySelectorAll('.code-tabs').forEach(container => {
+    const pres = Array.from(container.querySelectorAll(':scope > pre'));
+    if (pres.length < 2) return;
+
+    const customLabels = container.getAttribute('data-labels')?.split(',').map(s => s.trim());
+
+    const tabBar = document.createElement('div');
+    tabBar.className = 'code-tabs-bar';
+
+    pres.forEach((pre, i) => {
+      const label = customLabels?.[i] || pre.getAttribute('data-language') || 'code';
+      const btn = document.createElement('button');
+      btn.textContent = label;
+      if (customLabels?.[i]) btn.classList.add('has-filename');
+      if (i === 0) btn.classList.add('active');
+      btn.addEventListener('click', () => {
+        tabBar.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        pres.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        pres[i].classList.add('active');
+      });
+      tabBar.appendChild(btn);
+    });
+
+    pres[0].classList.add('active');
+    container.prepend(tabBar);
+  });
+
+  // Single code block with filename
+  document.querySelectorAll('[data-filename] > pre').forEach(pre => {
+    pre.setAttribute('data-language', pre.parentElement?.getAttribute('data-filename') || '');
+    pre.classList.add('has-filename');
   });
 </script>

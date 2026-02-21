@@ -370,6 +370,14 @@ pre::before {
   color: #888;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* Filename mode: no uppercase */
+pre.has-filename::before {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+}
   background-image:
     radial-gradient(circle 5px at 18px 50%, #ff5f57 5px, transparent 6px),
     radial-gradient(circle 5px at 34px 50%, #febc2e 5px, transparent 6px),
@@ -416,6 +424,92 @@ pre code .line::before {
     width: 100%;
     border-radius: 0;
   }
+}
+
+/*
+  Code Tabs
+*/
+.code-tabs {
+  position: relative;
+  border-radius: 8px;
+  margin: 32px auto;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+  background-color: white;
+  width: 95%;
+  border: 1px solid #e5e5e5;
+}
+
+.code-tabs-bar {
+  display: flex;
+  align-items: stretch;
+  height: 34px;
+  background: #f6f8fa;
+  border-bottom: 1px solid #e5e5e5;
+  background-image:
+    radial-gradient(circle 5px at 18px 50%, #ff5f57 5px, transparent 6px),
+    radial-gradient(circle 5px at 34px 50%, #febc2e 5px, transparent 6px),
+    radial-gradient(circle 5px at 50px 50%, #28c840 5px, transparent 6px);
+  background-repeat: no-repeat;
+  padding-left: 68px;
+}
+
+.code-tabs-bar button {
+  border: none;
+  background: transparent;
+  padding: 0 14px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 11px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.code-tabs-bar button:hover {
+  color: #555;
+}
+
+.code-tabs-bar button.active {
+  color: #333;
+  border-bottom-color: #333;
+}
+
+.code-tabs-bar button.has-filename {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+}
+
+.code-tabs pre {
+  display: none;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  width: 100% !important;
+}
+
+.code-tabs pre::before {
+  display: none !important;
+}
+
+.code-tabs pre.active {
+  display: block;
+}
+
+@media (max-width: 30em) {
+  .code-tabs {
+    width: 100%;
+    border-radius: 0;
+  }
+}
+
+/* Filename wrapper — remove default pre spacing */
+[data-filename] > pre {
+  margin: 0 !important;
 }
 
 /* Inline code */
