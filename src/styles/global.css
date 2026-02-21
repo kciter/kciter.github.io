@@ -105,6 +105,30 @@ h6 a {
   text-decoration: none;
 }
 
+h1 a[href^="#"]::before,
+h2 a[href^="#"]::before,
+h3 a[href^="#"]::before,
+h4 a[href^="#"]::before,
+h5 a[href^="#"]::before,
+h6 a[href^="#"]::before {
+  content: '#';
+  position: absolute;
+  margin-left: -0.85em;
+  color: #c0c0c0;
+  font-weight: 400;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+h1:hover a[href^="#"]::before,
+h2:hover a[href^="#"]::before,
+h3:hover a[href^="#"]::before,
+h4:hover a[href^="#"]::before,
+h5:hover a[href^="#"]::before,
+h6:hover a[href^="#"]::before {
+  opacity: 1;
+}
+
 a {
   text-decoration: underline;
   color: #454f5b;
@@ -596,6 +620,12 @@ pre code .line.diff.remove {
 
 .toc .toc-list a:hover {
   color: #212b36;
+  background-color: #f4f6f8;
+}
+
+.toc .toc-list a.active {
+  color: #212b36;
+  font-weight: 600;
   background-color: #f4f6f8;
 }
 

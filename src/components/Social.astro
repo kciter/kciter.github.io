@@ -1,10 +1,10 @@
 ---
 const items = [
-  { icon: 'github', link: 'https://github.com/kciter', hoverColor: '#343434' },
-  { icon: 'facebook', link: 'https://www.facebook.com/sunhyoup.lee', hoverColor: '#3d5b99' },
-  { icon: 'linkedin', link: 'https://www.linkedin.com/in/kciter', hoverColor: '#0073a4' },
-  { icon: 'twitter', link: 'https://twitter.com/kciter', hoverColor: '#343434' },
-  { icon: 'rss', link: '/feed.xml', hoverColor: '#ff6600' }
+  { icon: 'github', link: 'https://github.com/kciter', hoverColor: '#343434', label: 'GitHub' },
+  { icon: 'facebook', link: 'https://www.facebook.com/sunhyoup.lee', hoverColor: '#3d5b99', label: 'Facebook' },
+  { icon: 'linkedin', link: 'https://www.linkedin.com/in/kciter', hoverColor: '#0073a4', label: 'LinkedIn' },
+  { icon: 'twitter', link: 'https://twitter.com/kciter', hoverColor: '#343434', label: 'X (Twitter)' },
+  { icon: 'rss', link: '/feed.xml', hoverColor: '#ff6600', label: 'RSS Feed' }
 ];
 
 const svgIcons: Record<string, string> = {
@@ -27,6 +27,7 @@ const svgIcons: Record<string, string> = {
       target="_blank"
       rel="noopener noreferrer"
       class="social-icon inline-block p-[5px] no-underline"
+      aria-label={item.label}
       style={`--hover-color: ${item.hoverColor}; transition: color .5s;${index !== items.length - 1 ? ' margin-right: 5px;' : ''}`}
     >
       <svg

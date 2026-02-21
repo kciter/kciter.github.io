@@ -170,4 +170,27 @@ const meta = [
     pre.setAttribute('data-language', pre.parentElement?.getAttribute('data-filename') || '');
     pre.classList.add('has-filename');
   });
+
+  // TOC active heading highlight
+  const tocLinks = document.querySelectorAll<HTMLAnchorElement>('.toc .toc-list a');
+  if (tocLinks.length > 0) {
+    const headingIds = Array.from(tocLinks).map(a => a.getAttribute('href')?.slice(1)).filter(Boolean) as string[];
+    const headingEls = headingIds.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+
+    const observer = new IntersectionObserver(
+      entries => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            tocLinks.forEach(a => {
+              a.classList.toggle('active', a.getAttribute('href') === `#${id}`);
+            });
+          }
+        }
+      },
+      { rootMargin: '0px 0px -70% 0px', threshold: 0 }
+    );
+
+    headingEls.forEach(el => observer.observe(el));
+  }
 </script>
