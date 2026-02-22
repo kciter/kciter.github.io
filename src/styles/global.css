@@ -402,6 +402,19 @@ pre::before {
   padding-left: 68px;
 }
 
+/* Vertical separator line (continuous) */
+pre::after {
+  content: '';
+  position: absolute;
+  top: 35px;
+  bottom: 0;
+  left: 48px;
+  width: 1px;
+  background-color: #e8e8e8;
+  z-index: 1;
+  pointer-events: none;
+}
+
 /* Filename mode: no uppercase */
 pre.has-filename::before {
   text-transform: none;
@@ -418,7 +431,6 @@ pre > code {
   counter-reset: line;
   padding: 0.8em 0;
   overflow-x: auto;
-  background-image: linear-gradient(to right, transparent 48px, #e8e8e8 48px, #e8e8e8 49px, transparent 49px);
 }
 
 pre code .line {
@@ -434,13 +446,16 @@ pre code .line::before {
   display: inline-block;
   box-sizing: content-box;
   width: 3em;
-  padding-right: 0.8em;
+  padding-right: 1em;
   text-align: right;
   color: #b0b0b0;
   font-size: 12px;
-  margin-right: 1.2em;
+  margin-right: 1.5em;
   -webkit-user-select: none;
   user-select: none;
+  position: sticky;
+  left: 0;
+  background-color: #ffffff;
 }
 
 /* Line highlight — // [!code highlight] */
