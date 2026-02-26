@@ -24,10 +24,15 @@ function drawHorizontal(ctx: CanvasRenderingContext2D, w: number): number {
 
   const midX = w / 2;
 
+  // ── Zone dimensions (symmetric) ──
+  const zoneGap = 32 * s;
+  const zonePad = 20 * s;
+  const zoneW = (w - zoneGap - zonePad * 2) / 2;
+
   // ── Left zone: "내가 통제하는 코드" ──
-  const lzX = 20 * s;
+  const lzX = zonePad;
   const lzY = 32 * s;
-  const lzW = midX - 36 * s;
+  const lzW = zoneW;
   const lzH = 150 * s;
 
   // Zone background
@@ -52,7 +57,8 @@ function drawHorizontal(ctx: CanvasRenderingContext2D, w: number): number {
   const innerBoxes = ['내 서비스', '내 모듈', '내 함수'];
   const ibW = (lzW - 40 * s) / 3;
   const ibH = 36 * s;
-  const ibY = lzY + 30 * s + (lzH - 30 * s - ibH) / 2;
+  // Center between title area (top 30*s) and bottom label area (bottom 22*s)
+  const ibY = lzY + 30 * s + (lzH - 30 * s - 22 * s - ibH) / 2;
 
   for (let i = 0; i < innerBoxes.length; i++) {
     const ibX = lzX + 12 * s + i * (ibW + 8 * s);
@@ -75,13 +81,14 @@ function drawHorizontal(ctx: CanvasRenderingContext2D, w: number): number {
   ctx.globalAlpha = 1;
 
   // ── Boundary: vertical dashed line ──
+  const bndX = lzX + lzW + zoneGap / 2;
   ctx.strokeStyle = '#fa5252';
   ctx.globalAlpha = 0.4;
   ctx.lineWidth = 1.5;
   ctx.setLineDash([5, 4]);
   ctx.beginPath();
-  ctx.moveTo(midX, 18 * s);
-  ctx.lineTo(midX, 195 * s);
+  ctx.moveTo(bndX, 18 * s);
+  ctx.lineTo(bndX, lzY + lzH + 10 * s);
   ctx.stroke();
   ctx.setLineDash([]);
   ctx.globalAlpha = 1;
@@ -91,12 +98,12 @@ function drawHorizontal(ctx: CanvasRenderingContext2D, w: number): number {
   ctx.font = `600 ${Math.max(9 * s, 7)}px ${FONT}`;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
-  ctx.fillText('경계', midX + 5, 185 * s);
+  ctx.fillText('경계', bndX + 5, lzY + lzH + 2 * s);
   ctx.globalAlpha = 1;
 
   // ── Right zone: "통제할 수 없는 코드" ──
-  const rzX = midX + 16 * s;
-  const rzW = w - rzX - 20 * s;
+  const rzX = lzX + lzW + zoneGap;
+  const rzW = zoneW;
 
   // Zone background (slightly unsettling)
   ctx.fillStyle = '#fff5f5';
@@ -119,27 +126,25 @@ function drawHorizontal(ctx: CanvasRenderingContext2D, w: number): number {
   // External items with "change" indicators
   const items = [
     { label: '외부 API', sub: 'v2 → v3 ⚡' },
-    { label: '라이브러리', sub: 'breaking 💥' },
-    { label: '런타임', sub: 'update ⚠️' },
+    { label: '라이브러리', sub: 'update ⚠️' },
+    { label: '플랫폼', sub: 'breaking 💥' },
   ];
 
-  const eiW = (rzW - 40 * s) / 3;
-  const eiH = 36 * s;
   const eiY = ibY;
 
   for (let i = 0; i < items.length; i++) {
-    const eiX = rzX + 12 * s + i * (eiW + 8 * s);
-    drawRoundRect(ctx, eiX, eiY, eiW, eiH, 6, '#ffe3e3', '#ffa8a8', 1);
+    const eiX = rzX + 12 * s + i * (ibW + 8 * s);
+    drawRoundRect(ctx, eiX, eiY, ibW, ibH, 6, '#ffe3e3', '#ffa8a8', 1);
 
     ctx.fillStyle = '#e03131';
     ctx.font = `${innerFs}px ${FONT}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(items[i].label, eiX + eiW / 2, eiY + eiH / 2 - 5 * s);
+    ctx.fillText(items[i].label, eiX + ibW / 2, eiY + ibH / 2 - 5 * s);
 
     ctx.fillStyle = '#868e96';
     ctx.font = `${Math.max(8 * s, 7)}px ${FONT}`;
-    ctx.fillText(items[i].sub, eiX + eiW / 2, eiY + eiH / 2 + 7 * s);
+    ctx.fillText(items[i].sub, eiX + ibW / 2, eiY + ibH / 2 + 7 * s);
   }
 
   // Unstable indicator
@@ -157,16 +162,16 @@ function drawHorizontal(ctx: CanvasRenderingContext2D, w: number): number {
     ctx.strokeStyle = '#adb5bd';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(lzX + lzW - 2, ay);
-    ctx.lineTo(rzX + 2, ay);
+    ctx.moveTo(lzX + lzW + 2, ay);
+    ctx.lineTo(rzX - 2, ay);
     ctx.stroke();
 
     // Arrowhead pointing right
     ctx.beginPath();
     ctx.fillStyle = '#adb5bd';
-    ctx.moveTo(rzX, ay);
-    ctx.lineTo(rzX - 5, ay - 3);
-    ctx.lineTo(rzX - 5, ay + 3);
+    ctx.moveTo(rzX - 2, ay);
+    ctx.lineTo(rzX - 7, ay - 3);
+    ctx.lineTo(rzX - 7, ay + 3);
     ctx.closePath();
     ctx.fill();
   }
@@ -280,8 +285,8 @@ function drawVertical(ctx: CanvasRenderingContext2D, w: number): number {
 
   const items = [
     { label: '외부 API', sub: 'v2 → v3 ⚡' },
-    { label: '라이브러리', sub: 'breaking 💥' },
-    { label: '런타임', sub: 'update ⚠️' },
+    { label: '라이브러리', sub: 'update ⚠️' },
+    { label: '플랫폼', sub: 'breaking 💥' },
   ];
 
   const eiY = rzY + 32;

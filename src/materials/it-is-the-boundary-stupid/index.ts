@@ -11,3 +11,4 @@ export { ConwaysLawDiagram } from './ConwaysLawDiagram';
 export { TelephoneGameDiagram } from './TelephoneGameDiagram';
 export { TradeoffScaleDiagram } from './TradeoffScaleDiagram';
 export { HeroSloganDiagram } from './HeroSloganDiagram';
+export { AbstractionLeakDiagram } from './AbstractionLeakDiagram';

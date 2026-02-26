@@ -1,7 +1,7 @@
 ---
 title: "바보야, 문제는 경계야!"
 categories: article
-tags: [software-engineering, boundary, architecture, design]
+tags: [software-engineering]
 image: /images/2026-02-25-it-is-the-boundary-stupid/thumbnail.png
 comments: true
 draft: true
@@ -9,7 +9,7 @@ hide: false
 ---
 
 import Image from '@components/Image';
-import { BoundaryDualityDiagram, CallerCalleeBoundaryDiagram, DependencyBoundaryDiagram, DataTransformFlowDiagram, TrustBoundaryDiagram, DesignErosionDiagram, AsyncOrderDiagram, ScaleBoundaryDiagram, AtomicityBreakDiagram, ConwaysLawDiagram, TelephoneGameDiagram, TradeoffScaleDiagram, HeroSloganDiagram } from '@materials/it-is-the-boundary-stupid';
+import { BoundaryDualityDiagram, CallerCalleeBoundaryDiagram, DependencyBoundaryDiagram, DataTransformFlowDiagram, TrustBoundaryDiagram, DesignErosionDiagram, AsyncOrderDiagram, ScaleBoundaryDiagram, AtomicityBreakDiagram, ConwaysLawDiagram, TelephoneGameDiagram, TradeoffScaleDiagram, HeroSloganDiagram, AbstractionLeakDiagram } from '@materials/it-is-the-boundary-stupid';
 
 **소프트웨어 개발의 어려움은 늘 경계에 있다.**
 
@@ -85,7 +85,7 @@ String content = Files.readString(Path.of("data.txt"));
 
 파일 읽기는 한 줄이면 된다. 하지만 `readString` 한 줄이 감추고 있는 것은 파일 시스템, 운영체제, 디스크 하드웨어, 네트워크에 이르는 거대한 계층이다. 경로가 네트워크 드라이브를 가리킨다면 지연과 타임아웃이 발생할 수 있다. 다른 프로세스가 파일을 쓰고 있다면 파일 잠금에 걸린다. 인코딩이 UTF-8이 아니라면 깨진 문자열을 얻게 된다. 파일이 10GB라면 `OutOfMemoryError`와 마주한다. 대부분의 경우 잘 동작하지만 운영 환경에서 예상치 못한 조건을 만나면 개발자는 한 줄의 코드가 감추려 했던 아래 계층을 다시 직면해야 한다.
 
-{/* TODO: 이미지 — 추상화 계층이 높아질수록 복잡성과 이해할 정보는 줄어들지만, 잃어버리는 정보는 많아지는 모습을 보여주는 다이어그램 */}
+<AbstractionLeakDiagram client:visible caption="추상화가 높아질수록 단순해지지만, 감춰진 정보도 함께 늘어난다" />
 
 언어 차원의 추상화도 예외는 아니다. 예를 들어, Java에서 문자열을 `+` 연산자로 합치는 것은 직관적이고 깔끔해 보이지만 반복문 안에서 수천 번 실행되면 매번 새로운 `String` 객체가 생성되어 성능이 급격히 저하된다. 결국 개발자는 `StringBuilder`라는 추상화 아래 계층의 도구를 꺼내 들어야 한다. 추상화의 경계가 높을수록 복잡성이 줄어들고 이해할 정보도 줄어들지만 그만큼 잃어버리는 정보도 많아진다. 이것이 인터페이스 경계의 본질적인 어려움이다.
 
@@ -97,13 +97,13 @@ String content = Files.readString(Path.of("data.txt"));
 
 <DependencyBoundaryDiagram client:visible caption="경계 너머의 코드는 예고 없이 변한다" />
 
-어제까지 잘 동작하던 시스템이 오늘 갑자기 실패해서 원인을 추적해보니 외부 API가 응답 필드명을 예고 없이 바꿨거나, 의존하던 라이브러리가 메이저 버전을 올리며 하위호환성을 깨뜨리는 경우도 있다. 이런 경우 내 코드에는 버그가 없는데도 시스템은 무너진다. 이러한 문제가 특히 까다로운 이유는 **경계 너머를 통제할 수 없기 때문**이다. 의존성의 경계는 **내가 통제할 수 있는 영역의 한계**를 보여준다.
+어제까지 잘 동작하던 시스템이 오늘 갑자기 실패해서 원인을 추적해보니 외부 API가 응답 필드명을 예고 없이 바꿨거나, 의존하던 라이브러리가 버전을 올리며 하위호환성을 깨뜨리는 경우도 있다. 이런 경우 내 코드에는 버그가 없는데도 시스템은 무너진다. 이러한 문제가 특히 까다로운 이유는 **경계 너머를 통제할 수 없기 때문**이다. 의존성의 경계는 **내가 통제할 수 있는 영역의 한계**를 보여준다.
 
 ## 표현의 경계
 
 소프트웨어에서 같은 개념이라도 시스템마다 표현하는 방식이 다르다. 이 차이가 경계에서 충돌을 일으킨다.
 
-가장 잘 알려진 예는 **객체-관계 임피던스 불일치**[^4]다. 같은 데이터라도 애플리케이션은 객체로 세상을 모델링하고 데이터베이스는 테이블과 행으로 세상을 모델링한다.
+가장 잘 알려진 예는 [객체-관계 임피던스 불일치](https://en.wikipedia.org/wiki/Object%E2%80%93relational_impedance_mismatch)다. 같은 데이터라도 애플리케이션은 객체로 세상을 모델링하고 데이터베이스는 테이블과 행으로 세상을 모델링한다.
 
 ```kotlin
 class User(
@@ -123,15 +123,15 @@ class User(
 
 **신뢰의 경계**란 검증된 데이터와 검증되지 않은 데이터가 만나는 지점이다. 경계 안쪽의 데이터는 이미 검증을 거쳤으므로 신뢰할 수 있다. 그러나 경계 바깥에서 들어오는 데이터는 원칙적으로 신뢰할 수 없다.
 
-예를 들어, 외부 결제 서비스로부터 웹훅을 수신하는 상황을 생각해보자. 결제가 완료되면 외부 서비스가 우리 서버로 HTTP 요청을 보내준다. 이 요청이 정말 해당 서비스에서 보낸 것인지, 누군가 위조한 것은 아닌지 어떻게 알 수 있을까? 서명 검증 없이 요청 본문을 그대로 신뢰하면, 공격자가 가짜 결제 완료 요청을 보내 상품을 탈취할 수 있다. 경계 바깥에서 들어온 데이터를 검증 없이 신뢰한 결과다.
+가장 기본적으로는 데이터 검증이 있다. 사용자로부터 입력을 받을 때 입력이 악의적일 수도 있고 단순한 실수일 수도 있다. 입력값이 유효한지, 예상 범위 내에 있는지, 형식이 맞는지 등을 검증하지 않고 그대로 사용하면 시스템이 예기치 않게 동작할 수 있다.
 
-이는 웹훅에만 국한되지 않는다. SQL Injection, XSS, CSRF 같은 보안 취약점의 본질도 모두 **신뢰의 경계를 무시한 것**이다. 경계를 넘는 데이터에 대한 불신이 부족했던 것이다.
+혹은 신뢰할 수 있는 대상에게만 데이터를 받아야할 수도 있다. 예를 들어, 외부 결제 서비스로부터 웹훅을 수신하는 상황을 생각해보자. 결제가 완료되면 외부 서비스가 우리 서버로 HTTP 요청을 보내준다. 그런데 이 요청이 정말 해당 서비스에서 보낸 것인지, 누군가 위조한 것은 아닌지 어떻게 알 수 있을까? 서명 검증 없이 요청 본문을 그대로 신뢰하면 공격자가 가짜 결제 완료 요청을 보내 상품을 탈취할 수 있다.
 
-Michael Nygard는 이를 **"냉소적인 소프트웨어"**라는 개념으로 설명했다.[^3] 좋은 소프트웨어는 냉소적이다. 자기 자신조차 믿지 않으며, 외부에서 오는 모든 것을 의심한다. 이는 비관적인 것이 아니라 현실적인 것이다. 경계 바깥은 언제나 예측 불가능하며, 그 예측 불가능성으로부터 경계 안쪽을 보호하는 것이 견고한 소프트웨어의 조건이다.
+Michael Nygard는 이를 **"냉소적인 소프트웨어"**라는 개념으로 설명했다.[^3] 좋은 소프트웨어는 냉소적이다. 자기 자신조차 믿지 않으며, 외부에서 오는 모든 것을 의심해야 한다. 경계 바깥은 언제나 예측 불가능하며 그 예측 불가능성으로부터 경계 안쪽을 보호하는 것이 견고한 소프트웨어의 조건이다.
 
 <TrustBoundaryDiagram client:visible caption="경계를 넘는 모든 데이터는 검증을 거쳐야 한다" />
 
-신뢰의 경계는 보안에만 국한되지 않는다. 외부 API의 응답을 그대로 믿고 사용하다가, 스펙에 없던 필드가 `null`로 오면서 시스템이 터지는 경우도 신뢰의 경계 문제다. **경계 너머에서 오는 모든 것은 의심의 대상**이라는 원칙을 잊으면, 언젠가 반드시 문제가 발생한다.
+결국 경계는 검증과 보안이라는 복잡성을 낳는다. 경계 안쪽에서는 데이터가 이미 검증되었다고 가정할 수 있지만 경계 바깥에서 들어오는 모든 데이터는 잠재적인 공격이 될 수 있다.
 
 ## 설계와 구현의 경계
 
