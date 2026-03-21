@@ -24,6 +24,7 @@ function buildTree(headings: Heading[]): TocItem[] {
 
   for (const h of headings) {
     if (h.depth > 4) continue;
+    if (h.slug === 'footnote-label') continue;
     const item: TocItem = { url: `#${h.slug}`, title: h.text };
 
     // Pop items from stack that are at same or deeper level
@@ -48,10 +49,12 @@ function buildTree(headings: Heading[]): TocItem[] {
 // Recursive HTML renderer (needed because Astro templates can't recurse)
 function renderItems(items: TocItem[]): string {
   return `<ul class="toc-list">${items
-    .map(
-      item =>
-        `<li><a href="${item.url}">${item.title}</a>${item.items ? renderItems(item.items) : ''}</li>`
-    )
+    .map(item => {
+      if (item.items) {
+        return `<li class="toc-parent collapsed"><div class="toc-link-row"><a href="${item.url}">${item.title}</a><button class="toc-toggle" aria-label="Toggle submenu"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M4.5 2L8.5 6L4.5 10" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="toc-children">${renderItems(item.items)}</div></li>`;
+      }
+      return `<li><a href="${item.url}">${item.title}</a></li>`;
+    })
     .join('')}</ul>`;
 }
 

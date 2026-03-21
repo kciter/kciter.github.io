@@ -599,7 +599,6 @@ pre code .line.diff.remove {
 .toc .toc-list {
   margin: 0 0 8px 0;
   padding: 0;
-  max-width: 250px;
   width: 100%;
   height: 100%;
 }
@@ -611,8 +610,7 @@ pre code .line.diff.remove {
 }
 
 .toc .toc-list li .toc-list {
-  margin-left: 16px;
-  border-left: 1px solid #dfe3e8;
+  padding-left: 0;
 }
 
 .toc .toc-list a {
@@ -637,6 +635,55 @@ pre code .line.diff.remove {
   color: #212b36;
   font-weight: 600;
   background-color: #f4f6f8;
+}
+
+.toc-link-row {
+  display: flex;
+  align-items: center;
+}
+
+.toc-link-row a {
+  flex: 1;
+  min-width: 0;
+  word-break: break-all;
+}
+
+.toc-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #919eab;
+  cursor: pointer;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.toc-toggle:hover {
+  color: #212b36;
+  background-color: #f4f6f8;
+}
+
+.toc-parent.expanded > .toc-link-row > .toc-toggle {
+  transform: rotate(90deg);
+}
+
+.toc-children {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+  margin-left: 18px;
+  border-left: 1px solid #dfe3e8;
+}
+
+.toc-parent.expanded > .toc-children {
+  max-height: 500px;
+  overflow: visible;
 }
 
 /*

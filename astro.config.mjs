@@ -45,6 +45,7 @@ export default defineConfig({
       ]
     },
     remarkPlugins: [remarkGfm],
+    remarkRehype: { footnoteLabel: ' ', footnoteLabelTagName: 'span', footnoteLabelProperties: { style: 'display:none' } },
     rehypePlugins: [
       rehypeSlug,
       [rehypeAutolinkHeadings, { behavior: 'wrap' }],

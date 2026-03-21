@@ -165,11 +165,24 @@ const meta = [
     container.prepend(tabBar);
   });
 
-  // TOC active heading highlight
+  // TOC active heading highlight + collapsible sections
   const tocLinks = document.querySelectorAll<HTMLAnchorElement>('.toc .toc-list a');
   if (tocLinks.length > 0) {
     const headingIds = Array.from(tocLinks).map(a => a.getAttribute('href')?.slice(1)).filter(Boolean) as string[];
     const headingEls = headingIds.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+
+    // Toggle button click handlers
+    document.querySelectorAll<HTMLButtonElement>('.toc-toggle').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const parent = btn.closest('.toc-parent');
+        if (parent) {
+          parent.classList.toggle('collapsed');
+          parent.classList.toggle('expanded');
+        }
+      });
+    });
 
     const observer = new IntersectionObserver(
       entries => {
@@ -179,6 +192,20 @@ const meta = [
             tocLinks.forEach(a => {
               a.classList.toggle('active', a.getAttribute('href') === `#${id}`);
             });
+
+            // Auto expand/collapse TOC sections
+            const activeLink = document.querySelector(`.toc a[href="#${id}"]`);
+            document.querySelectorAll('.toc-parent').forEach(el => {
+              el.classList.remove('expanded');
+              el.classList.add('collapsed');
+            });
+            // Expand all ancestor toc-parents (handles nested h3 inside h2)
+            let ancestor = activeLink?.closest('.toc-parent') as HTMLElement | null;
+            while (ancestor) {
+              ancestor.classList.remove('collapsed');
+              ancestor.classList.add('expanded');
+              ancestor = ancestor.parentElement?.closest('.toc-parent') as HTMLElement | null;
+            }
           }
         }
       },

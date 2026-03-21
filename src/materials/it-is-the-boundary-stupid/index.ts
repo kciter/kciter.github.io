@@ -12,3 +12,6 @@ export { TelephoneGameDiagram } from './TelephoneGameDiagram';
 export { TradeoffScaleDiagram } from './TradeoffScaleDiagram';
 export { HeroSloganDiagram } from './HeroSloganDiagram';
 export { AbstractionLeakDiagram } from './AbstractionLeakDiagram';
+export { FocusLineEffect } from './FocusLineEffect';
+export { HiddenBoundaryDiagram } from './HiddenBoundaryDiagram';
+export { BoundaryEvolutionDiagram } from './BoundaryEvolutionDiagram';
