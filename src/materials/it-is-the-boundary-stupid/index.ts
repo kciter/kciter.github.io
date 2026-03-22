@@ -15,3 +15,4 @@ export { AbstractionLeakDiagram } from './AbstractionLeakDiagram';
 export { FocusLineEffect } from './FocusLineEffect';
 export { HiddenBoundaryDiagram } from './HiddenBoundaryDiagram';
 export { BoundaryEvolutionDiagram } from './BoundaryEvolutionDiagram';
+export { UserDevBoundaryDiagram } from './UserDevBoundaryDiagram';

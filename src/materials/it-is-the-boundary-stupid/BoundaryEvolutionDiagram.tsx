@@ -49,9 +49,9 @@ interface Box {
 // 2: Two services (2 boxes)
 // 3: Monolith again (1 box)
 
-const PHASE_DURATION = 2; // seconds per phase
+const PHASE_DURATIONS = [2, 1.5, 1.2, 0.8]; // seconds per phase (모놀리스, 분리, 부분통합, 재통합)
 const TRANSITION_DURATION = 1; // seconds for transition
-const TOTAL_CYCLE = 4 * PHASE_DURATION + 4 * TRANSITION_DURATION;
+const TOTAL_CYCLE = PHASE_DURATIONS.reduce((a, b) => a + b, 0) + 4 * TRANSITION_DURATION;
 
 const COLORS = {
   blue: { fill: '#e7f5ff', stroke: '#228be6' },
@@ -104,19 +104,24 @@ export const BoundaryEvolutionDiagram = ({ caption }: Props) => {
       const gap = 10 * s;
 
       // Calculate phase and transition
-      let phase: number;
-      let transProgress: number;
+      let phase = 0;
+      let transProgress = 0;
+      let acc = 0;
 
-      const segmentLen = PHASE_DURATION + TRANSITION_DURATION;
-      const segIndex = Math.floor(elapsed / segmentLen);
-      const segElapsed = elapsed - segIndex * segmentLen;
-
-      if (segElapsed < PHASE_DURATION) {
-        phase = segIndex;
-        transProgress = 0;
-      } else {
-        phase = segIndex;
-        transProgress = smoothstep((segElapsed - PHASE_DURATION) / TRANSITION_DURATION);
+      for (let i = 0; i < 4; i++) {
+        const segLen = PHASE_DURATIONS[i] + TRANSITION_DURATION;
+        if (elapsed < acc + segLen) {
+          const segElapsed = elapsed - acc;
+          if (segElapsed < PHASE_DURATIONS[i]) {
+            phase = i;
+            transProgress = 0;
+          } else {
+            phase = i;
+            transProgress = smoothstep((segElapsed - PHASE_DURATIONS[i]) / TRANSITION_DURATION);
+          }
+          break;
+        }
+        acc += segLen;
       }
 
       const fromPhase = phase % 4;

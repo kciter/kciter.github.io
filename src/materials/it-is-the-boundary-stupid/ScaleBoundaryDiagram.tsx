@@ -18,10 +18,10 @@ function drawRoundRect(
 
 // Threshold points where qualitative change happens
 const THRESHOLDS = [
-  { x: 0.18, y: 0.12, label: '메모리 → 디스크', color: '#228be6' },
-  { x: 0.42, y: 0.32, label: '단일 → 분산', color: '#40c057' },
-  { x: 0.65, y: 0.58, label: '동기 → 비동기', color: '#fab005' },
-  { x: 0.85, y: 0.88, label: '단일 DC → 멀티 리전', color: '#fa5252' },
+  { x: 0.18, y: 0.12, label: '커넥션 풀 고갈', color: '#228be6' },
+  { x: 0.42, y: 0.32, label: '슬로우 쿼리', color: '#40c057' },
+  { x: 0.65, y: 0.58, label: '네트워크 파티션', color: '#fab005' },
+  { x: 0.85, y: 0.88, label: '타임아웃 연쇄', color: '#fa5252' },
 ];
 
 // Step curve points (normalized 0–1)
@@ -196,6 +196,47 @@ function drawHorizontal(ctx: CanvasRenderingContext2D, w: number): number {
   ctx.textBaseline = 'middle';
   ctx.fillText('선형 증가 (기대)', lgX + lgLineW + 4 * s, lgY2);
 
+  // "분산 전환" milestone (between threshold 2 and 3)
+  const mlNx = 0.56;
+  const mlNy = 0.34;
+  const mlTx = toX(mlNx);
+  const mlTy = toY(mlNy);
+
+  // Vertical dashed line below dot
+  ctx.strokeStyle = '#845ef7';
+  ctx.globalAlpha = 0.2;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(mlTx, originY);
+  ctx.lineTo(mlTx, mlTy + 4);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 1;
+
+  ctx.beginPath();
+  ctx.arc(mlTx, mlTy, 3.5 * s, 0, Math.PI * 2);
+  ctx.fillStyle = '#845ef7';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.font = `600 ${labelFs}px ${FONT}`;
+  const mlLabel = '분산 전환';
+  const mlLabelW = ctx.measureText(mlLabel).width;
+  const mlBw = mlLabelW + 8 * s;
+  const mlBh = 14 * s;
+  const mlBx = mlTx - mlBw / 2;
+  const mlBy = mlTy - mlBh - 6 * s;
+  ctx.globalAlpha = 0.9;
+  drawRoundRect(ctx, mlBx, mlBy, mlBw, mlBh, 3, '#fff', '#845ef740');
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = '#845ef7';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(mlLabel, mlTx, mlBy + mlBh / 2);
+
   // Threshold labels with badges
   for (const t of THRESHOLDS) {
     const tx = toX(t.x);
@@ -328,6 +369,35 @@ function drawVertical(ctx: CanvasRenderingContext2D, w: number): number {
     ctx.lineTo(toX(curve[i].x), toY(curve[i].y));
   }
   ctx.stroke();
+
+  // "분산 전환" milestone
+  const mmlTx = toX(0.56);
+  const mmlTy = toY(0.34);
+
+  ctx.strokeStyle = '#845ef7';
+  ctx.globalAlpha = 0.2;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(mmlTx, originY);
+  ctx.lineTo(mmlTx, mmlTy + 4);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 1;
+
+  ctx.beginPath();
+  ctx.arc(mmlTx, mmlTy, 3, 0, Math.PI * 2);
+  ctx.fillStyle = '#845ef7';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = '#845ef7';
+  ctx.font = `600 7px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('분산 전환', mmlTx, mmlTy - 8);
 
   // Threshold dots + labels
   for (let i = 0; i < THRESHOLDS.length; i++) {
