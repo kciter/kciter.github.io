@@ -1,0 +1,1 @@
+import{s as l}from"./reveal.Bcvb05OM.js";let e=null;document.addEventListener("astro:page-load",()=>{e?.();const t=document.querySelector("[data-shelf]");e=t?l(t):null});document.addEventListener("astro:before-swap",()=>{e?.(),e=null});
